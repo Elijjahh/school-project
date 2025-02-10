@@ -1,0 +1,21 @@
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native"]
+  previewFeatures = ["omitApi"]
+}
+
+// generator zod {
+//   provider = "npx zod-prisma-types || bunx zod-prisma-types"
+// }
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id        Int     @id
+//   email     String  @unique
+//   firstName String?
+//   lastName  String?
+// }
