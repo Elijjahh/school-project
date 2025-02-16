@@ -16,11 +16,13 @@
     "@vueuse/core": "^12.5.0",
     "@vueuse/nuxt": "12.5.0",
     "nuxt": "^3.15.4",
+    "nuxt-auth-utils": "^0.5.15",
     "pinia": "^2.3.1",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.5",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.0.1",
