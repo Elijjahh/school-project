@@ -1,12 +1,12 @@
 <script lang="ts" setup></script>
 
 <template>
-  <div class="cards-container">
-    <section class="cards-sec">
-      <h1 class="courses">Мои курсы</h1>
+  <section class="cards">
+    <div class="cards-container">
+      <h1 class="cards-title">Мои курсы</h1>
 
       <form>
-        <div class="card flex justify-center flex-wrap gap-4 cards-btns">
+        <div>
           <PrimeButton label="Все" variant="text" severity="secondary" />
           <PrimeButton label="Вводные" variant="text" severity="secondary" />
           <PrimeButton label="Основные" variant="text" severity="secondary" />
@@ -14,7 +14,7 @@
         </div>
 
         <div class="cards-grid">
-          <PrimeCard style="width: 25rem; overflow: hidden">
+          <PrimeCard>
             <template #header>
               <img
                 alt="user header"
@@ -29,7 +29,7 @@
             <template #footer> </template>
           </PrimeCard>
 
-          <PrimeCard style="width: 25rem; overflow: hidden">
+          <PrimeCard>
             <template #header>
               <img
                 alt="user header"
@@ -44,7 +44,7 @@
             <template #footer> </template>
           </PrimeCard>
 
-          <PrimeCard style="width: 25rem; overflow: hidden">
+          <PrimeCard>
             <template #header>
               <img
                 alt="user header"
@@ -60,17 +60,21 @@
           </PrimeCard>
         </div>
       </form>
-    </section>
-  </div>
+    </div>
+  </section>
 </template>
 
 <style scoped>
 .cards-container {
   display: grid;
-  place-items: center;
+  grid-template-columns: 50rem;
+  overflow: hidden;
+  width: 80%;
+  margin: 0 auto;
+  justify-content: center;
 }
 
-.courses {
+.cards-title {
   font-size: 2.5rem;
   margin: 40px 0;
 }
