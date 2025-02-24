@@ -6,14 +6,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   css: ['/assets/scss/main.scss'],
-  modules: [
-    '@nuxt/eslint',
-    '@vueuse/nuxt',
-    '@pinia/nuxt',
-    '@vee-validate/nuxt',
-    '@primevue/nuxt-module',
-    // '@prisma/nuxt',
-  ],
+  modules: ['@nuxt/eslint', '@vueuse/nuxt', '@pinia/nuxt', '@vee-validate/nuxt', // '@prisma/nuxt',
+  '@primevue/nuxt-module', 'nuxt-auth-utils'],
   vite: {
     resolve: {
       alias: {

@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { prisma } from '~/server/db';
+import bcrypt from 'bcryptjs';
 
 const bodySchema = z.object({
   email: z.string().email(),
@@ -8,16 +10,31 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { email, password } = await readValidatedBody(event, bodySchema.parse);
 
-  if (email === 'admin@admin.com' && password === 'iamtheadmin') {
-    await setUserSession(event, {
-      user: {
-        name: 'John Doe',
-      },
-    });
-    return {};
-  }
-  throw createError({
-    statusCode: 401,
-    message: 'Bad credentials',
+  const user = await prisma.user.findUnique({
+    where: { email },
   });
+
+  if (!user) {
+    throw createError({
+      statusCode: 401,
+      message: 'Неверные учетные данные',
+    });
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw createError({
+      statusCode: 401,
+      message: 'Неверные учетные данные',
+    });
+  }
+
+  await setUserSession(event, {
+    user: {
+      name: user.username,
+    },
+  });
+
+  return {};
 });
