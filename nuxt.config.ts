@@ -6,14 +6,15 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   css: ['/assets/scss/main.scss'],
-  modules: ['@nuxt/eslint', '@vueuse/nuxt', '@pinia/nuxt', '@vee-validate/nuxt', // '@prisma/nuxt',
-  '@primevue/nuxt-module', 'nuxt-auth-utils'],
+  modules: [
+    '@nuxt/eslint',
+    '@vueuse/nuxt',
+    '@pinia/nuxt',
+    '@vee-validate/nuxt',
+    '@primevue/nuxt-module',
+    'nuxt-auth-utils',
+  ],
   vite: {
-    resolve: {
-      alias: {
-        '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
-      },
-    },
     css: {
       preprocessorOptions: {
         scss: {
@@ -24,13 +25,10 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'bun',
+    experimental: {
+      tasks: true,
+    },
   },
-  // prisma: {
-  //   generateClient: false,
-  //   autoSetupPrisma: true,
-  //   // installStudio: false,
-  //   runMigration: false,
-  // },
   primevue: {
     options: {
       theme: {

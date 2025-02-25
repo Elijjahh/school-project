@@ -7,5 +7,15 @@
       <PrimeInputText></PrimeInputText>
       <PrimeButton>Кликни на меня</PrimeButton>
     </form>
+
+    <AuthState>
+      <template #default="{ loggedIn, clear }">
+        <button v-if="loggedIn" @click="clear">Logout</button>
+        <NuxtLink v-else to="/login">Login</NuxtLink>
+      </template>
+      <template #placeholder>
+        <button disabled>Loading...</button>
+      </template>
+    </AuthState>
   </section>
 </template>

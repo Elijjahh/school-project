@@ -1,12 +1,10 @@
-import { prisma } from '~/server/db';
 import bcrypt from 'bcryptjs';
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const { username, password } = body;
+  const { username, email, password, firstName, lastName } = await readBody(event);
 
-  const existingUser = await prisma.user.findUnique({
-    where: { username },
+  const existingUser = await useDrizzle().query.users.findFirst({
+    where: (users, { eq }) => eq(users.username, username),
   });
 
   if (existingUser) {
@@ -15,16 +13,20 @@ export default defineEventHandler(async (event) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await prisma.user.create({
-    data: {
+  const newUser = await useDrizzle()
+    .insert(tables.users)
+    .values({
       username,
+      email,
       password: hashedPassword,
-    },
-  });
+      firstName,
+      lastName,
+    })
+    .returning();
 
   await setUserSession(event, {
     user: {
-      login: newUser.username,
+      login: newUser[0].username,
     },
     secure: {
       apiToken: '1234567890',

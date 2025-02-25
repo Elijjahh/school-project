@@ -1,17 +1,16 @@
 import { z } from 'zod';
-import { prisma } from '~/server/db';
 import bcrypt from 'bcryptjs';
 
 const bodySchema = z.object({
-  email: z.string().email(),
+  username: z.string(),
   password: z.string().min(8),
 });
 
 export default defineEventHandler(async (event) => {
-  const { email, password } = await readValidatedBody(event, bodySchema.parse);
+  const { username, password } = await readValidatedBody(event, bodySchema.parse);
 
-  const user = await prisma.user.findUnique({
-    where: { email },
+  const user = await useDrizzle().query.users.findFirst({
+    where: (users, { eq }) => eq(users.username, username),
   });
 
   if (!user) {
