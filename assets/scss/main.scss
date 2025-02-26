@@ -9,3 +9,7 @@
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
+
+.container {
+  padding: 0px calc(300 / 1920 * 100vw);
+}
