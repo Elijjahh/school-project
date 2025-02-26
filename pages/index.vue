@@ -1,11 +1,8 @@
 <script lang="ts" setup></script>
+
 <template>
   <section>
-    <h1>Главная</h1>
-    это пример использования компонентов primevue
-    <form>
-      <PrimeInputText></PrimeInputText>
-      <PrimeButton>Кликни на меня</PrimeButton>
-    </form>
+    <PrimeButton><NuxtLink to="/login">логин</NuxtLink></PrimeButton>
+    <PrimeButton><NuxtLink to="/register">регистрация</NuxtLink></PrimeButton>
   </section>
 </template>
