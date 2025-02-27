@@ -1,5 +1,3 @@
-import { hashPassword } from 'auth';
-
 export default defineEventHandler(async (event) => {
   const { username, email, password, firstName, lastName } = await readBody(event);
 

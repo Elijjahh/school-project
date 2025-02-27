@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { verifyPassword } from 'auth';
 
 const bodySchema = z.object({
   username: z.string(),
