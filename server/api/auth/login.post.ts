@@ -15,16 +15,16 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 401,
-      message: 'Неверные учетные данные',
+      message: 'Такого пользователя не существует',
     });
   }
 
-  const isPasswordValid = await verifyPassword(password, user.password);
+  const isPasswordValid = await verifyPassword(user.password, password);
 
   if (!isPasswordValid) {
     throw createError({
       statusCode: 401,
-      message: 'Неверные учетные данные',
+      message: 'Пароль не верный',
     });
   }
 
