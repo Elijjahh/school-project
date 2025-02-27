@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
+import { verifyPassword } from 'auth';
 
 const bodySchema = z.object({
   username: z.string(),
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await verifyPassword(password, user.password);
 
   if (!isPasswordValid) {
     throw createError({

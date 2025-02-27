@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import { hashPassword } from 'auth';
 
 export default defineEventHandler(async (event) => {
   const { username, email, password, firstName, lastName } = await readBody(event);
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Пользователь уже существует' });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
   const newUser = await useDrizzle()
     .insert(tables.users)

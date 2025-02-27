@@ -19,7 +19,6 @@
     "@vee-validate/zod": "^4.15.0",
     "@vueuse/core": "^12.5.0",
     "@vueuse/nuxt": "12.5.0",
-    "bcryptjs": "^3.0.2",
     "drizzle-orm": "^0.39.3",
     "nuxt": "^3.15.4",
     "nuxt-auth-utils": "^0.5.15",
