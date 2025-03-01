@@ -1,66 +1,9 @@
 <script lang="ts" setup></script>
 
 <template>
-  <section class="cards">
-    <div class="cards-container">
-      <h1 class="cards-title">Мои курсы</h1>
-
-      <form>
-        <div>
-          <PrimeButton label="Все" variant="text" severity="secondary" />
-          <PrimeButton label="Вводные" variant="text" severity="secondary" />
-          <PrimeButton label="Основные" variant="text" severity="secondary" />
-          <PrimeButton label="Профориентация" variant="text" severity="secondary" />
-        </div>
-
-        <div class="cards-grid">
-          <PrimeCard>
-            <template #header>
-              <img
-                alt="user header"
-                src="https://primefaces.org/cdn/primevue/images/usercard.png"
-              />
-            </template>
-            <template #subtitle>История</template>
-            <template #title>Вводный курс по истории</template>
-            <template #content>
-              <p class="m-0">Читайте прошлое создавайте будущее</p>
-            </template>
-            <template #footer> </template>
-          </PrimeCard>
-
-          <PrimeCard>
-            <template #header>
-              <img
-                alt="user header"
-                src="https://primefaces.org/cdn/primevue/images/usercard.png"
-              />
-            </template>
-            <template #subtitle>История</template>
-            <template #title>Вводный курс по истории</template>
-            <template #content>
-              <p class="m-0">Читайте прошлое создавайте будущее</p>
-            </template>
-            <template #footer> </template>
-          </PrimeCard>
-
-          <PrimeCard>
-            <template #header>
-              <img
-                alt="user header"
-                src="https://primefaces.org/cdn/primevue/images/usercard.png"
-              />
-            </template>
-            <template #subtitle>История</template>
-            <template #title>Вводный курс по истории</template>
-            <template #content>
-              <p class="m-0">Читайте прошлое создавайте будущее</p>
-            </template>
-            <template #footer> </template>
-          </PrimeCard>
-        </div>
-      </form>
-    </div>
+  <section>
+    <PrimeButton><NuxtLink to="/login">логин</NuxtLink></PrimeButton>
+    <PrimeButton><NuxtLink to="/register">регистрация</NuxtLink></PrimeButton>
   </section>
 </template>
 
