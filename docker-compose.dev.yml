@@ -1,0 +1,28 @@
+volumes:
+  db-data:
+
+services:
+  # smtp4dev:
+  #   container_name: smtp4dev
+  #   image: rnwood/smtp4dev:latest
+  #   ports:
+  #     - '2525:25'
+  #     - '5050:80'
+  db:
+    container_name: school-db
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

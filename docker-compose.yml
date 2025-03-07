@@ -1,0 +1,59 @@
+volumes:
+  db-data:
+  files:
+
+networks:
+  school:
+
+services:
+  db:
+    container_name: db
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: 'pg_isready -U ${DB_USER} -d ${DB_NAME}'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - school
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1'
+    #       memory: 4G
+
+  app:
+    container_name: app
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    environment:
+      DATABASE_URL: 'postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}?schema=public'
+      API_SECRET: ${API_SECRET}
+      BASE_URL: ${BASE_URL}
+      NODEMAILER_FROM: ${NODEMAILER_FROM}
+      NODEMAILER_HOST: ${NODEMAILER_HOST}
+      NODEMAILER_PORT: ${NODEMAILER_PORT}
+      NODEMAILER_SECURE: ${NODEMAILER_SECURE}
+      NODEMAILER_AUTH_USER: ${NODEMAILER_AUTH_USER}
+      NODEMAILER_AUTH_PASS: ${NODEMAILER_AUTH_PASS}
+    build: .
+    restart: always
+    ports:
+      - '80:3000'
+      - '443:3000'
+    volumes:
+      - files:/src/files
+    networks:
+      - school
