@@ -6,6 +6,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   css: ['/assets/scss/main.scss'],
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+  },
   modules: [
     '@nuxt/eslint',
     '@vueuse/nuxt',
