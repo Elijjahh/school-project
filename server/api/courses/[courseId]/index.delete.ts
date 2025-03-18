@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { courses } from '~/drizzle/schema';
 
 export default defineEventHandler(async (event) => {
@@ -9,6 +8,6 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const course = await useDrizzle().delete(courses).where(eq(courses.id, courseId)).returning();
-  return course[0];
+  const result = await useDrizzle().delete(courses).where(eq(courses.id, courseId)).returning();
+  return result[0];
 });

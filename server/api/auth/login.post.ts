@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 const bodySchema = z.object({
   username: z.string(),
   password: z.string().min(8),

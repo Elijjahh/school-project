@@ -1,5 +1,4 @@
 import { users } from '~/drizzle/schema';
-import { z } from 'zod';
 
 const bodySchema = z.object({
   username: z.string(),
