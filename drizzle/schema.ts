@@ -35,3 +35,10 @@ export const tests = pgTable('tests', {
   historyAttemptsId: integer('historyAttemptsId'),
   testAttempts: integer('testAttempts'),
 });
+
+export const courses = pgTable('courses', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  creator_id: integer('creator_id').notNull(),
+});
