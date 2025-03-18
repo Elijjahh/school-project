@@ -4,6 +4,6 @@ export default defineConfig({
   schema: './drizzle/schema.ts',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: 'postgresql://admin:root@localhost:5432/school_db?schema=public',
   },
 });
