@@ -1,4 +1,4 @@
-import { pgTable, serial, text, pgEnum, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, pgEnum, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
 
 export const roleEnum = pgEnum('role', ['student', 'teacher', 'admin']);
 
@@ -11,6 +11,13 @@ export const users = pgTable('users', {
   lastName: text('lastName').notNull(),
   role: roleEnum().default('student'),
   createdAt: timestamp().defaultNow(),
+});
+
+export const courses = pgTable('courses', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  creator_id: integer('creator_id').notNull(),
 });
 
 export const modules = pgTable('modules', {
@@ -31,14 +38,23 @@ export const lessons = pgTable('lessons', {
 
 export const tests = pgTable('tests', {
   id: serial('id').primaryKey(),
-  exampleId: integer('example_id').notNull(),
-  historyAttemptsId: integer('historyAttemptsId'),
-  testAttempts: integer('testAttempts'),
 });
 
-export const courses = pgTable('courses', {
+export const testAttempts = pgTable('testAttempts', {
   id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  description: text('description').notNull(),
-  creator_id: integer('creator_id').notNull(),
+  testId: integer('testId').notNull(),
+  datetime: timestamp().defaultNow(),
+});
+
+export const questions = pgTable('questions', {
+  id: serial('id').primaryKey(),
+  testId: integer('testId').notNull(),
+  text: text('text').notNull(),
+});
+
+export const answers = pgTable('answers', {
+  id: serial('id').primaryKey(),
+  questionId: integer('questionId').notNull(),
+  text: text('text').notNull(),
+  correct: boolean('correct').notNull(),
 });

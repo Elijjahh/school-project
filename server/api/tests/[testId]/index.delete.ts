@@ -1,10 +1,13 @@
 import { tests } from '~/drizzle/schema';
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'testId');
-  const test = await useDrizzle()
-    .delete(tests)
-    .where(eq(tests.id, Number(id)))
-    .returning();
-  return test[0];
+  const { testId } = await getValidatedRouterParams(
+    event,
+    z.object({
+      testId: z.number({ coerce: true }).int().positive(),
+    }).parse,
+  );
+
+  const result = await useDrizzle().delete(tests).where(eq(tests.id, testId)).returning();
+  return result[0];
 });

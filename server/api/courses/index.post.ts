@@ -1,5 +1,4 @@
 import { courses } from '~/drizzle/schema';
-import { z } from 'zod';
 
 const bodySchema = z.object({
   title: z.string(),

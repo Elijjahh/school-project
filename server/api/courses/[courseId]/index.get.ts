@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 export default defineEventHandler(async (event) => {
   const { courseId } = await getValidatedRouterParams(
     event,

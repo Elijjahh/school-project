@@ -1,5 +1,4 @@
 import { lessons } from '~/drizzle/schema';
-import { z } from 'zod';
 
 const bodySchema = z.object({
   moduleId: z.number(),
@@ -11,9 +10,9 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { moduleId, title, content, order } = await readValidatedBody(event, bodySchema.parse);
 
-  const lesson = await useDrizzle()
+  const result = await useDrizzle()
     .insert(lessons)
     .values({ moduleId, title, content, order })
     .returning();
-  return lesson[0];
+  return result[0];
 });

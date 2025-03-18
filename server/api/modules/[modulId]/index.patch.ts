@@ -1,5 +1,4 @@
 import { modules } from '~/drizzle/schema';
-import { z } from 'zod';
 
 const bodySchema = z.object({
   courseId: z.number(),
@@ -9,13 +8,19 @@ const bodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'moduleId');
+  const { moduleId } = await getValidatedRouterParams(
+    event,
+    z.object({
+      moduleId: z.number({ coerce: true }).int().positive(),
+    }).parse,
+  );
+
   const { courseId, title, description, order } = await readValidatedBody(event, bodySchema.parse);
 
-  const module = await useDrizzle()
+  const result = await useDrizzle()
     .update(modules)
     .set({ courseId, title, description, order })
-    .where(eq(modules.id, Number(id)))
+    .where(eq(modules.id, moduleId))
     .returning();
-  return module[0];
+  return result[0];
 });
