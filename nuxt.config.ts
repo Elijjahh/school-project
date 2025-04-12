@@ -4,7 +4,6 @@ import ThemePreset from './theme';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  ssr: false,
   css: ['/assets/scss/main.scss'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
@@ -15,14 +14,9 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vee-validate/nuxt',
     '@primevue/nuxt-module',
-    // '@prisma/nuxt',
+    'nuxt-auth-utils',
   ],
   vite: {
-    resolve: {
-      alias: {
-        '.prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
-      },
-    },
     css: {
       preprocessorOptions: {
         scss: {
@@ -33,13 +27,10 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'bun',
+    experimental: {
+      tasks: true,
+    },
   },
-  // prisma: {
-  //   generateClient: false,
-  //   autoSetupPrisma: true,
-  //   // installStudio: false,
-  //   runMigration: false,
-  // },
   primevue: {
     options: {
       theme: {
