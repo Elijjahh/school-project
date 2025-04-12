@@ -32,7 +32,9 @@ export const courses = pgTable('courses', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description').notNull(),
-  creatorId: integer('creator_id').notNull(),
+  creatorId: integer('creator_id')
+    .notNull()
+    .references(() => users.id),
 });
 
 export const coursesRelations = relations(courses, ({ one, many }) => ({
@@ -103,7 +105,9 @@ export const coursesProgressRelations = relations(coursesProgress, ({ one }) => 
 
 export const modules = pgTable('modules', {
   id: serial('id').primaryKey(),
-  courseId: integer('courseId').notNull(),
+  courseId: integer('courseId')
+    .notNull()
+    .references(() => courses.id),
   title: text('title').notNull(),
   description: text('description').notNull(),
   order: integer('order').notNull(),
@@ -147,7 +151,9 @@ export const modulesProgressRelations = relations(modulesProgress, ({ one }) => 
 
 export const lessons = pgTable('lessons', {
   id: serial('id').primaryKey(),
-  moduleId: integer('moduleId').notNull(),
+  moduleId: integer('moduleId')
+    .notNull()
+    .references(() => modules.id),
   title: text('title').notNull(),
   content: text('content').notNull(),
   order: integer('order').notNull(),
@@ -192,7 +198,9 @@ export const lessonsProgressRelations = relations(lessonsProgress, ({ one }) => 
 
 export const tests = pgTable('tests', {
   id: serial('id').primaryKey(),
-  lessonId: integer('lesson_id').notNull(),
+  lessonId: integer('lesson_id')
+    .notNull()
+    .references(() => lessons.id),
   maxAttempts: integer('lesson_id').notNull().default(0),
 });
 
@@ -208,7 +216,9 @@ export const testsRelations = relations(tests, ({ one, many }) => ({
 
 export const testAttempts = pgTable('testAttempts', {
   id: serial('id').primaryKey(),
-  testId: integer('testId').notNull(),
+  testId: integer('testId')
+    .notNull()
+    .references(() => tests.id),
   datetime: timestamp().defaultNow(),
 });
 
@@ -222,7 +232,9 @@ export const testAttemptsRelations = relations(testAttempts, ({ one }) => ({
 
 export const questions = pgTable('questions', {
   id: serial('id').primaryKey(),
-  testId: integer('testId').notNull(),
+  testId: integer('testId')
+    .notNull()
+    .references(() => tests.id),
   text: text('text').notNull(),
 });
 
@@ -237,7 +249,9 @@ export const questionsRelations = relations(questions, ({ one, many }) => ({
 
 export const answers = pgTable('answers', {
   id: serial('id').primaryKey(),
-  questionId: integer('questionId').notNull(),
+  questionId: integer('questionId')
+    .notNull()
+    .references(() => questions.id),
   text: text('text').notNull(),
   correct: boolean('correct').notNull(),
 });
