@@ -4,7 +4,6 @@ import ThemePreset from './theme';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  ssr: false,
   css: ['/assets/scss/main.scss'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
