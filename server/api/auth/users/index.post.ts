@@ -4,12 +4,12 @@ const bodySchema = z.object({
   username: z.string(),
   password: z.string().min(8),
   email: z.string().email(),
-  firstName: z.string(),
-  lastName: z.string(),
+  firstname: z.string(),
+  lastname: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { username, email, password, firstName, lastName } = await readValidatedBody(
+  const { username, email, password, firstname, lastname } = await readValidatedBody(
     event,
     bodySchema.parse,
   );
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   const user = await useDrizzle()
     .insert(users)
-    .values({ username, email, password: hashedPassword, firstName, lastName })
+    .values({ username, email, password: hashedPassword, firstname, lastname })
     .returning();
   return user[0];
 });

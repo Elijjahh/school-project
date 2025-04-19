@@ -1,18 +1,18 @@
 const bodySchema = z.object({
-  username: z.string(),
+  email: z.string(),
   password: z.string().min(8),
 });
 
 export default defineEventHandler(async (event) => {
-  const { username, password } = await readValidatedBody(event, bodySchema.parse);
+  const { email, password } = await readValidatedBody(event, bodySchema.parse);
 
   const user = await useDrizzle().query.users.findFirst({
-    where: (users, { eq }) => eq(users.username, username),
+    where: (users, { eq }) => eq(users.email, email),
   });
 
   if (!user) {
     throw createError({
-      statusCode: 401,
+      statusCode: 404,
       message: 'Такого пользователя не существует',
     });
   }
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
   await setUserSession(event, {
     user: {
-      name: user.username,
+      email: user.email,
     },
   });
 

@@ -274,14 +274,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "firstName": {
-          "name": "firstName",
+        "firstname": {
+          "name": "firstname",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "lastName": {
-          "name": "lastName",
+        "lastname": {
+          "name": "lastname",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -309,9 +309,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -323,11 +321,7 @@
     "public.role": {
       "name": "role",
       "schema": "public",
-      "values": [
-        "student",
-        "teacher",
-        "admin"
-      ]
+      "values": ["student", "teacher", "admin"]
     }
   },
   "schemas": {},

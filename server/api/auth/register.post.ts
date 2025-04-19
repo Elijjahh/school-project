@@ -1,12 +1,12 @@
 export default defineEventHandler(async (event) => {
-  const { username, email, password, firstName, lastName } = await readBody(event);
+  const { username, email, password, firstname, lastname } = await readBody(event);
 
   const existingUser = await useDrizzle().query.users.findFirst({
     where: (users, { eq }) => eq(users.username, username),
   });
 
   if (existingUser) {
-    throw createError({ statusCode: 400, message: 'Пользователь уже существует' });
+    throw createError({ statusCode: 409, message: 'Пользователь уже существует' });
   }
 
   const hashedPassword = await hashPassword(password);
@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
       username,
       email,
       password: hashedPassword,
-      firstName,
-      lastName,
+      firstname,
+      lastname,
     })
     .returning();
 
@@ -26,10 +26,6 @@ export default defineEventHandler(async (event) => {
     user: {
       login: newUser[0].username,
     },
-    secure: {
-      apiToken: '1234567890',
-    },
-    loggedInAt: new Date(),
   });
 
   return { success: true };

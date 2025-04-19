@@ -14,11 +14,11 @@ export const roleEnum = pgEnum('role', ['student', 'teacher', 'admin']);
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
-  username: text('username').notNull(),
+  username: text('username').notNull().unique(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
-  firstName: text('firstName').notNull(),
-  lastName: text('lastName').notNull(),
+  firstname: text('firstname').notNull(),
+  lastname: text('lastname').notNull(),
   role: roleEnum().default('student'),
   createdAt: timestamp().defaultNow(),
 });
@@ -55,7 +55,7 @@ export const coursesParticipations = pgTable('users_to_courses', {
     .references(() => users.id, { onDelete: 'cascade' }),
   courseId: integer('course_id')
     .notNull()
-    .references(() => courses.id, { onDelete: 'cascade' }),
+    .references(() => courses.id),
 });
 
 export const coursesParticipationsRelations = relations(coursesParticipations, ({ one, many }) => ({
