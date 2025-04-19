@@ -50,8 +50,8 @@ CREATE TABLE "users" (
 	"username" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,
-	"firstName" text NOT NULL,
-	"lastName" text NOT NULL,
+	"firstname" text NOT NULL,
+	"lastname" text NOT NULL,
 	"role" "role" DEFAULT 'student',
 	"createdAt" timestamp DEFAULT now(),
 	CONSTRAINT "users_email_unique" UNIQUE("email")

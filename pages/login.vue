@@ -1,4 +1,71 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { useField, useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import * as zod from 'zod';
+import type { NuxtError } from '#app';
+
+const validationSchema = toTypedSchema(
+  zod.object({
+    email: zod
+      .string({ message: 'Это обязательное поле' })
+      .min(1, { message: 'Это обязательное поле' })
+      .email('Введите корректную почту'),
+    password: zod
+      .string({ message: 'Это обязательное поле' })
+      .min(8, { message: 'Длина пароля должна быть хотя бы 8 символов' }),
+  }),
+);
+
+const { handleSubmit, errors } = useForm({
+  validationSchema,
+});
+
+const emailInputId = useId();
+const passwordInputId = useId();
+
+const { value: email } = useField<string>('email');
+const { value: password } = useField<string>('password');
+
+const onSubmit = handleSubmit(() => {
+  submitForm();
+});
+
+const loading = ref(false);
+const error = ref('');
+
+const { fetch: fetchUserSession } = useUserSession();
+const router = useRouter();
+
+async function submitForm() {
+  const submitData = {
+    email: email.value,
+    password: password.value,
+  };
+
+  loading.value = true;
+  error.value = '';
+
+  try {
+    await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: submitData,
+    });
+
+    await fetchUserSession();
+    router.push('/');
+  } catch (err) {
+    const statusCode = (err as NuxtError).statusCode;
+
+    if (statusCode == 400) error.value = 'Введите корректные данные';
+    else if (statusCode == 404) error.value = 'Пользователь с такой почтой не найден';
+    else if (statusCode == 401) error.value = 'Неверный пароль';
+    else error.value = 'Ошибка на сервере';
+  }
+
+  loading.value = false;
+}
+</script>
+
 <template>
   <section class="login">
     <div class="login__img">
@@ -6,33 +73,48 @@
     </div>
     <div class="login__content">
       <h1 class="login__title">Войдите в ваш аккаунт</h1>
-      <div class="login__form">
+      <form class="login__form" @submit.prevent="onSubmit">
         <div class="login__input-groups">
           <div class="login__input-group">
-            <label for="" class="login__label">Email</label>
-            <PrimeInputText class="login__input" placeholder="Email" />
+            <label :for="emailInputId" class="login__label">Email</label>
+            <PrimeInputText
+              :id="emailInputId"
+              v-model="email"
+              :invalid="!!errors.email"
+              class="login__input"
+              placeholder="Email"
+            />
+            <p v-if="errors.email" class="login__error">
+              {{ errors.email }}
+            </p>
           </div>
+
           <div class="login__input-group">
-            <label for="" class="login__label">Пароль</label>
-            <PrimeInputText class="login__input" placeholder="Пароль" />
+            <label :for="passwordInputId" class="login__label">Пароль</label>
+            <PrimePassword
+              :id="passwordInputId"
+              v-model="password"
+              fluid
+              :feedback="false"
+              :invalid="!!errors.password"
+              class="login__input"
+              placeholder="Пароль"
+            />
+            <p v-if="errors.password" class="login__error">
+              {{ errors.password }}
+            </p>
           </div>
         </div>
 
-        <div class="login__form-footer">
-          <div class="login__checkbox">
-            <PrimeCheckbox class="login__checkbox-body"></PrimeCheckbox>
-            <label class="login__checkbox-label">Запомните меня</label>
-          </div>
+        <p class="login__error login__error_general">{{ error }}</p>
 
-          <PrimeButton
-            label="Войти"
-            size="large"
-            icon="pi pi-arrow-right"
-            icon-pos="right"
-            class="login__button"
-          />
-        </div>
-      </div>
+        <PrimeButton
+          type="submit"
+          :label="loading ? 'Входим...' : 'Войти'"
+          size="large"
+          class="login__button"
+        />
+      </form>
     </div>
   </section>
 </template>
@@ -107,35 +189,25 @@
     letter-spacing: -1%;
   }
 
-  &__input {
+  &__input-group:has(.p-invalid) &__label {
+    color: var(--p-inputtext-invalid-placeholder-color);
   }
 
-  &__form-footer {
-    margin-top: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  &__checkbox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  &__checkbox-body {
-  }
-
-  &__checkbox-label {
-    color: rgb(78, 85, 102);
+  &__error {
+    color: var(--p-inputtext-invalid-placeholder-color);
     font-size: 14px;
     font-weight: 400;
     line-height: 22px;
     letter-spacing: -1%;
+
+    &_general {
+      margin-top: 10px;
+    }
   }
 
   &__button {
-    width: fit-content;
+    margin-top: 24px;
+    width: 100%;
   }
 }
 </style>

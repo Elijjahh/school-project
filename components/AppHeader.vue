@@ -24,6 +24,8 @@ const menubarConfig = ref({
     },
   },
 });
+
+const { loggedIn } = useUserSession();
 </script>
 
 <template>
@@ -45,6 +47,7 @@ const menubarConfig = ref({
         </div>
       </div>
     </div>
+    {{ loggedIn }}
   </header>
 </template>
 
