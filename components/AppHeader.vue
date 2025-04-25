@@ -1,61 +1,88 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-
-const items = ref([
-  {
-    label: 'Home',
-  },
-  {
-    label: 'Courses',
-  },
-  {
-    label: 'About',
-  },
-  {
-    label: 'Become an Instructor',
-  },
-]);
-const menubarConfig = ref({
-  root: {
-    background: 'rgb(0,0, 0)',
-    item: {
-      focus: { background: 'rgb(31, 30, 30)', color: 'rgb(255, 255, 255)' },
-      color: 'rgb(171, 171, 171)',
-    },
-  },
-});
-
-const { loggedIn } = useUserSession();
+const { loggedIn } = useUserSession()
 </script>
 
 <template>
   <header class="header">
     <div class="container header__top">
-      <PrimeMenubar :model="items" class="header__menubar" :dt="menubarConfig" />
+      <nav class="header__nav">
+        <NuxtLink to="/" class="header__nav-link">Home</NuxtLink>
+        <NuxtLink to="/courses" class="header__nav-link">Courses</NuxtLink>
+        <NuxtLink to="/about" class="header__nav-link">About</NuxtLink>
+        <NuxtLink to="/become-instructor" class="header__nav-link">Become an Instructor</NuxtLink>
+      </nav>
     </div>
-    <div class="wheader">
-      <div class="container wheader__container">
-        <NuxtLink to="/" class="wheader__img">
-          <img src="/assets/images/logo-img.svg" alt="" />
+    <div class="header__second">
+      <div class="container header__container">
+        <NuxtLink to="/" class="header__img">
+          <img src="/assets/images/logo-img.svg" alt="Логотип" />
         </NuxtLink>
-        <div class="wheader__action">
-          <div class="wheader__label">Ещё нет аккаунта?</div>
 
-          <PrimeButton size="large" class="wheader__button">
-            <NuxtLink to="/register">Создать аккаунт</NuxtLink>
-          </PrimeButton>
+        <div class="header__right">
+          <div class="header__actions">
+            <div class="header__icons">
+              <NuxtLink to="/wishlist">
+                <PrimeOverlayBadge class="inline-flex">
+                  <PrimeAvatar icon="pi pi-heart" shape="circle" />
+                </PrimeOverlayBadge>
+              </NuxtLink>
+
+              <NuxtLink to="/cart">
+                <PrimeOverlayBadge class="inline-flex">
+                  <PrimeAvatar icon="pi pi-shopping-cart" shape="circle" />
+                </PrimeOverlayBadge>
+              </NuxtLink>
+            </div>
+
+            <PrimeAvatar
+              v-if="loggedIn"
+              image="https://primefaces.org/cdn/primevue/images/organization/walter.jpg"
+              size="large"
+              shape="circle"
+              class="header__profile-img"
+            />
+          </div>
+          <div v-if="!loggedIn" class="header__create">
+            <PrimeButton size="large" class="header__button">
+              <NuxtLink to="/login">Войти в аккаунт</NuxtLink>
+            </PrimeButton>
+            <PrimeButton size="large" severity="secondary" class="header__button">
+              <NuxtLink to="/register">Создать аккаунт</NuxtLink>
+            </PrimeButton>
+          </div>
         </div>
       </div>
     </div>
-    {{ loggedIn }}
   </header>
 </template>
 
 <style scoped lang="scss">
-.wheader {
-  box-shadow: inset 0px -1px 0px 0px rgb(233, 234, 240);
-  background: rgb(255, 255, 255);
-  padding: 20px 0px;
+.header {
+  &__top {
+    background-color: rgb(0, 0, 0);
+  }
+
+  &__nav {
+    display: flex;
+    gap: 24px;
+    padding: 10px 0;
+  }
+
+  &__nav-link {
+    color: rgb(171, 171, 171);
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: rgb(255, 255, 255);
+    }
+  }
+
+  &__second {
+    box-shadow: inset 0px -1px 0px 0px rgb(233, 234, 240);
+    background: rgb(255, 255, 255);
+    padding: 20px 0px;
+  }
 
   &__container {
     display: flex;
@@ -63,7 +90,27 @@ const { loggedIn } = useUserSession();
     align-items: center;
   }
 
-  &__action {
+  &__right {
+    display: flex;
+    align-items: center;
+  }
+
+  &__actions {
+    display: flex;
+  }
+
+  &__icons {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  &__profile-img {
+    margin-left: 24px;
+  }
+
+  &__create {
+    margin-left: 24px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -75,14 +122,6 @@ const { loggedIn } = useUserSession();
     font-weight: 400;
     line-height: 22px;
     letter-spacing: -1%;
-  }
-}
-.header {
-  &__top {
-    background-color: rgb(0, 0, 0);
-  }
-  &__menubar {
-    border: none;
   }
 }
 </style>
