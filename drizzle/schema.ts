@@ -201,7 +201,7 @@ export const tests = pgTable('tests', {
   lessonId: integer('lesson_id')
     .notNull()
     .references(() => lessons.id, { onDelete: 'cascade' }),
-  maxAttempts: integer('lesson_id').notNull().default(0),
+  maxAttempts: integer('max_attempts').notNull().default(0),
 });
 
 export const testsRelations = relations(tests, ({ one, many }) => ({
