@@ -3,7 +3,8 @@ import { courses } from '~/drizzle/schema';
 const bodySchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
-  creator_id: z.number().optional(),
+  creatorId: z.number(),
+  image: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -14,11 +15,11 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const { title, description, creator_id } = await readValidatedBody(event, bodySchema.parse);
+  const { title, description, creatorId, image } = await readValidatedBody(event, bodySchema.parse);
 
   const result = await useDrizzle()
     .update(courses)
-    .set({ title, description, creator_id })
+    .set({ title, description, creatorId, image })
     .where(eq(courses.id, courseId))
     .returning();
   return result[0];

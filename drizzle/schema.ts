@@ -20,6 +20,7 @@ export const users = pgTable('users', {
   firstname: text('firstname').notNull(),
   lastname: text('lastname').notNull(),
   role: roleEnum().default('student'),
+  image: text('image'),
   createdAt: timestamp().defaultNow(),
 });
 
@@ -32,6 +33,7 @@ export const courses = pgTable('courses', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description').notNull(),
+  image: text('image'),
   creatorId: integer('creator_id')
     .notNull()
     .references(() => users.id),
