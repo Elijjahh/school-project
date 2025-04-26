@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const hashedPassword = await hashPassword(password);
 
-  const newUser = await useDrizzle()
+  const [user] = await useDrizzle()
     .insert(tables.users)
     .values({
       username,
@@ -22,10 +22,11 @@ export default defineEventHandler(async (event) => {
     })
     .returning();
 
+  // Убираем пароль из сессии
+  const { password: _, ...userSessionData } = user;
+
   await setUserSession(event, {
-    user: {
-      login: newUser[0].username,
-    },
+    user: userSessionData,
   });
 
   return { success: true };

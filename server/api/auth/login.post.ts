@@ -26,10 +26,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Убираем пароль из сессии
+  const { password: _, ...userSessionData } = user;
+
   await setUserSession(event, {
-    user: {
-      email: user.email,
-    },
+    user: userSessionData,
   });
 
   return {};

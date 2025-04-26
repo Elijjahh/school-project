@@ -1,12 +1,12 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const { loggedIn } = useUserSession()
-  const authRoutes = ['/login', '/register']
+  const { loggedIn } = useUserSession();
+  const authRoutes = ['/login', '/register'];
 
   if (loggedIn.value && authRoutes.includes(to.path)) {
-    return navigateTo('/')
+    return navigateTo('/');
   }
 
   if (!loggedIn.value && !authRoutes.includes(to.path)) {
-    return navigateTo('/login')
+    return navigateTo('/login');
   }
-}) 
+});
