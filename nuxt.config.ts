@@ -1,11 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import ThemePreset from './theme';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  css: ['/assets/scss/main.scss'],
+  css: ['/assets/scss/main.scss', '~/assets/css/main.css'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
   },
@@ -16,7 +17,12 @@ export default defineNuxtConfig({
     '@vee-validate/nuxt',
     '@primevue/nuxt-module',
     'nuxt-auth-utils',
+    'shadcn-nuxt',
   ],
+  shadcn: {
+    prefix: '',
+    componentDir: './components/ui',
+  },
   vite: {
     css: {
       preprocessorOptions: {
@@ -25,6 +31,7 @@ export default defineNuxtConfig({
         },
       },
     },
+    plugins: [tailwindcss()],
   },
   nitro: {
     preset: 'bun',
