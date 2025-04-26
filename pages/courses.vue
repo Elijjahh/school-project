@@ -1,65 +1,47 @@
-<script lang="ts" setup></script>
+<script setup lang="ts">
+const { data: courses, pending, error } = await useFetch('/api/courses');
+</script>
 
 <template>
   <section class="cards">
     <div class="cards-container">
       <h1 class="cards-title">Мои курсы</h1>
 
-      <form>
-        <div>
+      <div>
+        <div class="cards-btns">
           <PrimeButton label="Все" variant="text" severity="secondary" />
           <PrimeButton label="Вводные" variant="text" severity="secondary" />
           <PrimeButton label="Основные" variant="text" severity="secondary" />
           <PrimeButton label="Профориентация" variant="text" severity="secondary" />
         </div>
 
-        <div class="cards-grid">
-          <PrimeCard>
+        <div v-if="pending" class="loading">
+          <PrimeProgressSpinner />
+        </div>
+        <div v-else-if="error" class="error">Произошла ошибка при загрузке курсов</div>
+        <div v-else class="cards-grid">
+          <PrimeCard v-for="course in courses" :key="course.id">
             <template #header>
               <img
-                alt="user header"
-                src="https://primefaces.org/cdn/primevue/images/usercard.png"
+                v-if="course.image"
+                :src="course.image"
+                :alt="course.title"
+                class="course-image"
               />
-            </template>
-            <template #subtitle>История</template>
-            <template #title>Вводный курс по истории</template>
-            <template #content>
-              <p class="m-0">Читайте прошлое создавайте будущее</p>
-            </template>
-            <template #footer> </template>
-          </PrimeCard>
-
-          <PrimeCard>
-            <template #header>
               <img
-                alt="user header"
+                v-else
                 src="https://primefaces.org/cdn/primevue/images/usercard.png"
+                :alt="course.title"
+                class="course-image"
               />
             </template>
-            <template #subtitle>История</template>
-            <template #title>Вводный курс по истории</template>
+            <template #title>{{ course.title }}</template>
             <template #content>
-              <p class="m-0">Читайте прошлое создавайте будущее</p>
+              <p class="m-0">{{ course.description }}</p>
             </template>
-            <template #footer> </template>
-          </PrimeCard>
-
-          <PrimeCard>
-            <template #header>
-              <img
-                alt="user header"
-                src="https://primefaces.org/cdn/primevue/images/usercard.png"
-              />
-            </template>
-            <template #subtitle>История</template>
-            <template #title>Вводный курс по истории</template>
-            <template #content>
-              <p class="m-0">Читайте прошлое создавайте будущее</p>
-            </template>
-            <template #footer> </template>
           </PrimeCard>
         </div>
-      </form>
+      </div>
     </div>
   </section>
 </template>
@@ -89,5 +71,26 @@
 .cards-btns {
   display: flex;
   justify-content: left;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.course-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.error {
+  color: var(--red-500);
+  text-align: center;
+  padding: 20px;
 }
 </style>
