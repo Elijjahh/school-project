@@ -94,130 +94,68 @@ async function submitForm() {
 </script>
 
 <template>
-  <section class="grid grid-cols-[1fr_1.3fr] md:grid-cols-1">
-    <div class="bg-purple-50 flex items-end md:hidden">
-      <div class="aspect-square">
-        <img src="/assets/images/register-img.png" alt="" class="h-full w-full object-contain" />
-      </div>
-    </div>
-    <div class="p-[14vw_15.6vw_14vw_6.9vw] xl:p-[14vw_6.9vw]">
-      <h1 class="text-gray-900 text-4xl font-semibold leading-[48px] tracking-tight text-center">
-        Создайте аккаунт
-      </h1>
-      <form class="mt-10" @submit.prevent="onSubmit">
-        <div class="flex flex-col gap-4.5">
-          <div class="flex flex-col gap-1.5">
-            <label
-              :for="lastnameInputId"
-              class="text-gray-900 text-sm leading-[22px] tracking-tight"
-            >
-              Ваше полное имя
-            </label>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <UIInput
-                  :id="lastnameInputId"
-                  v-model="lastname"
-                  :class="{ 'border-red-500': errors.lastname }"
-                  placeholder="Фамилия"
-                />
-                <p v-if="errors.lastname" class="text-red-500 text-sm leading-[22px] mt-1.5">
-                  {{ errors.lastname }}
-                </p>
-              </div>
-              <div>
-                <UIInput
-                  v-model="firstname"
-                  :class="{ 'border-red-500': errors.firstname }"
-                  placeholder="Имя"
-                />
-                <p v-if="errors.firstname" class="text-red-500 text-sm leading-[22px] mt-1.5">
-                  {{ errors.firstname }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label
-              :for="usernameInputId"
-              class="text-gray-900 text-sm leading-[22px] tracking-tight"
-            >
-              Имя пользователя
-            </label>
-            <UIInput
-              :id="usernameInputId"
-              v-model="username"
-              :class="{ 'border-red-500': errors.username }"
-              placeholder="Имя пользователя"
-            />
-            <p v-if="errors.username" class="text-red-500 text-sm leading-[22px]">
-              {{ errors.username }}
-            </p>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label :for="emailInputId" class="text-gray-900 text-sm leading-[22px] tracking-tight">
-              Email
-            </label>
-            <UIInput
-              :id="emailInputId"
-              v-model="email"
-              :class="{ 'border-red-500': errors.email }"
-              placeholder="Email"
-            />
-            <p v-if="errors.email" class="text-red-500 text-sm leading-[22px]">
-              {{ errors.email }}
-            </p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1.5">
-              <label
-                :for="passwordInputId"
-                class="text-gray-900 text-sm leading-[22px] tracking-tight"
-              >
-                Создайте пароль
-              </label>
-              <UIInput
-                :id="passwordInputId"
-                v-model="password"
-                type="password"
-                :class="{ 'border-red-500': errors.password }"
-                placeholder="Создайте пароль"
-              />
-              <p v-if="errors.password" class="text-red-500 text-sm leading-[22px]">
-                {{ errors.password }}
-              </p>
-            </div>
-
-            <div class="flex flex-col gap-1.5">
-              <label
-                :for="confirmPasswordInputId"
-                class="text-gray-900 text-sm leading-[22px] tracking-tight"
-              >
-                Повторите пароль
-              </label>
-              <UIInput
-                :id="confirmPasswordInputId"
-                v-model="confirmPassword"
-                type="password"
-                :class="{ 'border-red-500': errors.confirmPassword }"
-                placeholder="Повторите пароль"
-              />
-              <p v-if="errors.confirmPassword" class="text-red-500 text-sm leading-[22px]">
-                {{ errors.confirmPassword }}
-              </p>
-            </div>
-          </div>
+  <AuthFormLayout title="Создайте аккаунт">
+    <form class="mt-10" @submit.prevent="onSubmit">
+      <div class="flex flex-col gap-4.5">
+        <div class="grid grid-cols-2 gap-4">
+          <FormInput
+            :id="lastnameInputId"
+            v-model="lastname"
+            label="Фамилия"
+            placeholder="Фамилия"
+            :error="errors.lastname"
+          />
+          <FormInput
+            v-model="firstname"
+            :id="useId()"
+            label="Имя"
+            placeholder="Имя"
+            :error="errors.firstname"
+          />
         </div>
 
-        <p v-if="error" class="text-red-500 text-sm leading-[22px] mt-4">{{ error }}</p>
+        <FormInput
+          :id="usernameInputId"
+          v-model="username"
+          label="Имя пользователя"
+          placeholder="Имя пользователя"
+          :error="errors.username"
+        />
 
-        <UIButton type="submit" size="lg" class="w-full mt-6">
-          {{ loading ? 'Создаем...' : 'Создать аккаунт' }}
-        </UIButton>
-      </form>
-    </div>
-  </section>
+        <FormInput
+          :id="emailInputId"
+          v-model="email"
+          label="Email"
+          placeholder="Email"
+          :error="errors.email"
+        />
+
+        <div class="grid grid-cols-2 gap-4">
+          <FormInput
+            :id="passwordInputId"
+            v-model="password"
+            label="Создайте пароль"
+            type="password"
+            placeholder="Создайте пароль"
+            :error="errors.password"
+          />
+
+          <FormInput
+            :id="confirmPasswordInputId"
+            v-model="confirmPassword"
+            label="Повторите пароль"
+            type="password"
+            placeholder="Повторите пароль"
+            :error="errors.confirmPassword"
+          />
+        </div>
+      </div>
+
+      <p v-if="error" class="text-red-500 text-sm leading-[22px] mt-4">{{ error }}</p>
+
+      <UIButton type="submit" size="lg" class="w-full mt-6">
+        {{ loading ? 'Создаем...' : 'Создать аккаунт' }}
+      </UIButton>
+    </form>
+  </AuthFormLayout>
 </template>

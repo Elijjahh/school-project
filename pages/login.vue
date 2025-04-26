@@ -67,59 +67,32 @@ async function submitForm() {
 </script>
 
 <template>
-  <section class="grid grid-cols-[1fr_1.3fr] md:grid-cols-1">
-    <div class="bg-purple-50 flex items-end md:hidden">
-      <div class="aspect-square">
-        <img src="/assets/images/login-img.png" alt="" class="h-full w-full object-contain" />
+  <AuthFormLayout title="Войдите в ваш аккаунт">
+    <form class="mt-10" @submit.prevent="onSubmit">
+      <div class="flex flex-col gap-4.5">
+        <FormInput
+          :id="emailInputId"
+          v-model="email"
+          label="Email"
+          placeholder="Email"
+          :error="errors.email"
+        />
+
+        <FormInput
+          :id="passwordInputId"
+          v-model="password"
+          label="Пароль"
+          type="password"
+          placeholder="Пароль"
+          :error="errors.password"
+        />
       </div>
-    </div>
-    <div class="p-[14vw_15.6vw_14vw_6.9vw] xl:p-[14vw_6.9vw]">
-      <h1 class="text-gray-900 text-4xl font-semibold leading-[48px] tracking-tight text-center">
-        Войдите в ваш аккаунт
-      </h1>
-      <form class="mt-10" @submit.prevent="onSubmit">
-        <div class="flex flex-col gap-4.5">
-          <div class="flex flex-col gap-1.5">
-            <label :for="emailInputId" class="text-gray-900 text-sm leading-[22px] tracking-tight">
-              Email
-            </label>
-            <UIInput
-              :id="emailInputId"
-              v-model="email"
-              :class="{ 'border-red-500': errors.email }"
-              placeholder="Email"
-            />
-            <p v-if="errors.email" class="text-red-500 text-sm leading-[22px]">
-              {{ errors.email }}
-            </p>
-          </div>
 
-          <div class="flex flex-col gap-1.5">
-            <label
-              :for="passwordInputId"
-              class="text-gray-900 text-sm leading-[22px] tracking-tight"
-            >
-              Пароль
-            </label>
-            <UIInput
-              :id="passwordInputId"
-              v-model="password"
-              type="password"
-              :class="{ 'border-red-500': errors.password }"
-              placeholder="Пароль"
-            />
-            <p v-if="errors.password" class="text-red-500 text-sm leading-[22px]">
-              {{ errors.password }}
-            </p>
-          </div>
-        </div>
+      <p v-if="error" class="text-red-500 text-sm leading-[22px] mt-4">{{ error }}</p>
 
-        <p v-if="error" class="text-red-500 text-sm leading-[22px] mt-4">{{ error }}</p>
-
-        <UIButton type="submit" size="lg" class="w-full mt-6">
-          {{ loading ? 'Входим...' : 'Войти' }}
-        </UIButton>
-      </form>
-    </div>
-  </section>
+      <UIButton type="submit" size="lg" class="w-full mt-6">
+        {{ loading ? 'Входим...' : 'Войти' }}
+      </UIButton>
+    </form>
+  </AuthFormLayout>
 </template>
