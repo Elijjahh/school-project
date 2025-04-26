@@ -67,147 +67,59 @@ async function submitForm() {
 </script>
 
 <template>
-  <section class="login">
-    <div class="login__img">
-      <div class="login__img-wrapper"><img src="/assets/images/login-img.png" alt="" /></div>
+  <section class="grid grid-cols-[1fr_1.3fr] md:grid-cols-1">
+    <div class="bg-purple-50 flex items-end md:hidden">
+      <div class="aspect-square">
+        <img src="/assets/images/login-img.png" alt="" class="h-full w-full object-contain" />
+      </div>
     </div>
-    <div class="login__content">
-      <h1 class="login__title">Войдите в ваш аккаунт</h1>
-      <form class="login__form" @submit.prevent="onSubmit">
-        <div class="login__input-groups">
-          <div class="login__input-group">
-            <label :for="emailInputId" class="login__label">Email</label>
-            <PrimeInputText
+    <div class="p-[14vw_15.6vw_14vw_6.9vw] xl:p-[14vw_6.9vw]">
+      <h1 class="text-gray-900 text-4xl font-semibold leading-[48px] tracking-tight text-center">
+        Войдите в ваш аккаунт
+      </h1>
+      <form class="mt-10" @submit.prevent="onSubmit">
+        <div class="flex flex-col gap-4.5">
+          <div class="flex flex-col gap-1.5">
+            <label :for="emailInputId" class="text-gray-900 text-sm leading-[22px] tracking-tight">
+              Email
+            </label>
+            <UIInput
               :id="emailInputId"
               v-model="email"
-              :invalid="!!errors.email"
-              class="login__input"
+              :class="{ 'border-red-500': errors.email }"
               placeholder="Email"
             />
-            <p v-if="errors.email" class="login__error">
+            <p v-if="errors.email" class="text-red-500 text-sm leading-[22px]">
               {{ errors.email }}
             </p>
           </div>
 
-          <div class="login__input-group">
-            <label :for="passwordInputId" class="login__label">Пароль</label>
-            <PrimePassword
+          <div class="flex flex-col gap-1.5">
+            <label
+              :for="passwordInputId"
+              class="text-gray-900 text-sm leading-[22px] tracking-tight"
+            >
+              Пароль
+            </label>
+            <UIInput
               :id="passwordInputId"
               v-model="password"
-              fluid
-              :feedback="false"
-              :invalid="!!errors.password"
-              class="login__input"
+              type="password"
+              :class="{ 'border-red-500': errors.password }"
               placeholder="Пароль"
             />
-            <p v-if="errors.password" class="login__error">
+            <p v-if="errors.password" class="text-red-500 text-sm leading-[22px]">
               {{ errors.password }}
             </p>
           </div>
         </div>
 
-        <p class="login__error login__error_general">{{ error }}</p>
+        <p v-if="error" class="text-red-500 text-sm leading-[22px] mt-4">{{ error }}</p>
 
-        <PrimeButton
-          type="submit"
-          :label="loading ? 'Входим...' : 'Войти'"
-          size="large"
-          class="login__button"
-        />
+        <UIButton type="submit" size="lg" class="w-full mt-6">
+          {{ loading ? 'Входим...' : 'Войти' }}
+        </UIButton>
       </form>
     </div>
   </section>
 </template>
-
-<style scoped lang="scss">
-.login {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr;
-  }
-
-  &__img {
-    background-color: rgb(235, 235, 255);
-    display: flex;
-    align-items: flex-end;
-
-    @media (max-width: 700px) {
-      display: none;
-    }
-  }
-
-  &__img-wrapper {
-    aspect-ratio: 1;
-    img {
-      height: 100%;
-      width: 100%;
-      object-fit: contain;
-    }
-  }
-
-  &__content {
-    padding: calc(270 / 1920 * 100vw) calc(300 / 1920 * 100vw) calc(270 / 1920 * 100vw)
-      calc(133 / 1920 * 100vw);
-
-    @media (max-width: 1300px) {
-      padding-right: calc(133 / 1920 * 100vw);
-    }
-  }
-
-  &__title {
-    color: rgb(29, 32, 38);
-    font-size: 40px;
-    font-weight: 600;
-    line-height: 48px;
-    letter-spacing: -1%;
-    text-align: center;
-  }
-
-  &__form {
-    margin-top: 40px;
-  }
-
-  &__input-groups {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  &__input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  &__label {
-    color: rgb(29, 32, 38);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 22px;
-    letter-spacing: -1%;
-  }
-
-  &__input-group:has(.p-invalid) &__label {
-    color: var(--p-inputtext-invalid-placeholder-color);
-  }
-
-  &__error {
-    color: var(--p-inputtext-invalid-placeholder-color);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 22px;
-    letter-spacing: -1%;
-
-    &_general {
-      margin-top: 10px;
-    }
-  }
-
-  &__button {
-    margin-top: 24px;
-    width: 100%;
-  }
-}
-</style>

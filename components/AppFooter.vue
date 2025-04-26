@@ -1,14 +1,8 @@
 <script lang="ts" setup></script>
 
 <template>
-  <footer class="footer">
-    <div class="container footer__top"></div>
-    <div class="container footer__bottom"></div>
+  <footer class="bg-gray-500">
+    <div class="container mx-auto py-8"></div>
+    <div class="container mx-auto py-4"></div>
   </footer>
 </template>
-
-<style scoped lang="scss">
-.footer {
-  background-color: grey;
-}
-</style>

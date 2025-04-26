@@ -3,94 +3,47 @@ const { data: courses, pending, error } = await useFetch('/api/courses');
 </script>
 
 <template>
-  <section class="cards">
-    <div class="cards-container">
-      <h1 class="cards-title">Мои курсы</h1>
+  <section class="py-10">
+    <div class="container max-w-4xl mx-auto">
+      <h1 class="text-4xl font-semibold mb-10">Мои курсы</h1>
 
       <div>
-        <div class="cards-btns">
-          <PrimeButton label="Все" variant="text" severity="secondary" />
-          <PrimeButton label="Вводные" variant="text" severity="secondary" />
-          <PrimeButton label="Основные" variant="text" severity="secondary" />
-          <PrimeButton label="Профориентация" variant="text" severity="secondary" />
+        <div class="flex gap-2.5 mb-5">
+          <UIButton variant="ghost">Все</UIButton>
+          <UIButton variant="ghost">Вводные</UIButton>
+          <UIButton variant="ghost">Основные</UIButton>
+          <UIButton variant="ghost">Профориентация</UIButton>
         </div>
 
-        <div v-if="pending" class="loading">
-          <PrimeProgressSpinner />
+        <div v-if="pending" class="flex justify-center items-center min-h-[200px]">
+          <UISpinner class="w-8 h-8" />
         </div>
-        <div v-else-if="error" class="error">Произошла ошибка при загрузке курсов</div>
-        <div v-else class="cards-grid">
-          <PrimeCard v-for="course in courses" :key="course.id">
-            <template #header>
-              <img
-                v-if="course.image"
-                :src="course.image"
-                :alt="course.title"
-                class="course-image"
-              />
-              <img
-                v-else
-                src="https://primefaces.org/cdn/primevue/images/usercard.png"
-                :alt="course.title"
-                class="course-image"
-              />
-            </template>
-            <template #title>{{ course.title }}</template>
-            <template #content>
-              <p class="m-0">{{ course.description }}</p>
-            </template>
-          </PrimeCard>
+        <div v-else-if="error" class="text-red-500 text-center py-5">
+          Произошла ошибка при загрузке курсов
+        </div>
+        <div v-else class="grid grid-cols-2 gap-5 mt-10">
+          <UICard v-for="course in courses" :key="course.id" class="overflow-hidden">
+            <img
+              v-if="course.image"
+              :src="course.image"
+              :alt="course.title"
+              class="w-full h-[200px] object-cover"
+            />
+            <img
+              v-else
+              src="/assets/images/register-img.png"
+              :alt="course.title"
+              class="w-full h-[200px] object-cover"
+            />
+            <UICardHeader>
+              <UICardTitle>{{ course.title }}</UICardTitle>
+            </UICardHeader>
+            <UICardContent>
+              <p class="text-gray-600">{{ course.description }}</p>
+            </UICardContent>
+          </UICard>
         </div>
       </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-.cards-container {
-  display: grid;
-  grid-template-columns: 50rem;
-  overflow: hidden;
-  width: 80%;
-  margin: 0 auto;
-  justify-content: center;
-}
-
-.cards-title {
-  font-size: 2.5rem;
-  margin: 40px 0;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin: 40px 10px;
-}
-
-.cards-btns {
-  display: flex;
-  justify-content: left;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.course-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-}
-
-.error {
-  color: var(--red-500);
-  text-align: center;
-  padding: 20px;
-}
-</style>
