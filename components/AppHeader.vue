@@ -1,127 +1,66 @@
 <script lang="ts" setup>
+import { Heart, ShoppingCart } from 'lucide-vue-next';
 const { loggedIn } = useUserSession();
 </script>
 
 <template>
-  <header class="header">
-    <div class="container header__top">
-      <nav class="header__nav">
-        <NuxtLink to="/" class="header__nav-link">Home</NuxtLink>
-        <NuxtLink to="/courses" class="header__nav-link">Courses</NuxtLink>
-        <NuxtLink to="/about" class="header__nav-link">About</NuxtLink>
-        <NuxtLink to="/become-instructor" class="header__nav-link">Become an Instructor</NuxtLink>
-      </nav>
+  <header class="w-full">
+    <div class="bg-black">
+      <div class="container mx-auto">
+        <nav class="flex gap-6 py-2.5">
+          <NuxtLink to="/" class="text-gray-400 hover:text-white transition-colors">
+            Главная
+          </NuxtLink>
+          <NuxtLink to="/courses" class="text-gray-400 hover:text-white transition-colors">
+            Курсы
+          </NuxtLink>
+          <NuxtLink to="/about" class="text-gray-400 hover:text-white transition-colors">
+            О нас
+          </NuxtLink>
+          <NuxtLink
+            to="/become-instructor"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
+            Стать преподавателем
+          </NuxtLink>
+        </nav>
+      </div>
     </div>
-    <div class="header__second">
-      <div class="container header__container">
-        <NuxtLink to="/" class="header__img">
+
+    <div class="border-b bg-white py-5">
+      <div class="container mx-auto flex justify-between items-center">
+        <NuxtLink to="/" class="flex items-center">
           <img src="/assets/images/logo-img.svg" alt="Логотип" />
         </NuxtLink>
 
-        <div class="header__right">
-          <div class="header__actions">
-            <div class="header__icons">
+        <div class="flex items-center">
+          <div class="flex items-center">
+            <div class="flex items-center gap-6">
               <NuxtLink to="/wishlist">
-                <PrimeOverlayBadge class="inline-flex">
-                  <PrimeAvatar icon="pi pi-heart" shape="circle" />
-                </PrimeOverlayBadge>
+                <Heart class="w-5 h-5" />
               </NuxtLink>
 
               <NuxtLink to="/cart">
-                <PrimeOverlayBadge class="inline-flex">
-                  <PrimeAvatar icon="pi pi-shopping-cart" shape="circle" />
-                </PrimeOverlayBadge>
+                <ShoppingCart class="w-5 h-5" />
               </NuxtLink>
             </div>
 
-            <PrimeAvatar
+            <UIAvatar
               v-if="loggedIn"
-              image="https://primefaces.org/cdn/primevue/images/organization/walter.jpg"
-              size="large"
-              shape="circle"
-              class="header__profile-img"
+              class="ml-6"
+              src="https://primefaces.org/cdn/primevue/images/organization/walter.jpg"
             />
           </div>
-          <div v-if="!loggedIn" class="header__create">
-            <PrimeButton size="large" class="header__button">
+          <div v-if="!loggedIn" class="ml-6 flex items-center gap-4">
+            <UIButton variant="default" size="lg">
               <NuxtLink to="/login">Войти в аккаунт</NuxtLink>
-            </PrimeButton>
-            <PrimeButton size="large" severity="secondary" class="header__button">
+            </UIButton>
+            <UIButton variant="secondary" size="lg">
               <NuxtLink to="/register">Создать аккаунт</NuxtLink>
-            </PrimeButton>
+            </UIButton>
           </div>
         </div>
       </div>
     </div>
   </header>
 </template>
-
-<style scoped lang="scss">
-.header {
-  &__top {
-    background-color: rgb(0, 0, 0);
-  }
-
-  &__nav {
-    display: flex;
-    gap: 24px;
-    padding: 10px 0;
-  }
-
-  &__nav-link {
-    color: rgb(171, 171, 171);
-    text-decoration: none;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: rgb(255, 255, 255);
-    }
-  }
-
-  &__second {
-    box-shadow: inset 0px -1px 0px 0px rgb(233, 234, 240);
-    background: rgb(255, 255, 255);
-    padding: 20px 0px;
-  }
-
-  &__container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  &__right {
-    display: flex;
-    align-items: center;
-  }
-
-  &__actions {
-    display: flex;
-  }
-
-  &__icons {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-
-  &__profile-img {
-    margin-left: 24px;
-  }
-
-  &__create {
-    margin-left: 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  &__label {
-    color: rgb(78, 85, 102);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 22px;
-    letter-spacing: -1%;
-  }
-}
-</style>
