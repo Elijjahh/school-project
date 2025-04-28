@@ -94,68 +94,92 @@ async function submitForm() {
 </script>
 
 <template>
-  <AuthFormLayout title="Создайте аккаунт">
-    <form class="mt-10" @submit.prevent="onSubmit">
-      <div class="flex flex-col gap-4.5">
-        <div class="grid grid-cols-2 gap-4">
-          <FormInput
-            :id="lastnameInputId"
-            v-model="lastname"
-            label="Фамилия"
-            placeholder="Фамилия"
-            :error="errors.lastname"
-          />
-          <FormInput
-            v-model="firstname"
-            :id="useId()"
-            label="Имя"
-            placeholder="Имя"
-            :error="errors.firstname"
-          />
-        </div>
-
-        <FormInput
-          :id="usernameInputId"
-          v-model="username"
-          label="Имя пользователя"
-          placeholder="Имя пользователя"
-          :error="errors.username"
-        />
-
-        <FormInput
-          :id="emailInputId"
-          v-model="email"
-          label="Email"
-          placeholder="Email"
-          :error="errors.email"
-        />
-
-        <div class="grid grid-cols-2 gap-4">
-          <FormInput
-            :id="passwordInputId"
-            v-model="password"
-            label="Создайте пароль"
-            type="password"
-            placeholder="Создайте пароль"
-            :error="errors.password"
-          />
-
-          <FormInput
-            :id="confirmPasswordInputId"
-            v-model="confirmPassword"
-            label="Повторите пароль"
-            type="password"
-            placeholder="Повторите пароль"
-            :error="errors.confirmPassword"
-          />
-        </div>
+  <div class="min-h-screen flex items-center justify-center bg-background">
+    <div class="w-full max-w-md mx-auto p-8 space-y-6 bg-white rounded-lg shadow">
+      <div class="flex flex-col space-y-2 text-center">
+        <h1 class="text-2xl font-semibold tracking-tight">Создайте аккаунт</h1>
+        <p class="text-sm text-muted-foreground">Введите ваши данные ниже, чтобы создать аккаунт</p>
       </div>
-
-      <p v-if="error" class="text-red-500 text-sm leading-[22px] mt-4">{{ error }}</p>
-
-      <UIButton type="submit" size="lg" class="w-full mt-6">
-        {{ loading ? 'Создаем...' : 'Создать аккаунт' }}
-      </UIButton>
-    </form>
-  </AuthFormLayout>
+      <form class="space-y-4" @submit.prevent="onSubmit">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <FormInput
+              :id="lastnameInputId"
+              v-model="lastname"
+              label="Фамилия"
+              placeholder="Иванов"
+              :error="errors.lastname"
+            />
+          </div>
+          <div class="space-y-2">
+            <FormInput
+              v-model="firstname"
+              :id="useId()"
+              label="Имя"
+              placeholder="Иван"
+              :error="errors.firstname"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <FormInput
+            :id="usernameInputId"
+            v-model="username"
+            label="Имя пользователя"
+            placeholder="ivanov"
+            :error="errors.username"
+          />
+        </div>
+        <div class="space-y-2">
+          <FormInput
+            :id="emailInputId"
+            v-model="email"
+            label="Email"
+            placeholder="name@example.com"
+            :error="errors.email"
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <FormInput
+              :id="passwordInputId"
+              v-model="password"
+              label="Пароль"
+              type="password"
+              placeholder="••••••••"
+              :error="errors.password"
+            />
+          </div>
+          <div class="space-y-2">
+            <FormInput
+              :id="confirmPasswordInputId"
+              v-model="confirmPassword"
+              label="Подтвердите пароль"
+              type="password"
+              placeholder="••••••••"
+              :error="errors.confirmPassword"
+            />
+          </div>
+        </div>
+        <div v-if="error" class="text-sm font-medium text-destructive">
+          {{ error }}
+        </div>
+        <UIButton type="submit" class="w-full" :disabled="loading">
+          <span v-if="loading" class="flex items-center justify-center">
+            <span class="mr-2">Создаем...</span>
+            <span
+              class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            />
+          </span>
+          <span v-else>Создать аккаунт</span>
+        </UIButton>
+      </form>
+      <p class="px-8 text-center text-sm text-muted-foreground">
+        Уже есть аккаунт?
+        <NuxtLink to="/login" class="underline underline-offset-4 hover:text-primary">
+          Войти
+        </NuxtLink>
+      </p>
+    </div>
+  </div>
 </template>

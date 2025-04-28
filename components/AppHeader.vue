@@ -1,63 +1,65 @@
 <script lang="ts" setup>
-import { Heart, ShoppingCart } from 'lucide-vue-next';
+import { Heart } from 'lucide-vue-next';
 const { loggedIn, user } = useUserSession();
 </script>
 
 <template>
-  <header class="w-full">
-    <div class="bg-black">
-      <div class="container mx-auto">
-        <nav class="flex gap-6 py-2.5">
-          <NuxtLink to="/" class="text-gray-400 hover:text-white transition-colors">
+  <header
+    class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+  >
+    <div class="container mx-auto flex h-14 items-center">
+      <div class="mr-4 flex">
+        <NuxtLink to="/" class="mr-6 flex items-center space-x-2">
+          <img src="/assets/images/logo-img.svg" alt="Логотип" class="w-48" />
+        </NuxtLink>
+        <nav class="flex items-center space-x-6 text-sm font-medium">
+          <NuxtLink to="/" class="transition-colors hover:text-foreground/80 text-foreground/60">
             Главная
           </NuxtLink>
-          <NuxtLink to="/courses" class="text-gray-400 hover:text-white transition-colors">
+          <NuxtLink
+            to="/courses"
+            class="transition-colors hover:text-foreground/80 text-foreground/60"
+          >
             Курсы
           </NuxtLink>
-          <NuxtLink to="/about" class="text-gray-400 hover:text-white transition-colors">
+          <NuxtLink
+            to="/about"
+            class="transition-colors hover:text-foreground/80 text-foreground/60"
+          >
             О нас
           </NuxtLink>
           <NuxtLink
             to="/become-instructor"
-            class="text-gray-400 hover:text-white transition-colors"
+            class="transition-colors hover:text-foreground/80 text-foreground/60"
           >
             Стать преподавателем
           </NuxtLink>
         </nav>
       </div>
-    </div>
+      <div class="flex flex-1 items-center justify-end space-x-2">
+        <div class="flex items-center space-x-4">
+          <NuxtLink to="/profile/wishlist" class="text-muted-foreground hover:text-foreground">
+            <Heart class="h-5 w-5" />
+          </NuxtLink>
 
-    <div class="border-b bg-white py-5">
-      <div class="container mx-auto flex justify-between items-center">
-        <NuxtLink to="/" class="flex items-center">
-          <img src="/assets/images/logo-img.svg" alt="Логотип" />
-        </NuxtLink>
-
-        <div class="flex items-center">
-          <div class="flex items-center">
-            <div class="flex items-center gap-6">
-              <NuxtLink to="/profile/wishlist">
-                <Heart class="w-5 h-5" />
-              </NuxtLink>
-            </div>
-
-            <NuxtLink v-if="loggedIn" to="/profile" class="ml-6">
-              <UIAvatar class="size-10">
+          <template v-if="loggedIn">
+            <NuxtLink to="/profile">
+              <UIAvatar class="h-8 w-8">
                 <UIAvatarImage v-if="user?.image" :src="user.image" />
                 <UIAvatarFallback v-else>
                   {{ user?.firstname[0] }}{{ user?.lastname[0] }}
                 </UIAvatarFallback>
               </UIAvatar>
             </NuxtLink>
-          </div>
-          <div v-if="!loggedIn" class="ml-6 flex items-center gap-4">
-            <UIButton variant="default" size="lg">
-              <NuxtLink to="/login">Войти в аккаунт</NuxtLink>
+          </template>
+          <template v-else>
+            <UIButton variant="ghost" size="sm">
+              <NuxtLink to="/login">Войти</NuxtLink>
             </UIButton>
-            <UIButton variant="secondary" size="lg">
-              <NuxtLink to="/register">Создать аккаунт</NuxtLink>
+            <UIButton variant="default" size="sm">
+              <NuxtLink to="/register">Регистрация</NuxtLink>
             </UIButton>
-          </div>
+          </template>
         </div>
       </div>
     </div>

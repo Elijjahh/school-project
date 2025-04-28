@@ -26,28 +26,47 @@ const toggleWishlist = async () => {
 </script>
 
 <template>
-  <UICard class="flex flex-col">
-    <img :src="course.image || ''" class="w-full h-48 object-cover rounded-t-lg" />
-    <div class="p-4 flex flex-col gap-4">
-      <h3 class="text-xl font-semibold">{{ course.title }}</h3>
-      <p class="text-gray-600">{{ course.description }}</p>
-      <div class="flex items-center justify-between mt-auto">
-        <UIButton variant="default">Watch Lecture</UIButton>
+  <UICard class="group relative overflow-hidden rounded-lg border">
+    <div class="aspect-video relative flex flex-col">
+      <img
+        :src="course.image || ''"
+        class="h-full w-full object-cover transition-all group-hover:scale-105"
+        :alt="course.title"
+      />
+      <div class="flex-1 bg-gradient-to-t from-background/80 to-transparent" />
+    </div>
+    <div class="p-4 space-y-3">
+      <h3 class="font-semibold leading-none tracking-tight">{{ course.title }}</h3>
+      <p class="text-sm text-muted-foreground line-clamp-2">{{ course.description }}</p>
+      <div class="flex items-center justify-between pt-2">
         <div class="flex items-center gap-2">
-          <span v-if="course.completed" class="text-green-500">
+          <span
+            v-if="course.completed"
+            class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+          >
             {{ course.progress ? course.progress + '%' : '' }} Completed
           </span>
-          <span v-else-if="course.progress" class="text-blue-500">
-            {{ course.progress }}% Finish
+          <span
+            v-else-if="course.progress"
+            class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+          >
+            {{ course.progress }}% Progress
           </span>
-          <UIButton variant="ghost" size="icon" :disabled="isLoading" @click="toggleWishlist">
-            <Heart
-              class="w-5 h-5"
-              :class="{ 'text-red-500 fill-red-500': wishlistStore.isInWishlist(course.id) }"
-            />
-          </UIButton>
         </div>
+        <UIButton
+          variant="ghost"
+          size="icon"
+          :disabled="isLoading"
+          @click="toggleWishlist"
+          class="h-8 w-8"
+        >
+          <Heart
+            class="h-4 w-4"
+            :class="{ 'text-destructive fill-destructive': wishlistStore.isInWishlist(course.id) }"
+          />
+        </UIButton>
       </div>
+      <UIButton class="w-full" variant="default"> Watch Lecture </UIButton>
     </div>
   </UICard>
 </template>

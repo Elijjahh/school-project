@@ -17,58 +17,59 @@ const {
 </script>
 
 <template>
-  <div>
-    <div v-if="statsPending" class="text-center py-8">Загрузка статистики...</div>
-    <div v-else-if="statsError" class="text-center text-red-500 py-8">
-      Не удалось загрузить статистику
-    </div>
-    <div v-else class="grid grid-cols-4 gap-6">
-      <StatsCard
-        :value="stats?.enrolledCourses ?? '-'"
-        label="Ваши курсы"
-        :icon="Play"
-        icon-color="bg-blue-100"
-        bg-color="bg-blue-50"
-      />
-
-      <StatsCard
-        :value="stats?.activeCourses ?? '-'"
-        label="Активные курсы"
-        :icon="Headphones"
-        icon-color="bg-green-100"
-        bg-color="bg-green-50"
-      />
-
-      <StatsCard
-        :value="stats?.completedCourses ?? '-'"
-        label="Завершенные курсы"
-        :icon="Trophy"
-        icon-color="bg-yellow-100"
-        bg-color="bg-yellow-50"
-      />
-
-      <StatsCard
-        :value="stats?.instructors ?? '-'"
-        label="Преподаватели"
-        :icon="Users"
-        icon-color="bg-purple-100"
-        bg-color="bg-purple-50"
-      />
+  <div class="space-y-8">
+    <div class="space-y-2">
+      <h2 class="text-3xl font-bold tracking-tight">Панель управления</h2>
+      <p class="text-muted-foreground">Обзор вашей активности и прогресса в обучении</p>
     </div>
 
-    <div v-if="coursesPending" class="text-center py-8">Загрузка курсов...</div>
-    <div v-else-if="coursesError" class="text-center text-red-500 py-8">
-      Не удалось загрузить курсы
+    <div v-if="statsPending" class="flex justify-center py-8">
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
     </div>
-    <div v-else>
-      <div v-if="courses && courses.length > 0">
-        <h2 class="text-2xl font-semibold mb-6">Ваши курсы</h2>
-        <div class="grid grid-cols-3 gap-6">
+    <div
+      v-else-if="statsError"
+      class="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive"
+    >
+      <p class="text-center">Не удалось загрузить статистику</p>
+    </div>
+    <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <StatsCard :value="stats?.enrolledCourses ?? '-'" label="Ваши курсы" :icon="Play" />
+
+      <StatsCard :value="stats?.activeCourses ?? '-'" label="Активные курсы" :icon="Headphones" />
+
+      <StatsCard :value="stats?.completedCourses ?? '-'" label="Завершенные курсы" :icon="Trophy" />
+
+      <StatsCard :value="stats?.instructors ?? '-'" label="Преподаватели" :icon="Users" />
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="space-y-1">
+          <h2 class="text-2xl font-semibold tracking-tight">Ваши курсы</h2>
+          <p class="text-sm text-muted-foreground">
+            Продолжайте обучение с того места, где остановились
+          </p>
+        </div>
+      </div>
+
+      <div v-if="coursesPending" class="flex justify-center py-8">
+        <div
+          class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+        />
+      </div>
+      <div
+        v-else-if="coursesError"
+        class="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive"
+      >
+        <p class="text-center">Не удалось загрузить курсы</p>
+      </div>
+      <div v-else>
+        <div v-if="courses && courses.length > 0" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <CourseCard
             v-for="course in courses"
             :key="course.id"
             :course="{
-              id: course.id.toString(),
+              id: course.id,
               title: course.title,
               description: course.description,
               image: course.image || undefined,
@@ -77,8 +78,22 @@ const {
             }"
           />
         </div>
+        <div
+          v-else
+          class="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center"
+        >
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+            <Play class="h-6 w-6 text-muted-foreground" />
+          </div>
+          <h3 class="mt-4 text-lg font-semibold">Нет курсов</h3>
+          <p class="mt-2 text-sm text-muted-foreground">
+            Начните обучение, выбрав курс из каталога
+          </p>
+          <UIButton variant="outline" class="mt-4">
+            <NuxtLink to="/courses">Перейти к курсам</NuxtLink>
+          </UIButton>
+        </div>
       </div>
-      <h2 v-else class="text-2xl font-semibold text-center py-8">У вас пока нет курсов</h2>
     </div>
   </div>
 </template>

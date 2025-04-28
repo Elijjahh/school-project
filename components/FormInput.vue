@@ -14,8 +14,11 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-1.5">
-    <label :for="id" class="text-gray-900 text-sm leading-[22px] tracking-tight">
+  <div class="space-y-2">
+    <label
+      :for="id"
+      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    >
       {{ label }}
     </label>
     <UIInput
@@ -23,10 +26,10 @@ defineEmits<{
       :value="modelValue"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       :type="type || 'text'"
-      :class="{ 'border-red-500': error }"
+      :class="{ 'border-destructive focus-visible:ring-destructive': error }"
       :placeholder="placeholder"
     />
-    <p v-if="error" class="text-red-500 text-sm leading-[22px]">
+    <p v-if="error" class="text-sm font-medium text-destructive">
       {{ error }}
     </p>
   </div>
