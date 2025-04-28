@@ -1,5 +1,13 @@
 <script setup lang="ts">
+import { useWishlistStore } from '~/stores/wishlist';
+
 const { data: courses, pending, error } = await useFetch('/api/courses');
+const wishlistStore = useWishlistStore();
+
+// Fetch wishlist on page load
+onMounted(async () => {
+  await wishlistStore.fetchWishlist();
+});
 </script>
 
 <template>

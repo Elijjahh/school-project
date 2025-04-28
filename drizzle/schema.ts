@@ -264,3 +264,25 @@ export const answersRelations = relations(answers, ({ one }) => ({
     references: [questions.id],
   }),
 }));
+
+export const wishlist = pgTable('wishlist', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  courseId: integer('course_id')
+    .notNull()
+    .references(() => courses.id, { onDelete: 'cascade' }),
+  createdAt: timestamp().defaultNow(),
+});
+
+export const wishlistRelations = relations(wishlist, ({ one }) => ({
+  user: one(users, {
+    fields: [wishlist.userId],
+    references: [users.id],
+  }),
+  course: one(courses, {
+    fields: [wishlist.courseId],
+    references: [courses.id],
+  }),
+}));

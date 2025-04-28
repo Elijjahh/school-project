@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 defineProps<{
   courses?: Array<{
-    id: string | number;
+    id: number;
     title: string;
     description: string;
     image?: string | null;
+    completed?: boolean;
+    progress?: number;
   }>;
   pending?: boolean;
   error?: Error;
@@ -20,26 +22,18 @@ defineProps<{
       Произошла ошибка при загрузке курсов
     </div>
     <div v-else class="grid grid-cols-2 gap-5 mt-10">
-      <UICard v-for="course in courses" :key="course.id" class="overflow-hidden">
-        <img
-          v-if="course.image"
-          :src="course.image"
-          :alt="course.title"
-          class="w-full h-[200px] object-cover"
-        />
-        <img
-          v-else
-          src="/assets/images/register-img.png"
-          :alt="course.title"
-          class="w-full h-[200px] object-cover"
-        />
-        <UICardHeader>
-          <UICardTitle>{{ course.title }}</UICardTitle>
-        </UICardHeader>
-        <UICardContent>
-          <p class="text-gray-600">{{ course.description }}</p>
-        </UICardContent>
-      </UICard>
+      <CourseCard
+        v-for="course in courses"
+        :key="course.id"
+        :course="{
+          id: course.id,
+          title: course.title,
+          description: course.description,
+          image: course.image,
+          completed: course.completed,
+          progress: course.progress,
+        }"
+      />
     </div>
   </div>
 </template>
