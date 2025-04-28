@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Heart, ShoppingCart } from 'lucide-vue-next';
-const { loggedIn } = useUserSession();
+const { loggedIn, user } = useUserSession();
 </script>
 
 <template>
@@ -36,20 +36,19 @@ const { loggedIn } = useUserSession();
         <div class="flex items-center">
           <div class="flex items-center">
             <div class="flex items-center gap-6">
-              <NuxtLink to="/wishlist">
+              <NuxtLink to="/profile/wishlist">
                 <Heart class="w-5 h-5" />
-              </NuxtLink>
-
-              <NuxtLink to="/cart">
-                <ShoppingCart class="w-5 h-5" />
               </NuxtLink>
             </div>
 
-            <UIAvatar
-              v-if="loggedIn"
-              class="ml-6"
-              src="https://primefaces.org/cdn/primevue/images/organization/walter.jpg"
-            />
+            <NuxtLink v-if="loggedIn" to="/profile" class="ml-6">
+              <UIAvatar class="size-10">
+                <UIAvatarImage v-if="user?.image" :src="user.image" />
+                <UIAvatarFallback v-else>
+                  {{ user?.firstname[0] }}{{ user?.lastname[0] }}
+                </UIAvatarFallback>
+              </UIAvatar>
+            </NuxtLink>
           </div>
           <div v-if="!loggedIn" class="ml-6 flex items-center gap-4">
             <UIButton variant="default" size="lg">

@@ -6,7 +6,7 @@ const tabs = [
   { label: 'Курсы', icon: Book, path: '/profile/courses' },
   { label: 'Преподаватели', icon: Users, path: '/profile/instructors' },
   { label: 'Сообщения', icon: Mail, path: '/profile/messages' },
-  { label: 'Избранное', icon: Heart, path: '/profile/favorites' },
+  { label: 'Избранное', icon: Heart, path: '/profile/wishlist' },
   { label: 'Покупки', icon: ShoppingCart, path: '/profile/purchases' },
   { label: 'Настройки', icon: Settings, path: '/profile/settings' },
 ];

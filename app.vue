@@ -1,11 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <main class="main">
-    <AppHeader />
+  <NuxtLayout name="default">
     <NuxtPage />
-    <AppFooter />
-  </main>
+  </NuxtLayout>
 </template>
 
 <style scoped lang="scss">
@@ -17,12 +15,5 @@
 .page-enter-from,
 .page-leave-to {
   opacity: 0;
-}
-
-.main {
-  min-height: 100vh;
-
-  display: grid;
-  grid-template-rows: auto 1fr;
 }
 </style>
