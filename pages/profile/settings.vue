@@ -27,26 +27,12 @@ const validationSchema = toTypedSchema(
 
 const { handleSubmit, errors, resetForm } = useForm({
   validationSchema,
-  initialValues: {
-    lastname: user.value?.lastname || '',
-    firstname: user.value?.firstname || '',
-    username: user.value?.username || '',
-    email: user.value?.email || '',
-  },
-});
-
-// Reset form when user data changes
-watch(user, (newUser) => {
-  if (newUser) {
-    resetForm({
-      values: {
-        lastname: newUser.lastname || '',
-        firstname: newUser.firstname || '',
-        username: newUser.username || '',
-        email: newUser.email || '',
-      },
-    });
-  }
+  // initialValues: {
+  //   lastname: user.value?.lastname || '',
+  //   firstname: user.value?.firstname || '',
+  //   username: user.value?.username || '',
+  //   email: user.value?.email || '',
+  // },
 });
 
 const lastnameInputId = useId();
@@ -85,13 +71,17 @@ async function submitForm() {
   success.value = '';
 
   try {
-    await $fetch('/api/auth/users/me', {
+    await $fetch(`/api/auth/users/${user.value?.id}`, {
       method: 'PATCH',
       body: submitData,
     });
 
     await fetchUserSession();
     success.value = 'Профиль успешно обновлен';
+
+    resetForm({
+      values: submitData,
+    });
   } catch (err) {
     const statusCode = (err as NuxtError).statusCode;
 

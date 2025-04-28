@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from '~/drizzle/schema';
 
-export { sql, eq, and, or, count } from 'drizzle-orm';
+export { sql, eq, and, or, count, ne } from 'drizzle-orm';
 export const tables = schema;
 
 const db = drizzle({
