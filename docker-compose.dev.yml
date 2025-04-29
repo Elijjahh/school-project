@@ -1,13 +1,28 @@
 volumes:
   db-data:
+  minio-data:
 
 services:
-  # smtp4dev:
-  #   container_name: smtp4dev
-  #   image: rnwood/smtp4dev:latest
-  #   ports:
-  #     - '2525:25'
-  #     - '5050:80'
+  minio:
+    container_name: minio-dev
+    image: minio/minio:latest
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - '9000:9000' # API port
+      - '9001:9001' # Console port
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
   db:
     container_name: school-db
     image: postgres:15

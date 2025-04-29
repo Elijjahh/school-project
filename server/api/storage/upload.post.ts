@@ -1,62 +1,103 @@
 import { createStorage } from 'unstorage';
-import fsDriver from 'unstorage/drivers/fs';
+import s3Driver from 'unstorage/drivers/s3';
+import type { H3Error } from 'h3';
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const storage = createStorage({
-  driver: fsDriver({
-    base: './public/uploads',
+  driver: s3Driver({
+    accessKeyId: process.env.S3_ACCESS_KEY || 'minioadmin',
+    secretAccessKey: process.env.S3_SECRET_KEY || 'minioadmin',
+    endpoint:
+      process.env.S3_ENDPOINT || (isDevelopment ? 'http://localhost:9000' : 'http://minio:9000'),
+    bucket: process.env.S3_BUCKET || 'uploads',
+    region: process.env.S3_REGION || 'us-east-1',
   }),
 });
 
 export default defineEventHandler(async (event) => {
-  const form = await readMultipartFormData(event);
-  if (!form) {
-    throw createError({
-      statusCode: 400,
-      message: 'No file uploaded',
-    });
-  }
-
-  const file = form.find((f) => f.name === 'file');
-  if (!file) {
-    throw createError({
-      statusCode: 400,
-      message: 'No file found in request',
-    });
-  }
-
-  // Validate file type
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  if (!allowedTypes.includes(file.type || '')) {
-    throw createError({
-      statusCode: 400,
-      message: 'Invalid file type. Only JPG, PNG and GIF are allowed',
-    });
-  }
-
-  // Validate file size (2MB max)
-  const maxSize = 2 * 1024 * 1024; // 2MB in bytes
-  if (file.data.length > maxSize) {
-    throw createError({
-      statusCode: 400,
-      message: 'File size exceeds 2MB limit',
-    });
-  }
-
-  // Generate unique filename
-  let extension = 'jpg';
-  if (file.filename) {
-    const parts = file.filename.split('.');
-    if (parts.length > 1) {
-      extension = parts[parts.length - 1];
+  try {
+    const form = await readMultipartFormData(event);
+    if (!form) {
+      throw createError({
+        statusCode: 400,
+        message: 'No file uploaded',
+      });
     }
+
+    const file = form.find((f) => f.name === 'file');
+    if (!file) {
+      throw createError({
+        statusCode: 400,
+        message: 'No file found in request',
+      });
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type || '')) {
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid file type. Only JPG, PNG and GIF are allowed',
+      });
+    }
+
+    // Validate file size (2MB max)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.data.length > maxSize) {
+      throw createError({
+        statusCode: 400,
+        message: 'File size exceeds 2MB limit',
+      });
+    }
+
+    // Generate a unique filename
+    const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${file.filename?.split('.').pop()}`;
+
+    // Try to upload the file
+    try {
+      await storage.setItemRaw(filename, file.data);
+    } catch (error: unknown) {
+      // If the error is about the bucket not existing, try to create it
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('NoSuchBucket') || errorMessage.includes('bucket does not exist')) {
+        // Create the bucket by making a PUT request
+        const response = await fetch(
+          `${process.env.S3_ENDPOINT || (isDevelopment ? 'http://localhost:9000' : 'http://minio:9000')}/${process.env.S3_BUCKET || 'uploads'}`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `AWS4-HMAC-SHA256 Credential=${process.env.S3_ACCESS_KEY || 'minioadmin'}/20250429/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-date,Signature=0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a`,
+              'x-amz-date': '20250429T000000Z',
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw createError({
+            statusCode: 500,
+            message: 'Failed to create bucket. Please check your MinIO configuration.',
+          });
+        }
+
+        // Retry the upload after creating the bucket
+        await storage.setItemRaw(filename, file.data);
+      } else {
+        throw error;
+      }
+    }
+
+    return {
+      url: `${process.env.S3_ENDPOINT || (isDevelopment ? 'http://localhost:9000' : 'http://minio:9000')}/${process.env.S3_BUCKET || 'uploads'}/${filename}`,
+    };
+  } catch (error: unknown) {
+    console.error('Upload handler error:', error);
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error as H3Error;
+    }
+    throw createError({
+      statusCode: 500,
+      message: 'An unexpected error occurred during file upload',
+    });
   }
-  const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${extension}`;
-
-  // Save file
-  await storage.setItemRaw(filename, file.data);
-
-  // Return the URL
-  return {
-    url: `/uploads/${filename}`,
-  };
 });
