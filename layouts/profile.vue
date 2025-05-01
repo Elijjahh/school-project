@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { Home, Book, Users, Mail, Heart, ShoppingCart, Settings } from 'lucide-vue-next';
+import { Home, Book, Users, Heart, Settings } from 'lucide-vue-next';
 
 const tabs = [
   { label: 'Панель', icon: Home, path: '/profile' },
   { label: 'Курсы', icon: Book, path: '/profile/courses' },
   { label: 'Преподаватели', icon: Users, path: '/profile/instructors' },
-  { label: 'Сообщения', icon: Mail, path: '/profile/messages' },
   { label: 'Избранное', icon: Heart, path: '/profile/wishlist' },
-  { label: 'Покупки', icon: ShoppingCart, path: '/profile/purchases' },
   { label: 'Настройки', icon: Settings, path: '/profile/settings' },
 ];
 
