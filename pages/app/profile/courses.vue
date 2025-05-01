@@ -62,7 +62,7 @@ const courses = ref([
 
           <div class="flex items-center justify-between">
             <UIButton variant="outline">
-              <NuxtLink :to="`/courses/${course.id}`">Продолжить обучение</NuxtLink>
+              <NuxtLink :to="`/app/courses/${course.id}`">Продолжить обучение</NuxtLink>
             </UIButton>
             <div v-if="course.completed" class="flex items-center gap-2 text-green-600">
               <Check class="w-4 h-4" />

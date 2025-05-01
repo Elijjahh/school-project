@@ -38,7 +38,7 @@ onMounted(async () => {
         Добавьте курсы в список желаний, чтобы вернуться к ним позже
       </p>
       <UIButton variant="outline" class="mt-4">
-        <NuxtLink to="/courses">Перейти к курсам</NuxtLink>
+        <NuxtLink to="/app/courses">Перейти к курсам</NuxtLink>
       </UIButton>
     </div>
     <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

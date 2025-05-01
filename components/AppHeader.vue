@@ -17,7 +17,7 @@ const { loggedIn, user } = useUserSession();
             Главная
           </NuxtLink>
           <NuxtLink
-            to="/courses"
+            to="/app/courses"
             class="transition-colors hover:text-foreground/80 text-foreground/60"
           >
             Курсы
@@ -38,12 +38,12 @@ const { loggedIn, user } = useUserSession();
       </div>
       <div class="flex flex-1 items-center justify-end space-x-2">
         <div class="flex items-center space-x-4">
-          <NuxtLink to="/profile/wishlist" class="text-muted-foreground hover:text-foreground">
+          <NuxtLink to="/app/profile/wishlist" class="text-muted-foreground hover:text-foreground">
             <Heart class="h-5 w-5" />
           </NuxtLink>
 
           <template v-if="loggedIn">
-            <NuxtLink to="/profile">
+            <NuxtLink to="/app/profile">
               <UIAvatar class="h-8 w-8">
                 <UIAvatarImage v-if="user?.image" :src="user.image" />
                 <UIAvatarFallback v-else>

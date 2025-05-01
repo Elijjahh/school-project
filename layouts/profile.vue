@@ -2,11 +2,11 @@
 import { Home, Book, Users, Heart, Settings } from 'lucide-vue-next';
 
 const tabs = [
-  { label: 'Панель', icon: Home, path: '/profile' },
-  { label: 'Курсы', icon: Book, path: '/profile/courses' },
-  { label: 'Преподаватели', icon: Users, path: '/profile/instructors' },
-  { label: 'Избранное', icon: Heart, path: '/profile/wishlist' },
-  { label: 'Настройки', icon: Settings, path: '/profile/settings' },
+  { label: 'Панель', icon: Home, path: '/app/profile' },
+  { label: 'Курсы', icon: Book, path: '/app/profile/courses' },
+  { label: 'Преподаватели', icon: Users, path: '/app/profile/instructors' },
+  { label: 'Избранное', icon: Heart, path: '/app/profile/wishlist' },
+  { label: 'Настройки', icon: Settings, path: '/app/profile/settings' },
 ];
 
 const route = useRoute();
