@@ -57,8 +57,8 @@ const toggleWishlist = async () => {
           variant="ghost"
           size="icon"
           :disabled="isLoading"
-          @click="toggleWishlist"
           class="h-8 w-8"
+          @click="toggleWishlist"
         >
           <Heart
             class="h-4 w-4"
@@ -66,7 +66,9 @@ const toggleWishlist = async () => {
           />
         </UIButton>
       </div>
-      <UIButton class="w-full" variant="default"> Watch Lecture </UIButton>
+      <NuxtLink :to="`/app/courses/${course.id}`" class="w-full">
+        <UIButton class="w-full" variant="default"> Перейти к курсу </UIButton>
+      </NuxtLink>
     </div>
   </UICard>
 </template>
