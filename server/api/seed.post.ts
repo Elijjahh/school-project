@@ -57,28 +57,101 @@ export default defineEventHandler(async (_event) => {
       }),
     );
 
-    // Create courses
-    const courseTitles = [
-      'Основы программирования на Python',
-      'Веб-разработка с нуля',
-      'Алгоритмы и структуры данных',
-      'Базы данных и SQL',
-      'JavaScript для начинающих',
-      'React и современный фронтенд',
-      'Node.js и серверная разработка',
-      'Мобильная разработка на Flutter',
-      'Машинное обучение и анализ данных',
-      'DevOps и CI/CD',
+    // Create categories
+    const categoryData = [
+      {
+        name: 'Программирование',
+        description: 'Курсы по различным языкам программирования и технологиям разработки',
+        image: 'https://example.com/images/programming.jpg',
+      },
+      {
+        name: 'Веб-разработка',
+        description: 'Создание современных веб-приложений и сайтов',
+        image: 'https://example.com/images/web-dev.jpg',
+      },
+      {
+        name: 'Мобильная разработка',
+        description: 'Разработка приложений для iOS и Android',
+        image: 'https://example.com/images/mobile-dev.jpg',
+      },
+      {
+        name: 'Базы данных',
+        description: 'Работа с различными базами данных и системами хранения',
+        image: 'https://example.com/images/databases.jpg',
+      },
+      {
+        name: 'Искусственный интеллект',
+        description: 'Машинное обучение, нейронные сети и анализ данных',
+        image: 'https://example.com/images/ai.jpg',
+      },
+      {
+        name: 'DevOps',
+        description: 'Развертывание, автоматизация и управление инфраструктурой',
+        image: 'https://example.com/images/devops.jpg',
+      },
+    ];
+
+    const categories = await Promise.all(
+      categoryData.map(async (category) => {
+        const [createdCategory] = await db.insert(tables.categories).values(category).returning();
+        return createdCategory;
+      }),
+    );
+
+    // Create courses with categories
+    const coursesData = [
+      {
+        title: 'Основы программирования на Python',
+        categoryName: 'Программирование',
+      },
+      {
+        title: 'Веб-разработка с нуля',
+        categoryName: 'Веб-разработка',
+      },
+      {
+        title: 'Алгоритмы и структуры данных',
+        categoryName: 'Программирование',
+      },
+      {
+        title: 'Базы данных и SQL',
+        categoryName: 'Базы данных',
+      },
+      {
+        title: 'JavaScript для начинающих',
+        categoryName: 'Веб-разработка',
+      },
+      {
+        title: 'React и современный фронтенд',
+        categoryName: 'Веб-разработка',
+      },
+      {
+        title: 'Node.js и серверная разработка',
+        categoryName: 'Веб-разработка',
+      },
+      {
+        title: 'Мобильная разработка на Flutter',
+        categoryName: 'Мобильная разработка',
+      },
+      {
+        title: 'Машинное обучение и анализ данных',
+        categoryName: 'Искусственный интеллект',
+      },
+      {
+        title: 'DevOps и CI/CD',
+        categoryName: 'DevOps',
+      },
     ];
 
     const createdCourses = await Promise.all(
-      courseTitles.map(async (title) => {
+      coursesData.map(async ({ title, categoryName }) => {
+        const category = categories.find((c) => c.name === categoryName)!;
         const [course] = await db
           .insert(tables.courses)
           .values({
             title,
             description: faker.lorem.paragraphs(2),
             creatorId: faker.helpers.arrayElement(teachers).id,
+            categoryId: category.id,
           })
           .returning();
         return course;

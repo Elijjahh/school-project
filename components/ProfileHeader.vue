@@ -10,19 +10,17 @@ const displayRole = computed(() => {
 
 <template>
   <div class="flex items-center gap-8 p-4 bg-white rounded-lg shadow">
-    <div class="w-[150px] h-[150px] rounded-full overflow-hidden">
-      <img
-        v-if="user?.image"
-        :src="user.image"
-        :alt="`${user?.firstname} ${user?.lastname}`"
-        class="w-full h-full object-cover"
-      />
-      <img
-        v-else
-        src="/assets/images/login-img.png"
-        :alt="`${user?.firstname} ${user?.lastname}`"
-        class="w-full h-full object-cover"
-      />
+    <div class="w-[150px] h-[150px] rounded-full overflow-hidden flex items-center justify-center">
+      <UIAvatar class="w-full h-full">
+        <UIAvatarImage
+          v-if="user?.image"
+          :src="user.image"
+          :alt="`${user?.firstname} ${user?.lastname}`"
+        />
+        <UIAvatarFallback v-else>
+          {{ user?.firstname?.[0] }}{{ user?.lastname?.[0] }}
+        </UIAvatarFallback>
+      </UIAvatar>
     </div>
     <div class="flex flex-col gap-2">
       <h1 class="text-4xl font-semibold m-0">{{ user?.firstname }} {{ user?.lastname }}</h1>

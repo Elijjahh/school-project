@@ -29,6 +29,18 @@ export const usersRelations = relations(users, ({ many }) => ({
   coursesParticipations: many(coursesParticipations),
 }));
 
+export const categories = pgTable('categories', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  description: text('description'),
+  image: text('image'),
+  createdAt: timestamp().defaultNow(),
+});
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  courses: many(courses),
+}));
+
 export const courses = pgTable('courses', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
@@ -37,12 +49,19 @@ export const courses = pgTable('courses', {
   creatorId: integer('creator_id')
     .notNull()
     .references(() => users.id),
+  categoryId: integer('category_id')
+    .notNull()
+    .references(() => categories.id),
 });
 
 export const coursesRelations = relations(courses, ({ one, many }) => ({
   creator: one(users, {
     fields: [courses.creatorId],
     references: [users.id],
+  }),
+  category: one(categories, {
+    fields: [courses.categoryId],
+    references: [categories.id],
   }),
   coursesParticipations: many(coursesParticipations, {
     relationName: 'coursesParticipationsOnCourses',
