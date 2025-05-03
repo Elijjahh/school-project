@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useWishlistStore } from '~/stores/wishlist';
-import { Heart } from 'lucide-vue-next';
+import { Heart, Users } from 'lucide-vue-next';
 
 const props = defineProps<{
   course: {
@@ -10,7 +10,10 @@ const props = defineProps<{
     image?: string | null;
     completed?: boolean;
     progress?: number;
+    category?: string;
+    studentsCount?: number;
   };
+  mode?: 'student' | 'teacher';
 }>();
 
 const wishlistStore = useWishlistStore();
@@ -38,7 +41,26 @@ const toggleWishlist = async () => {
     <div class="p-4 space-y-3">
       <h3 class="font-semibold leading-none tracking-tight">{{ course.title }}</h3>
       <p class="text-sm text-muted-foreground line-clamp-2">{{ course.description }}</p>
-      <div class="flex items-center justify-between pt-2">
+      <div v-if="mode === 'teacher'" class="flex flex-col gap-2 pt-2">
+        <div class="flex items-center gap-2 text-xs text-muted-foreground">
+          <UIBadge v-if="course.category" variant="secondary" class="text-xs">
+            {{ course.category }}
+          </UIBadge>
+          <span v-if="course.studentsCount" class="flex items-center gap-1">
+            <Users class="h-3 w-3" />
+            {{ course.studentsCount }} студентов
+          </span>
+        </div>
+        <div class="flex gap-2 mt-2">
+          <NuxtLink :to="`/app/teacher/courses/${course.id}`">
+            <UIButton variant="outline" size="sm">Детали</UIButton>
+          </NuxtLink>
+          <NuxtLink :to="`/app/teacher/courses/${course.id}/edit`">
+            <UIButton variant="secondary" size="sm">Редактировать</UIButton>
+          </NuxtLink>
+        </div>
+      </div>
+      <div v-else class="flex items-center justify-between pt-2">
         <div class="flex items-center gap-2">
           <span
             v-if="course.completed"
@@ -66,7 +88,7 @@ const toggleWishlist = async () => {
           />
         </UIButton>
       </div>
-      <NuxtLink :to="`/app/courses/${course.id}`" class="w-full">
+      <NuxtLink v-if="mode !== 'teacher'" :to="`/app/courses/${course.id}`" class="w-full">
         <UIButton class="w-full" variant="default"> Перейти к курсу </UIButton>
       </NuxtLink>
     </div>

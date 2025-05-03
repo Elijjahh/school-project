@@ -10,6 +10,7 @@ declare module '#auth-utils' {
     createdAt: Date | null;
     id: number;
     password?: string;
+    bio?: string;
   }
 }
 

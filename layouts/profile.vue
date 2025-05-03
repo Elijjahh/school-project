@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { Home, Book, Users, Heart, Settings } from 'lucide-vue-next';
 
-const tabs = [
+const props = defineProps({
+  mode: {
+    type: String,
+    default: 'student',
+  },
+});
+
+const studentTabs = [
   { label: 'Панель', icon: Home, path: '/app/profile' },
   { label: 'Курсы', icon: Book, path: '/app/profile/courses' },
   { label: 'Преподаватели', icon: Users, path: '/app/profile/instructors' },
@@ -9,9 +16,18 @@ const tabs = [
   { label: 'Настройки', icon: Settings, path: '/app/profile/settings' },
 ];
 
+const teacherTabs = [
+  { label: 'Обзор', icon: Home, path: '/app/teacher' },
+  { label: 'Панель', icon: Book, path: '/app/teacher/dashboard' },
+  { label: 'Мои курсы', icon: Heart, path: '/app/teacher/courses' },
+  { label: 'Настройки', icon: Users, path: '/app/teacher/settings' },
+];
+
+const tabs = computed(() => (props.mode === 'teacher' ? teacherTabs : studentTabs));
+
 const route = useRoute();
 const activeTab = computed(() => {
-  return tabs.findIndex((tab) => tab.path === route.path);
+  return tabs.value.findIndex((tab) => tab.path === route.path);
 });
 </script>
 
