@@ -18,6 +18,7 @@ export default defineEventHandler(async (_event) => {
         firstname: 'Администратор',
         lastname: 'Системы',
         role: 'admin',
+        bio: 'Администратор системы',
       })
       .returning();
 
@@ -33,6 +34,7 @@ export default defineEventHandler(async (_event) => {
             firstname: faker.person.firstName(),
             lastname: faker.person.lastName(),
             role: 'teacher',
+            bio: faker.lorem.sentence(),
           })
           .returning();
         return teacher;

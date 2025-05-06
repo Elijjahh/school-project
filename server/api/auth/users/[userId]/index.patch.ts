@@ -6,11 +6,12 @@ const bodySchema = z.object({
   firstname: z.string().optional(),
   lastname: z.string().optional(),
   image: z.string().optional(),
+  bio: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'userId');
-  const { username, email, firstname, lastname, image } = await readValidatedBody(
+  const { username, email, firstname, lastname, image, bio } = await readValidatedBody(
     event,
     bodySchema.parse,
   );
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
 
   const [user] = await useDrizzle()
     .update(users)
-    .set({ username, email, firstname, lastname, image })
+    .set({ username, email, firstname, lastname, image, bio })
     .where(eq(users.id, Number(id)))
     .returning();
 

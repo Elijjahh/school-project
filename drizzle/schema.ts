@@ -21,6 +21,7 @@ export const users = pgTable('users', {
   lastname: text('lastname').notNull(),
   role: roleEnum().default('student'),
   image: text('image'),
+  bio: text('bio'),
   createdAt: timestamp().defaultNow(),
 });
 

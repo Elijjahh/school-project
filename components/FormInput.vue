@@ -24,10 +24,10 @@ defineEmits<{
     <UIInput
       :id="id"
       :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       :type="type || 'text'"
       :class="{ 'border-destructive focus-visible:ring-destructive': error }"
       :placeholder="placeholder"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />
     <p v-if="error" class="text-sm font-medium text-destructive">
       {{ error }}

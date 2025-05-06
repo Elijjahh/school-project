@@ -1,17 +1,47 @@
 <script setup lang="ts">
-const teacher = ref({
-  name: 'Иван Иванов',
-  bio: 'Преподаватель математики с 10-летним опытом. Люблю делиться знаниями и помогать студентам достигать успеха.',
-});
-const courses = ref<{ id: number; title: string; description: string }[]>([]);
+const { user } = useUserSession();
+
+const teacher = computed(() => ({
+  name: user.value ? `${user.value.firstname} ${user.value.lastname}` : '',
+  bio: user.value?.bio || '',
+}));
+
+// Define a Course type matching CourseCard expectations
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  image?: string | null;
+  completed?: boolean;
+  progress?: number;
+  category?: string;
+  studentsCount?: number;
+  creator?: { id: number };
+}
+
+const courses = ref<Course[]>([]);
+const loading = ref(true);
+const error = ref('');
+
+async function fetchCourses() {
+  loading.value = true;
+  error.value = '';
+  try {
+    if (!user.value?.id) throw new Error('Пользователь не найден');
+    const { data, error: fetchError } = await useFetch(
+      `/api/auth/users/${user.value.id}/teaching-courses`,
+    );
+    if (fetchError.value) throw fetchError.value;
+    courses.value = (data.value || []) as Course[];
+  } catch (err: unknown) {
+    error.value = (err as Error).message || 'Ошибка загрузки курсов';
+  } finally {
+    loading.value = false;
+  }
+}
 
 onMounted(() => {
-  // Fetch teacher info and courses here
-  courses.value = [
-    { id: 1, title: 'Курс 1', description: 'Описание 1' },
-    { id: 2, title: 'Курс 2', description: 'Описание 2' },
-    { id: 3, title: 'Курс 3', description: 'Описание 3' },
-  ];
+  fetchCourses();
 });
 </script>
 
@@ -35,7 +65,9 @@ onMounted(() => {
           Все курсы
         </NuxtLink>
       </div>
-      <div v-if="courses.length" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div v-if="loading" class="text-center py-8">Загрузка...</div>
+      <div v-else-if="error" class="text-red-500 text-center py-8">{{ error }}</div>
+      <div v-else-if="courses.length" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CourseCard v-for="course in courses" :key="course.id" :course="course" />
       </div>
       <div

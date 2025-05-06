@@ -1,11 +1,26 @@
 <script setup lang="ts">
 import { Users, Book, CheckCircle } from 'lucide-vue-next';
-// In a real app, fetch these stats from an API
-const stats = [
-  { label: 'Студенты', value: 120, icon: Users },
-  { label: 'Курсы', value: 5, icon: Book },
-  { label: 'Завершения', value: '87%', icon: CheckCircle },
-];
+const { user } = useUserSession();
+
+const { data, pending, error } = useFetch(`/api/auth/users/${user.value!.id}/dashboard-stats`);
+
+function getPercent(finished: number, total: number): string {
+  if (!total) return '0%';
+  return `${Math.round((finished / total) * 100)}%`;
+}
+
+const stats = computed(() => {
+  const d = data.value || { studentsCount: 0, coursesCount: 0, finishedParticipations: 0 };
+  return [
+    { label: 'Студенты', value: d.studentsCount, icon: Users },
+    { label: 'Курсы', value: d.coursesCount, icon: Book },
+    {
+      label: 'Завершения',
+      value: getPercent(d.finishedParticipations, d.studentsCount),
+      icon: CheckCircle,
+    },
+  ];
+});
 </script>
 
 <template>
@@ -15,7 +30,9 @@ const stats = [
       <p class="text-muted-foreground">Статистика, активность и вовлечённость ваших студентов</p>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div v-if="pending" class="text-center py-8">Загрузка...</div>
+    <div v-else-if="error" class="text-red-500 text-center py-8">{{ error.message }}</div>
+    <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
         v-for="stat in stats"
         :key="stat.label"
