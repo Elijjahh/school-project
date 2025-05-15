@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { ref, computed, onMounted } from 'vue';
-
+const { user } = useUserSession();
 const route = useRoute();
 const courseId = computed(() => Number(route.params.id));
+const router = useRouter();
 
 // Mock interfaces based on drizzle schema
 interface Teacher {
@@ -44,6 +43,10 @@ const error = ref<string | null>(null);
 const isStarting = ref(false);
 const hasStarted = ref(false);
 const isInWishlist = ref(false);
+
+const isCreator = computed(() => {
+  return user.value && course.value && user.value.id === course.value.teacher.id;
+});
 
 async function fetchCourse() {
   loading.value = true;
@@ -104,6 +107,21 @@ function toggleWishlist() {
     removeFromWishlist();
   } else {
     addToWishlist();
+  }
+}
+
+const isRemoving = ref(false);
+
+async function removeCourse() {
+  if (!confirm('Вы уверены, что хотите удалить этот курс?')) return;
+  isRemoving.value = true;
+  try {
+    await $fetch(`/api/courses/${courseId.value}`, { method: 'DELETE' });
+    router.push('/app/teacher/courses');
+  } catch (err) {
+    error.value = (err as Error).message || 'Ошибка при удалении курса';
+  } finally {
+    isRemoving.value = false;
   }
 }
 
@@ -174,24 +192,40 @@ onMounted(async () => {
       <!-- Sidebar -->
       <aside class="w-full lg:w-80 flex-shrink-0 space-y-4">
         <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-4 sticky top-8">
-          <UIButton
-            v-if="!hasStarted"
-            variant="default"
-            class="w-full"
-            :loading="isStarting"
-            :disabled="isStarting"
-            @click="startCourse"
-          >
-            Начать курс
-          </UIButton>
-          <UIButton v-else variant="secondary" class="w-full" disabled> Курс начат </UIButton>
-          <UIButton
-            :variant="isInWishlist ? 'destructive' : 'outline'"
-            class="w-full"
-            @click="toggleWishlist"
-          >
-            {{ isInWishlist ? 'Убрать из избранного' : 'В избранное' }}
-          </UIButton>
+          <template v-if="isCreator">
+            <NuxtLink :to="`/app/teacher/courses/${courseId}/edit`">
+              <UIButton variant="default" class="w-full">Редактировать курс</UIButton>
+            </NuxtLink>
+            <UIButton
+              variant="destructive"
+              class="w-full"
+              :loading="isRemoving"
+              :disabled="isRemoving"
+              @click="removeCourse"
+            >
+              Удалить курс
+            </UIButton>
+          </template>
+          <template v-else>
+            <UIButton
+              v-if="!hasStarted"
+              variant="default"
+              class="w-full"
+              :loading="isStarting"
+              :disabled="isStarting"
+              @click="startCourse"
+            >
+              Начать курс
+            </UIButton>
+            <UIButton v-else variant="secondary" class="w-full" disabled> Курс начат </UIButton>
+            <UIButton
+              :variant="isInWishlist ? 'destructive' : 'outline'"
+              class="w-full"
+              @click="toggleWishlist"
+            >
+              {{ isInWishlist ? 'Убрать из избранного' : 'В избранное' }}
+            </UIButton>
+          </template>
         </div>
       </aside>
     </div>

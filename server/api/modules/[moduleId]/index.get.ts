@@ -6,7 +6,10 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const module = await useDrizzle().query.modules.findFirst({
+  const db = useDrizzle();
+
+  // Получаем сам модуль
+  const module = await db.query.modules.findFirst({
     where: (modules, { eq }) => eq(modules.id, moduleId),
   });
 
@@ -17,5 +20,14 @@ export default defineEventHandler(async (event) => {
       message: 'Модуль с таким id не найден',
     });
 
-  return module;
+  // Получаем уроки, связанные с этим модулем
+  const lessons = await db.query.lessons.findMany({
+    where: (lessons, { eq }) => eq(lessons.moduleId, moduleId),
+    orderBy: (lessons, { asc }) => asc(lessons.order),
+  });
+
+  return {
+    ...module,
+    lessons,
+  };
 });

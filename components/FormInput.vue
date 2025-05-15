@@ -1,16 +1,13 @@
 <script lang="ts" setup>
 defineProps<{
   id: string;
-  modelValue: string;
   label: string;
   type?: string;
   placeholder?: string;
   error?: string;
 }>();
 
-defineEmits<{
-  'update:modelValue': [value: string];
-}>();
+const modelValue = defineModel<string>({ required: true });
 </script>
 
 <template>
@@ -23,11 +20,10 @@ defineEmits<{
     </label>
     <UIInput
       :id="id"
-      :value="modelValue"
+      v-model="modelValue"
       :type="type || 'text'"
       :class="{ 'border-destructive focus-visible:ring-destructive': error }"
       :placeholder="placeholder"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />
     <p v-if="error" class="text-sm font-medium text-destructive">
       {{ error }}

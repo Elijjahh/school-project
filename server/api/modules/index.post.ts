@@ -4,15 +4,19 @@ const bodySchema = z.object({
   courseId: z.number(),
   title: z.string(),
   description: z.string(),
-  order: z.number(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { courseId, title, description, order } = await readValidatedBody(event, bodySchema.parse);
+  const { courseId, title, description } = await readValidatedBody(event, bodySchema.parse);
 
-  const result = await useDrizzle()
+  const [{ value: moduleCount }] = await useDrizzle()
+    .select({ value: count() })
+    .from(modules)
+    .where(eq(modules.courseId, courseId));
+
+  const [result] = await useDrizzle()
     .insert(modules)
-    .values({ courseId, title, description, order })
+    .values({ courseId, title, description, order: moduleCount + 1 })
     .returning();
-  return result[0];
+  return result;
 });
