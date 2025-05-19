@@ -74,7 +74,7 @@ export const coursesParticipations = pgTable('users_to_courses', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => users.id, { onDelete: 'restrict' }),
   courseId: integer('course_id')
     .notNull()
     .references(() => courses.id),
@@ -106,10 +106,10 @@ export const coursesProgress = pgTable('courses_progress', {
   id: serial('id').primaryKey(),
   courseId: integer('course_id')
     .notNull()
-    .references(() => courses.id, { onDelete: 'cascade' }),
+    .references(() => courses.id, { onDelete: 'restrict' }),
   participationId: integer('participation_id')
     .notNull()
-    .references(() => coursesParticipations.id, { onDelete: 'cascade' }),
+    .references(() => coursesParticipations.id, { onDelete: 'restrict' }),
   finished: boolean('finished').notNull(),
 });
 
@@ -129,7 +129,7 @@ export const modules = pgTable('modules', {
   id: serial('id').primaryKey(),
   courseId: integer('courseId')
     .notNull()
-    .references(() => courses.id, { onDelete: 'cascade' }),
+    .references(() => courses.id, { onDelete: 'restrict' }),
   title: text('title').notNull(),
   description: text('description').notNull(),
   order: integer('order').notNull(),
@@ -149,10 +149,10 @@ export const modulesProgress = pgTable(
   {
     moduleId: integer('module_id')
       .notNull()
-      .references(() => modules.id, { onDelete: 'cascade' }),
+      .references(() => modules.id, { onDelete: 'restrict' }),
     participationId: integer('participation_id')
       .notNull()
-      .references(() => coursesParticipations.id, { onDelete: 'cascade' }),
+      .references(() => coursesParticipations.id, { onDelete: 'restrict' }),
     finished: boolean('finished').notNull(),
   },
   (t) => [primaryKey({ columns: [t.participationId, t.moduleId] })],
@@ -175,7 +175,7 @@ export const lessons = pgTable('lessons', {
   id: serial('id').primaryKey(),
   moduleId: integer('moduleId')
     .notNull()
-    .references(() => modules.id, { onDelete: 'cascade' }),
+    .references(() => modules.id, { onDelete: 'restrict' }),
   title: text('title').notNull(),
   content: text('content').notNull(),
   order: integer('order').notNull(),
@@ -196,10 +196,10 @@ export const lessonsProgress = pgTable(
   {
     lessonId: integer('lesson_id')
       .notNull()
-      .references(() => lessons.id, { onDelete: 'cascade' }),
+      .references(() => lessons.id, { onDelete: 'restrict' }),
     participationId: integer('participation_id')
       .notNull()
-      .references(() => coursesParticipations.id, { onDelete: 'cascade' }),
+      .references(() => coursesParticipations.id, { onDelete: 'restrict' }),
     finished: boolean('finished').notNull(),
   },
   (t) => [primaryKey({ columns: [t.participationId, t.lessonId] })],
@@ -222,7 +222,7 @@ export const tests = pgTable('tests', {
   id: serial('id').primaryKey(),
   lessonId: integer('lesson_id')
     .notNull()
-    .references(() => lessons.id, { onDelete: 'cascade' }),
+    .references(() => lessons.id, { onDelete: 'restrict' }),
   maxAttempts: integer('max_attempts').notNull().default(0),
 });
 
@@ -240,7 +240,7 @@ export const testAttempts = pgTable('testAttempts', {
   id: serial('id').primaryKey(),
   testId: integer('testId')
     .notNull()
-    .references(() => tests.id, { onDelete: 'cascade' }),
+    .references(() => tests.id, { onDelete: 'restrict' }),
   datetime: timestamp().defaultNow(),
 });
 
@@ -256,7 +256,7 @@ export const questions = pgTable('questions', {
   id: serial('id').primaryKey(),
   testId: integer('testId')
     .notNull()
-    .references(() => tests.id, { onDelete: 'cascade' }),
+    .references(() => tests.id, { onDelete: 'restrict' }),
   text: text('text').notNull(),
 });
 
@@ -273,7 +273,7 @@ export const answers = pgTable('answers', {
   id: serial('id').primaryKey(),
   questionId: integer('questionId')
     .notNull()
-    .references(() => questions.id, { onDelete: 'cascade' }),
+    .references(() => questions.id, { onDelete: 'restrict' }),
   text: text('text').notNull(),
   correct: boolean('correct').notNull(),
 });
@@ -289,10 +289,10 @@ export const wishlist = pgTable('wishlist', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => users.id, { onDelete: 'restrict' }),
   courseId: integer('course_id')
     .notNull()
-    .references(() => courses.id, { onDelete: 'cascade' }),
+    .references(() => courses.id, { onDelete: 'restrict' }),
   createdAt: timestamp().defaultNow(),
 });
 
