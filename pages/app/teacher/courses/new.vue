@@ -141,7 +141,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="space-y-8 mb-10">
+  <div class="mb-10 space-y-8">
     <div class="space-y-2">
       <h2 class="text-3xl font-bold tracking-tight">Создать курс</h2>
       <p class="text-muted-foreground">Заполните информацию о курсе</p>
@@ -170,7 +170,7 @@ async function handleSubmit() {
               rows="3"
               :class="{ 'border-destructive focus-visible:ring-destructive': descriptionError }"
             />
-            <p v-if="descriptionError" class="text-sm font-medium text-destructive mt-1">
+            <p v-if="descriptionError" class="text-destructive mt-1 text-sm font-medium">
               {{ descriptionError }}
             </p>
           </div>
@@ -183,8 +183,8 @@ async function handleSubmit() {
                   alt="Course image"
                   class="h-full w-full rounded object-cover"
                 />
-                <div v-else class="flex h-full w-full items-center justify-center rounded bg-muted">
-                  <span class="text-2xl font-medium text-muted-foreground">
+                <div v-else class="bg-muted flex h-full w-full items-center justify-center rounded">
+                  <span class="text-muted-foreground text-2xl font-medium">
                     <span>📷</span>
                   </span>
                 </div>
@@ -211,10 +211,10 @@ async function handleSubmit() {
                   </span>
                   <span v-else>Загрузить изображение</span>
                 </UIButton>
-                <p class="text-sm text-muted-foreground">
+                <p class="text-muted-foreground text-sm">
                   JPG, GIF или PNG. Максимальный размер 2MB
                 </p>
-                <p v-if="imageError" class="text-sm font-medium text-destructive">
+                <p v-if="imageError" class="text-destructive text-sm font-medium">
                   {{ imageError }}
                 </p>
               </div>
@@ -250,7 +250,7 @@ async function handleSubmit() {
                   </UISelectGroup>
                 </UISelectContent>
               </UISelect>
-              <div v-if="categoryError" class="text-sm font-medium text-destructive mt-1">
+              <div v-if="categoryError" class="text-destructive mt-1 text-sm font-medium">
                 {{ categoryError }}
               </div>
             </div>
@@ -259,8 +259,8 @@ async function handleSubmit() {
       </UICardContent>
     </UICard>
 
-    <div v-if="error" class="text-sm font-medium text-destructive">{{ error }}</div>
-    <div v-if="success" class="text-sm font-medium text-primary">{{ success }}</div>
+    <div v-if="error" class="text-destructive text-sm font-medium">{{ error }}</div>
+    <div v-if="success" class="text-primary text-sm font-medium">{{ success }}</div>
     <div class="flex">
       <UIButton type="button" :disabled="loading" @click="handleSubmit">
         <span v-if="loading" class="flex items-center">

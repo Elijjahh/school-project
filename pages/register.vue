@@ -94,11 +94,11 @@ async function submitForm() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-background">
-    <div class="w-full max-w-md mx-auto p-8 space-y-6 bg-white rounded-lg shadow">
+  <div class="bg-background flex min-h-screen items-center justify-center">
+    <div class="mx-auto w-full max-w-md space-y-6 rounded-lg bg-white p-8 shadow">
       <div class="flex flex-col space-y-2 text-center">
         <h1 class="text-2xl font-semibold tracking-tight">Создайте аккаунт</h1>
-        <p class="text-sm text-muted-foreground">Введите ваши данные ниже, чтобы создать аккаунт</p>
+        <p class="text-muted-foreground text-sm">Введите ваши данные ниже, чтобы создать аккаунт</p>
       </div>
       <form class="space-y-4" @submit.prevent="onSubmit">
         <div class="grid grid-cols-2 gap-4">
@@ -161,7 +161,7 @@ async function submitForm() {
             />
           </div>
         </div>
-        <div v-if="error" class="text-sm font-medium text-destructive">
+        <div v-if="error" class="text-destructive text-sm font-medium">
           {{ error }}
         </div>
         <UIButton type="submit" class="w-full" :disabled="loading">
@@ -174,9 +174,9 @@ async function submitForm() {
           <span v-else>Создать аккаунт</span>
         </UIButton>
       </form>
-      <p class="px-8 text-center text-sm text-muted-foreground">
+      <p class="text-muted-foreground px-8 text-center text-sm">
         Уже есть аккаунт?
-        <NuxtLink to="/login" class="underline underline-offset-4 hover:text-primary">
+        <NuxtLink to="/login" class="hover:text-primary underline underline-offset-4">
           Войти
         </NuxtLink>
       </p>

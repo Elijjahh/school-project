@@ -5,7 +5,7 @@ const { loggedIn, user } = useUserSession();
 
 <template>
   <header
-    class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    class="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur"
   >
     <div class="container mx-auto flex h-14 items-center">
       <div class="mr-4 flex">
@@ -13,24 +13,24 @@ const { loggedIn, user } = useUserSession();
           <img src="/assets/images/logo-img.svg" alt="Логотип" class="w-48" />
         </NuxtLink>
         <nav class="flex items-center space-x-6 text-sm font-medium">
-          <NuxtLink to="/" class="transition-colors hover:text-foreground/80 text-foreground/60">
+          <NuxtLink to="/" class="hover:text-foreground/80 text-foreground/60 transition-colors">
             Главная
           </NuxtLink>
           <NuxtLink
             to="/app/courses"
-            class="transition-colors hover:text-foreground/80 text-foreground/60"
+            class="hover:text-foreground/80 text-foreground/60 transition-colors"
           >
             Курсы
           </NuxtLink>
           <NuxtLink
             to="/about"
-            class="transition-colors hover:text-foreground/80 text-foreground/60"
+            class="hover:text-foreground/80 text-foreground/60 transition-colors"
           >
             О нас
           </NuxtLink>
           <NuxtLink
             to="/become-instructor"
-            class="transition-colors hover:text-foreground/80 text-foreground/60"
+            class="hover:text-foreground/80 text-foreground/60 transition-colors"
           >
             Стать преподавателем
           </NuxtLink>

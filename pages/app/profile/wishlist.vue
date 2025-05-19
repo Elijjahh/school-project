@@ -18,11 +18,11 @@ onMounted(async () => {
     </div>
 
     <div v-if="wishlistStore.isLoading" class="flex justify-center py-8">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div class="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
     </div>
     <div
       v-else-if="wishlistStore.error"
-      class="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive"
+      class="border-destructive bg-destructive/10 text-destructive rounded-lg border p-4"
     >
       <p class="text-center">Произошла ошибка при загрузке списка желаний</p>
     </div>
@@ -30,11 +30,11 @@ onMounted(async () => {
       v-else-if="!wishlistStore.courses.length"
       class="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center"
     >
-      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-        <Heart class="h-6 w-6 text-muted-foreground" />
+      <div class="bg-muted mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+        <Heart class="text-muted-foreground h-6 w-6" />
       </div>
       <h3 class="mt-4 text-lg font-semibold">Список желаний пуст</h3>
-      <p class="mt-2 text-sm text-muted-foreground">
+      <p class="text-muted-foreground mt-2 text-sm">
         Добавьте курсы в список желаний, чтобы вернуться к ним позже
       </p>
       <UIButton variant="outline" class="mt-4">

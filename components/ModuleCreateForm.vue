@@ -63,7 +63,7 @@ async function handleSave() {
             'border-destructive focus-visible:ring-destructive': descriptionError,
           }"
         />
-        <div v-if="descriptionError" class="text-sm font-medium text-destructive">
+        <div v-if="descriptionError" class="text-destructive text-sm font-medium">
           {{ descriptionError }}
         </div>
         <UIButton type="button" :disabled="props.loading" @click="handleSave">
@@ -75,7 +75,7 @@ async function handleSave() {
           </span>
           <span v-else>Создать модуль</span>
         </UIButton>
-        <span v-if="saveError" class="text-sm font-medium text-destructive ml-4">{{
+        <span v-if="saveError" class="text-destructive ml-4 text-sm font-medium">{{
           saveError
         }}</span>
       </div>

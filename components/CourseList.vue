@@ -15,13 +15,13 @@ defineProps<{
 
 <template>
   <div>
-    <div v-if="pending" class="flex justify-center items-center min-h-[200px]">
-      <UISpinner class="w-8 h-8" />
+    <div v-if="pending" class="flex min-h-[200px] items-center justify-center">
+      <UISpinner class="h-8 w-8" />
     </div>
-    <div v-else-if="error" class="text-red-500 text-center py-5">
+    <div v-else-if="error" class="py-5 text-center text-red-500">
       Произошла ошибка при загрузке курсов
     </div>
-    <div v-else class="grid grid-cols-2 gap-5 mt-10">
+    <div v-else class="mt-10 grid grid-cols-2 gap-5">
       <CourseCard
         v-for="course in courses"
         :key="course.id"

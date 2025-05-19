@@ -64,8 +64,8 @@ async function onFileChange(event: Event) {
         alt="Course image"
         class="h-full w-full rounded object-cover"
       />
-      <div v-else class="flex h-full w-full items-center justify-center rounded bg-muted">
-        <span class="text-2xl font-medium text-muted-foreground"><span>📷</span></span>
+      <div v-else class="bg-muted flex h-full w-full items-center justify-center rounded">
+        <span class="text-muted-foreground text-2xl font-medium"><span>📷</span></span>
       </div>
     </div>
     <div class="space-y-2">
@@ -78,8 +78,8 @@ async function onFileChange(event: Event) {
         /></span>
         <span v-else>Загрузить изображение</span>
       </UIButton>
-      <p class="text-sm text-muted-foreground">JPG, GIF или PNG. Максимальный размер 2MB</p>
-      <p v-if="error" class="text-sm font-medium text-destructive">{{ error }}</p>
+      <p class="text-muted-foreground text-sm">JPG, GIF или PNG. Максимальный размер 2MB</p>
+      <p v-if="error" class="text-destructive text-sm font-medium">{{ error }}</p>
     </div>
   </div>
 </template>

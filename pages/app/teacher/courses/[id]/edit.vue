@@ -32,8 +32,8 @@ async function handleCourseSave(payload: {
 </script>
 
 <template>
-  <div class="space-y-8 mb-10">
-    <div v-if="loading" class="text-center py-8">Загрузка...</div>
+  <div class="mb-10 space-y-8">
+    <div v-if="loading" class="py-8 text-center">Загрузка...</div>
     <div v-else>
       <div class="space-y-2">
         <h2 class="text-3xl font-bold tracking-tight">Редактировать курс</h2>
@@ -48,7 +48,7 @@ async function handleCourseSave(payload: {
         :categories-error="errorMessage"
         @save="handleCourseSave"
       />
-      <div class="space-y-6 mt-10 max-w-2xl">
+      <div class="mt-10 max-w-2xl space-y-6">
         <div class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">Модули</h3>
           <UIButton variant="secondary">
@@ -61,7 +61,7 @@ async function handleCourseSave(payload: {
           <li v-for="mod in courseData.modules" :key="mod.id" class="mb-4">
             <NuxtLink
               :to="`/app/teacher/courses/${courseId}/modules/${mod.id}/edit`"
-              class="underline text-blue-600 hover:text-blue-800"
+              class="text-blue-600 underline hover:text-blue-800"
             >
               {{ mod.title || 'Без названия' }} (Порядок: {{ mod.order }})
             </NuxtLink>

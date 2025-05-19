@@ -68,7 +68,7 @@ function handleRemove() {
 }
 </script>
 <template>
-  <div class="mt-4 border rounded p-4">
+  <div class="mt-4 rounded border p-4">
     <div v-if="!editing">
       <div class="mb-2">
         <div class="font-semibold">Название урока</div>
@@ -95,8 +95,8 @@ function handleRemove() {
         rows="3"
         :class="{ 'border-destructive focus-visible:ring-destructive': contentError }"
       />
-      <div v-if="contentError" class="text-sm font-medium text-destructive">{{ contentError }}</div>
-      <div class="flex gap-2 mt-2">
+      <div v-if="contentError" class="text-destructive text-sm font-medium">{{ contentError }}</div>
+      <div class="mt-2 flex gap-2">
         <UIButton type="button" :disabled="saveLoading" @click="handleSave">
           <span v-if="saveLoading" class="flex items-center"
             ><span class="mr-2">Сохраняем...</span
@@ -106,10 +106,10 @@ function handleRemove() {
           <span v-else>Сохранить урок</span>
         </UIButton>
         <UIButton type="button" variant="destructive" @click="handleRemove">Удалить урок</UIButton>
-        <span v-if="saveSuccess" class="text-sm font-medium text-primary ml-4">{{
+        <span v-if="saveSuccess" class="text-primary ml-4 text-sm font-medium">{{
           saveSuccess
         }}</span>
-        <span v-if="saveError" class="text-sm font-medium text-destructive ml-4">{{
+        <span v-if="saveError" class="text-destructive ml-4 text-sm font-medium">{{
           saveError
         }}</span>
       </div>

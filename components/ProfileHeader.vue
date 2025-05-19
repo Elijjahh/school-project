@@ -9,9 +9,9 @@ const displayRole = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-8 p-4 bg-white rounded-lg shadow">
-    <div class="w-[150px] h-[150px] rounded-full overflow-hidden flex items-center justify-center">
-      <UIAvatar class="w-full h-full">
+  <div class="flex items-center gap-8 rounded-lg bg-white p-4 shadow">
+    <div class="flex h-[150px] w-[150px] items-center justify-center overflow-hidden rounded-full">
+      <UIAvatar class="h-full w-full">
         <UIAvatarImage
           v-if="user?.image"
           :src="user.image"
@@ -23,9 +23,9 @@ const displayRole = computed(() => {
       </UIAvatar>
     </div>
     <div class="flex flex-col gap-2">
-      <h1 class="text-4xl font-semibold m-0">{{ user?.firstname }} {{ user?.lastname }}</h1>
-      <p class="text-gray-500 m-0">@{{ user?.username }}</p>
-      <p v-if="displayRole" class="text-primary capitalize m-0">{{ displayRole }}</p>
+      <h1 class="m-0 text-4xl font-semibold">{{ user?.firstname }} {{ user?.lastname }}</h1>
+      <p class="m-0 text-gray-500">@{{ user?.username }}</p>
+      <p v-if="displayRole" class="text-primary m-0 capitalize">{{ displayRole }}</p>
     </div>
   </div>
 </template>

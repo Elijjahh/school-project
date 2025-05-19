@@ -40,8 +40,8 @@ const courses = ref([
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold">{{ course.title }}</h3>
             <div class="flex items-center gap-2">
-              <Clock class="w-4 h-4 text-muted-foreground" />
-              <span class="text-sm text-muted-foreground">
+              <Clock class="text-muted-foreground h-4 w-4" />
+              <span class="text-muted-foreground text-sm">
                 Последний доступ: {{ course.lastAccessed }}
               </span>
             </div>
@@ -52,9 +52,9 @@ const courses = ref([
               <span>Прогресс</span>
               <span>{{ course.progress }}%</span>
             </div>
-            <div class="h-2 bg-muted rounded-full">
+            <div class="bg-muted h-2 rounded-full">
               <div
-                class="h-full bg-primary rounded-full"
+                class="bg-primary h-full rounded-full"
                 :style="{ width: `${course.progress}%` }"
               ></div>
             </div>
@@ -65,7 +65,7 @@ const courses = ref([
               <NuxtLink :to="`/app/courses/${course.id}`">Продолжить обучение</NuxtLink>
             </UIButton>
             <div v-if="course.completed" class="flex items-center gap-2 text-green-600">
-              <Check class="w-4 h-4" />
+              <Check class="h-4 w-4" />
               <span class="text-sm">Завершено</span>
             </div>
           </div>

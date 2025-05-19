@@ -40,8 +40,8 @@ async function handleLessonSave(payload: { title: string; content: string; order
 </script>
 
 <template>
-  <div class="space-y-8 mb-10">
-    <div v-if="loading" class="text-center py-8">Загрузка...</div>
+  <div class="mb-10 space-y-8">
+    <div v-if="loading" class="py-8 text-center">Загрузка...</div>
     <div v-else>
       <div class="space-y-2">
         <h2 class="text-3xl font-bold tracking-tight">Редактировать урок</h2>

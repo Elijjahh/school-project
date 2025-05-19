@@ -22,20 +22,20 @@ const features = [
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-background">
-    <div class="w-full max-w-4xl mx-auto p-8 space-y-8">
-      <div class="text-center space-y-4">
+  <div class="bg-background flex min-h-screen items-center justify-center">
+    <div class="mx-auto w-full max-w-4xl space-y-8 p-8">
+      <div class="space-y-4 text-center">
         <h1 class="text-4xl font-bold tracking-tight">О нашей платформе</h1>
-        <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p class="text-muted-foreground mx-auto max-w-2xl text-xl">
           Мы создаем образовательную платформу, которая помогает людям получать новые знания и
           навыки
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         <UICard v-for="feature in features" :key="feature.title" class="p-6">
           <div class="space-y-4">
-            <component :is="feature.icon" class="w-12 h-12 text-primary" />
+            <component :is="feature.icon" class="text-primary h-12 w-12" />
             <h3 class="text-xl font-semibold">{{ feature.title }}</h3>
             <p class="text-muted-foreground">{{ feature.description }}</p>
           </div>
@@ -43,9 +43,9 @@ const features = [
       </div>
 
       <UICard class="p-6">
-        <div class="text-center space-y-4">
+        <div class="space-y-4 text-center">
           <h2 class="text-2xl font-bold">Присоединяйтесь к нам</h2>
-          <p class="text-muted-foreground max-w-2xl mx-auto">
+          <p class="text-muted-foreground mx-auto max-w-2xl">
             Начните свое обучение уже сегодня и откройте новые возможности для своего развития
           </p>
           <UIButton>

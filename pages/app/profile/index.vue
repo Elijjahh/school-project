@@ -24,11 +24,11 @@ const {
     </div>
 
     <div v-if="statsPending" class="flex justify-center py-8">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div class="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
     </div>
     <div
       v-else-if="statsError"
-      class="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive"
+      class="border-destructive bg-destructive/10 text-destructive rounded-lg border p-4"
     >
       <p class="text-center">Не удалось загрузить статистику</p>
     </div>
@@ -46,7 +46,7 @@ const {
       <div class="flex items-center justify-between">
         <div class="space-y-1">
           <h2 class="text-2xl font-semibold tracking-tight">Ваши курсы</h2>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-muted-foreground text-sm">
             Продолжайте обучение с того места, где остановились
           </p>
         </div>
@@ -54,12 +54,12 @@ const {
 
       <div v-if="coursesPending" class="flex justify-center py-8">
         <div
-          class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+          class="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
         />
       </div>
       <div
         v-else-if="coursesError"
-        class="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive"
+        class="border-destructive bg-destructive/10 text-destructive rounded-lg border p-4"
       >
         <p class="text-center">Не удалось загрузить курсы</p>
       </div>
@@ -82,11 +82,11 @@ const {
           v-else
           class="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center"
         >
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            <Play class="h-6 w-6 text-muted-foreground" />
+          <div class="bg-muted mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+            <Play class="text-muted-foreground h-6 w-6" />
           </div>
           <h3 class="mt-4 text-lg font-semibold">Нет курсов</h3>
-          <p class="mt-2 text-sm text-muted-foreground">
+          <p class="text-muted-foreground mt-2 text-sm">
             Начните обучение, выбрав курс из каталога
           </p>
           <UIButton variant="outline" class="mt-4">

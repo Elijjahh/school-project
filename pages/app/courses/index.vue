@@ -92,7 +92,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
     <div class="space-y-8">
       <div class="space-y-2">
         <h1 class="text-3xl font-bold tracking-tight">Курсы</h1>
@@ -161,12 +161,12 @@ onMounted(async () => {
 
         <div v-if="pending" class="flex justify-center py-8">
           <div
-            class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+            class="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
           />
         </div>
         <div
           v-else-if="error"
-          class="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive"
+          class="border-destructive bg-destructive/10 text-destructive rounded-lg border p-4"
         >
           <p class="text-center">Не удалось загрузить курсы</p>
         </div>
@@ -174,11 +174,11 @@ onMounted(async () => {
           v-else-if="!courses.length"
           class="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center"
         >
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            <Compass class="h-6 w-6 text-muted-foreground" />
+          <div class="bg-muted mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+            <Compass class="text-muted-foreground h-6 w-6" />
           </div>
           <h3 class="mt-4 text-lg font-semibold">Нет доступных курсов</h3>
-          <p class="mt-2 text-sm text-muted-foreground">
+          <p class="text-muted-foreground mt-2 text-sm">
             В данный момент нет доступных курсов в этой категории
           </p>
         </div>

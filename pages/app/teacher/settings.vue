@@ -229,9 +229,9 @@ async function handleLogout() {
               />
               <div
                 v-else
-                class="flex h-full w-full items-center justify-center rounded-full bg-muted"
+                class="bg-muted flex h-full w-full items-center justify-center rounded-full"
               >
-                <span class="text-2xl font-medium text-muted-foreground">
+                <span class="text-muted-foreground text-2xl font-medium">
                   {{ user?.firstname?.[0] }}{{ user?.lastname?.[0] }}
                 </span>
               </div>
@@ -258,8 +258,8 @@ async function handleLogout() {
                 </span>
                 <span v-else>Изменить фото</span>
               </UIButton>
-              <p class="text-sm text-muted-foreground">JPG, GIF или PNG. Максимальный размер 2MB</p>
-              <p v-if="imageError" class="text-sm font-medium text-destructive">
+              <p class="text-muted-foreground text-sm">JPG, GIF или PNG. Максимальный размер 2MB</p>
+              <p v-if="imageError" class="text-destructive text-sm font-medium">
                 {{ imageError }}
               </p>
             </div>
@@ -314,14 +314,14 @@ async function handleLogout() {
               placeholder="Краткая информация о себе..."
               :error="errors.bio"
               rows="3"
-              class="w-full px-3 py-2 border rounded"
+              class="w-full rounded border px-3 py-2"
             />
           </div>
 
-          <div v-if="error" class="text-sm font-medium text-destructive">
+          <div v-if="error" class="text-destructive text-sm font-medium">
             {{ error }}
           </div>
-          <div v-if="success" class="text-sm font-medium text-primary">
+          <div v-if="success" class="text-primary text-sm font-medium">
             {{ success }}
           </div>
 
@@ -351,7 +351,7 @@ async function handleLogout() {
       <UICardContent>
         <div class="flex items-center justify-between">
           <div class="space-y-1">
-            <p class="text-sm text-muted-foreground">
+            <p class="text-muted-foreground text-sm">
               При выходе вам потребуется повторно войти в аккаунт для доступа к вашим курсам и
               прогрессу
             </p>

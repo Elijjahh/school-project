@@ -36,16 +36,16 @@ const courses = computed(() => data.value || []);
     </div>
     <UICard>
       <UICardContent>
-        <div v-if="pending" class="text-center py-8">Загрузка...</div>
-        <div v-else-if="error" class="text-red-500 text-center py-8">{{ error.message }}</div>
+        <div v-if="pending" class="py-8 text-center">Загрузка...</div>
+        <div v-else-if="error" class="py-8 text-center text-red-500">{{ error.message }}</div>
         <div v-else-if="courses.length" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <CourseCard v-for="course in courses" :key="course.id" :course="course" mode="teacher" />
         </div>
         <div
           v-else
-          class="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center text-muted-foreground"
+          class="text-muted-foreground flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center"
         >
-          <span class="text-2xl mb-2">📚</span>
+          <span class="mb-2 text-2xl">📚</span>
           <span>Курсы не найдены</span>
         </div>
       </UICardContent>

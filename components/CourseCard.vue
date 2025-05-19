@@ -30,19 +30,19 @@ const toggleWishlist = async () => {
 
 <template>
   <UICard class="group relative overflow-hidden rounded-lg border">
-    <div class="aspect-video relative flex flex-col">
+    <div class="relative flex aspect-video flex-col">
       <img
         :src="course.image || ''"
         class="h-full w-full object-cover transition-all group-hover:scale-105"
         :alt="course.title"
       />
-      <div class="flex-1 bg-gradient-to-t from-background/80 to-transparent" />
+      <div class="from-background/80 flex-1 bg-gradient-to-t to-transparent" />
     </div>
-    <div class="p-4 space-y-3">
-      <h3 class="font-semibold leading-none tracking-tight">{{ course.title }}</h3>
-      <p class="text-sm text-muted-foreground line-clamp-2">{{ course.description }}</p>
+    <div class="space-y-3 p-4">
+      <h3 class="leading-none font-semibold tracking-tight">{{ course.title }}</h3>
+      <p class="text-muted-foreground line-clamp-2 text-sm">{{ course.description }}</p>
       <div v-if="mode === 'teacher'" class="flex flex-col gap-2 pt-2">
-        <div class="flex items-center gap-2 text-xs text-muted-foreground">
+        <div class="text-muted-foreground flex items-center gap-2 text-xs">
           <UIBadge v-if="course.category" variant="secondary" class="text-xs">
             {{ course.category }}
           </UIBadge>
@@ -51,7 +51,7 @@ const toggleWishlist = async () => {
             {{ course.studentsCount }} студентов
           </span>
         </div>
-        <div class="flex gap-2 mt-2">
+        <div class="mt-2 flex gap-2">
           <NuxtLink :to="`/app/courses/${course.id}`">
             <UIButton variant="outline" size="sm">Детали</UIButton>
           </NuxtLink>
@@ -64,13 +64,13 @@ const toggleWishlist = async () => {
         <div class="flex items-center gap-2">
           <span
             v-if="course.completed"
-            class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+            class="focus:ring-ring bg-primary text-primary-foreground hover:bg-primary/80 inline-flex items-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-semibold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             {{ course.progress ? course.progress + '%' : '' }} Completed
           </span>
           <span
             v-else-if="course.progress"
-            class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            class="focus:ring-ring bg-secondary text-secondary-foreground hover:bg-secondary/80 inline-flex items-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-semibold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             {{ course.progress }}% Progress
           </span>

@@ -36,12 +36,12 @@ async function handleLessonCreate(payload: LessonPayload) {
 </script>
 
 <template>
-  <div class="space-y-8 mb-10">
+  <div class="mb-10 space-y-8">
     <div class="space-y-2">
       <h2 class="text-3xl font-bold tracking-tight">Создать урок</h2>
       <p class="text-muted-foreground">Заполните информацию о новом уроке</p>
     </div>
     <LessonCreateForm :module-id="moduleId" :loading="loading" @save="handleLessonCreate" />
-    <div v-if="error" class="text-red-500 mt-4">{{ error }}</div>
+    <div v-if="error" class="mt-4 text-red-500">{{ error }}</div>
   </div>
 </template>

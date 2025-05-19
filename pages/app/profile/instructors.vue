@@ -33,13 +33,13 @@ const instructors = ref([
       <UICard v-for="instructor in instructors" :key="instructor.id" class="p-6">
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-              <User class="w-6 h-6 text-muted-foreground" />
+            <div class="bg-muted flex h-12 w-12 items-center justify-center rounded-full">
+              <User class="text-muted-foreground h-6 w-6" />
             </div>
             <div>
               <h3 class="text-lg font-semibold">{{ instructor.name }}</h3>
-              <div class="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail class="w-4 h-4" />
+              <div class="text-muted-foreground flex items-center gap-2 text-sm">
+                <Mail class="h-4 w-4" />
                 <span>{{ instructor.email }}</span>
               </div>
             </div>
@@ -47,7 +47,7 @@ const instructors = ref([
 
           <div class="space-y-2">
             <h4 class="font-medium">Курсы:</h4>
-            <ul class="list-disc list-inside text-sm text-muted-foreground">
+            <ul class="text-muted-foreground list-inside list-disc text-sm">
               <li v-for="course in instructor.courses" :key="course">
                 {{ course }}
               </li>
@@ -55,12 +55,12 @@ const instructors = ref([
           </div>
 
           <div class="flex items-center justify-between">
-            <div class="text-sm text-muted-foreground">
+            <div class="text-muted-foreground text-sm">
               Последний контакт: {{ instructor.lastContact }}
             </div>
             <UIButton variant="outline">
               <div class="flex items-center gap-2">
-                <MessageSquare class="w-4 h-4" />
+                <MessageSquare class="h-4 w-4" />
                 <span>Написать</span>
               </div>
             </UIButton>

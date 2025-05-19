@@ -43,11 +43,11 @@ const activeTab = computed(() => {
           :to="tab.path"
           class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
           :class="{
-            'text-primary border-b-2 border-primary': activeTab === index,
+            'text-primary border-primary border-b-2': activeTab === index,
             'text-gray-500 hover:text-gray-700': activeTab !== index,
           }"
         >
-          <component :is="tab.icon" class="w-4 h-4" />
+          <component :is="tab.icon" class="h-4 w-4" />
           {{ tab.label }}
         </NuxtLink>
       </div>

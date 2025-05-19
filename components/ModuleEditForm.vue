@@ -121,10 +121,10 @@ function handleAddLesson() {
               'border-destructive focus-visible:ring-destructive': descriptionError,
             }"
           />
-          <div v-if="descriptionError" class="text-sm font-medium text-destructive">
+          <div v-if="descriptionError" class="text-destructive text-sm font-medium">
             {{ descriptionError }}
           </div>
-          <div class="flex gap-2 mt-2">
+          <div class="mt-2 flex gap-2">
             <UIButton type="button" :disabled="saveLoading" @click="handleSave">
               <span v-if="saveLoading" class="flex items-center"
                 ><span class="mr-2">Сохраняем...</span
@@ -136,10 +136,10 @@ function handleAddLesson() {
             <UIButton type="button" variant="destructive" @click="handleRemove"
               >Удалить модуль</UIButton
             >
-            <span v-if="saveSuccess" class="text-sm font-medium text-primary ml-4">{{
+            <span v-if="saveSuccess" class="text-primary ml-4 text-sm font-medium">{{
               saveSuccess
             }}</span>
-            <span v-if="saveError" class="text-sm font-medium text-destructive ml-4">{{
+            <span v-if="saveError" class="text-destructive ml-4 text-sm font-medium">{{
               saveError
             }}</span>
           </div>

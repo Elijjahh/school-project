@@ -29,12 +29,12 @@ async function handleModuleCreate(payload: { title: string; description: string 
 </script>
 
 <template>
-  <div class="space-y-8 mb-10">
+  <div class="mb-10 space-y-8">
     <div class="space-y-2">
       <h2 class="text-3xl font-bold tracking-tight">Создать модуль</h2>
       <p class="text-muted-foreground">Заполните информацию о новом модуле</p>
     </div>
     <ModuleCreateForm :loading="loading" @save="handleModuleCreate" />
-    <div v-if="error" class="text-red-500 mt-4">{{ error }}</div>
+    <div v-if="error" class="mt-4 text-red-500">{{ error }}</div>
   </div>
 </template>

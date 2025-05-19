@@ -14,7 +14,7 @@ const modelValue = defineModel<string>({ required: true });
   <div class="space-y-2">
     <label
       :for="id"
-      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
     >
       {{ label }}
     </label>
@@ -25,7 +25,7 @@ const modelValue = defineModel<string>({ required: true });
       :class="{ 'border-destructive focus-visible:ring-destructive': error }"
       :placeholder="placeholder"
     />
-    <p v-if="error" class="text-sm font-medium text-destructive">
+    <p v-if="error" class="text-destructive text-sm font-medium">
       {{ error }}
     </p>
   </div>

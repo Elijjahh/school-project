@@ -30,8 +30,8 @@ const stats = computed(() => {
       <p class="text-muted-foreground">Статистика, активность и вовлечённость ваших студентов</p>
     </div>
 
-    <div v-if="pending" class="text-center py-8">Загрузка...</div>
-    <div v-else-if="error" class="text-red-500 text-center py-8">{{ error.message }}</div>
+    <div v-if="pending" class="py-8 text-center">Загрузка...</div>
+    <div v-else-if="error" class="py-8 text-center text-red-500">{{ error.message }}</div>
     <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
         v-for="stat in stats"

@@ -126,10 +126,10 @@ const formatDate = (date: string) => {
     <!-- Hero Section -->
     <section class="bg-background">
       <div class="container mx-auto px-6 py-24">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-          <div class="md:w-1/2 mb-8 md:mb-0">
-            <h1 class="text-4xl md:text-6xl font-bold mb-6">Начните свой путь к знаниям</h1>
-            <p class="text-xl mb-8 text-muted-foreground">
+        <div class="flex flex-col items-center justify-between md:flex-row">
+          <div class="mb-8 md:mb-0 md:w-1/2">
+            <h1 class="mb-6 text-4xl font-bold md:text-6xl">Начните свой путь к знаниям</h1>
+            <p class="text-muted-foreground mb-8 text-xl">
               Откройте для себя мир знаний с нашими экспертными курсами и интерактивным обучением.
             </p>
             <div class="space-x-4">
@@ -142,25 +142,25 @@ const formatDate = (date: string) => {
             </div>
           </div>
           <div class="md:w-1/2">
-            <img src="/hero-image.svg" alt="Иллюстрация обучения" class="w-full max-w-lg mx-auto" />
+            <img src="/hero-image.svg" alt="Иллюстрация обучения" class="mx-auto w-full max-w-lg" />
           </div>
         </div>
       </div>
     </section>
 
     <!-- Best Categories Section -->
-    <section class="py-20 bg-muted/50">
+    <section class="bg-muted/50 py-20">
       <div class="container mx-auto px-6">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">Популярные категории</h2>
-        <div class="grid md:grid-cols-4 gap-6">
+        <h2 class="mb-16 text-center text-3xl font-bold md:text-4xl">Популярные категории</h2>
+        <div class="grid gap-6 md:grid-cols-4">
           <UICard
             v-for="category in categories"
             :key="category.name"
-            class="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            class="cursor-pointer p-6 transition-shadow hover:shadow-lg"
           >
-            <div class="text-center space-y-4">
+            <div class="space-y-4 text-center">
               <div class="flex justify-center">
-                <component :is="category.icon" class="w-12 h-12 text-primary" />
+                <component :is="category.icon" class="text-primary h-12 w-12" />
               </div>
               <h3 class="text-xl font-semibold">{{ category.name }}</h3>
               <p class="text-muted-foreground">{{ category.count }} курсов</p>
@@ -171,23 +171,23 @@ const formatDate = (date: string) => {
     </section>
 
     <!-- Popular Courses Section -->
-    <section class="py-20 bg-background">
+    <section class="bg-background py-20">
       <div class="container mx-auto px-6">
-        <div class="flex justify-between items-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold">Популярные курсы</h2>
+        <div class="mb-12 flex items-center justify-between">
+          <h2 class="text-3xl font-bold md:text-4xl">Популярные курсы</h2>
           <UIButton variant="outline" asChild>
             <NuxtLink to="/app/courses">Все курсы</NuxtLink>
           </UIButton>
         </div>
-        <div class="grid md:grid-cols-3 gap-6">
+        <div class="grid gap-6 md:grid-cols-3">
           <UICard v-for="course in popularCourses" :key="course.id" class="overflow-hidden">
-            <img :src="course.image" :alt="course.title" class="w-full h-48 object-cover" />
+            <img :src="course.image" :alt="course.title" class="h-48 w-full object-cover" />
             <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">{{ course.title }}</h3>
+              <h3 class="mb-2 text-xl font-semibold">{{ course.title }}</h3>
               <p class="text-muted-foreground mb-4">{{ course.description }}</p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
-                  <UserCircle class="w-5 h-5" />
+                  <UserCircle class="h-5 w-5" />
                   <span>{{ course.students }} студентов</span>
                 </div>
                 <UIButton size="sm" asChild>
@@ -201,23 +201,23 @@ const formatDate = (date: string) => {
     </section>
 
     <!-- Recently Added Courses -->
-    <section class="py-20 bg-muted/50">
+    <section class="bg-muted/50 py-20">
       <div class="container mx-auto px-6">
-        <div class="flex justify-between items-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold">Новые курсы</h2>
+        <div class="mb-12 flex items-center justify-between">
+          <h2 class="text-3xl font-bold md:text-4xl">Новые курсы</h2>
           <UIButton variant="outline" asChild>
             <NuxtLink to="/app/courses?sort=newest">Все новые курсы</NuxtLink>
           </UIButton>
         </div>
-        <div class="grid md:grid-cols-3 gap-6">
+        <div class="grid gap-6 md:grid-cols-3">
           <UICard v-for="course in recentCourses" :key="course.id" class="overflow-hidden">
-            <img :src="course.image" :alt="course.title" class="w-full h-48 object-cover" />
+            <img :src="course.image" :alt="course.title" class="h-48 w-full object-cover" />
             <div class="p-6">
-              <h3 class="text-xl font-semibold mb-2">{{ course.title }}</h3>
+              <h3 class="mb-2 text-xl font-semibold">{{ course.title }}</h3>
               <p class="text-muted-foreground mb-4">{{ course.description }}</p>
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
-                  <Calendar class="w-5 h-5" />
+                  <Calendar class="h-5 w-5" />
                   <span>{{ formatDate(course.createdAt) }}</span>
                 </div>
                 <UIButton size="sm" asChild>
@@ -231,36 +231,36 @@ const formatDate = (date: string) => {
     </section>
 
     <!-- Become an Instructor Section -->
-    <section class="py-20 bg-background">
+    <section class="bg-background py-20">
       <div class="container mx-auto px-6">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold mb-4">Станьте преподавателем</h2>
-          <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <div class="mb-16 text-center">
+          <h2 class="mb-4 text-3xl font-bold md:text-4xl">Станьте преподавателем</h2>
+          <p class="text-muted-foreground mx-auto max-w-2xl text-xl">
             Делитесь своими знаниями с тысячами студентов и постройте успешную карьеру преподавателя
           </p>
         </div>
-        <div class="grid md:grid-cols-3 gap-8 mb-12">
-          <div class="text-center space-y-4">
-            <div class="flex justify-center mb-6">
-              <ClipboardCheck class="w-16 h-16 text-primary" />
+        <div class="mb-12 grid gap-8 md:grid-cols-3">
+          <div class="space-y-4 text-center">
+            <div class="mb-6 flex justify-center">
+              <ClipboardCheck class="text-primary h-16 w-16" />
             </div>
             <h3 class="text-xl font-semibold">1. Подайте заявку</h3>
             <p class="text-muted-foreground">
               Заполните форму заявки и расскажите о своем опыте и экспертизе
             </p>
           </div>
-          <div class="text-center space-y-4">
-            <div class="flex justify-center mb-6">
-              <UserCog class="w-16 h-16 text-primary" />
+          <div class="space-y-4 text-center">
+            <div class="mb-6 flex justify-center">
+              <UserCog class="text-primary h-16 w-16" />
             </div>
             <h3 class="text-xl font-semibold">2. Настройте профиль</h3>
             <p class="text-muted-foreground">
               Создайте привлекательный профиль преподавателя с вашим опытом и достижениями
             </p>
           </div>
-          <div class="text-center space-y-4">
-            <div class="flex justify-center mb-6">
-              <BookOpen class="w-16 h-16 text-primary" />
+          <div class="space-y-4 text-center">
+            <div class="mb-6 flex justify-center">
+              <BookOpen class="text-primary h-16 w-16" />
             </div>
             <h3 class="text-xl font-semibold">3. Создавайте курсы</h3>
             <p class="text-muted-foreground">
@@ -277,21 +277,21 @@ const formatDate = (date: string) => {
     </section>
 
     <!-- Top Instructors Section -->
-    <section class="py-20 bg-muted/50">
+    <section class="bg-muted/50 py-20">
       <div class="container mx-auto px-6">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">Лучшие преподаватели</h2>
-        <div class="grid md:grid-cols-4 gap-6">
+        <h2 class="mb-16 text-center text-3xl font-bold md:text-4xl">Лучшие преподаватели</h2>
+        <div class="grid gap-6 md:grid-cols-4">
           <UICard v-for="instructor in topInstructors" :key="instructor.id" class="p-6">
-            <div class="text-center space-y-4">
+            <div class="space-y-4 text-center">
               <img
                 :src="instructor.image || '/default-avatar.png'"
                 :alt="instructor.name"
-                class="w-24 h-24 rounded-full mx-auto object-cover"
+                class="mx-auto h-24 w-24 rounded-full object-cover"
               />
               <h3 class="text-xl font-semibold">{{ instructor.name }}</h3>
               <p class="text-muted-foreground">{{ instructor.expertise }}</p>
               <div class="flex items-center justify-center space-x-2">
-                <Users class="w-5 h-5" />
+                <Users class="h-5 w-5" />
                 <span>{{ instructor.studentsCount }} студентов</span>
               </div>
               <UIButton variant="outline" size="sm" asChild>

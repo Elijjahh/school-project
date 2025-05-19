@@ -48,8 +48,8 @@ async function handleModuleSave(payload: { title: string; description: string; o
 </script>
 
 <template>
-  <div class="space-y-8 mb-10">
-    <div v-if="loading" class="text-center py-8">Загрузка...</div>
+  <div class="mb-10 space-y-8">
+    <div v-if="loading" class="py-8 text-center">Загрузка...</div>
     <div v-else>
       <div class="space-y-2">
         <h2 class="text-3xl font-bold tracking-tight">Редактировать модуль</h2>
@@ -62,7 +62,7 @@ async function handleModuleSave(payload: { title: string; description: string; o
         :loading="loading"
         @save="handleModuleSave"
       />
-      <div class="space-y-6 mt-10 max-w-2xl">
+      <div class="mt-10 max-w-2xl space-y-6">
         <div class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">Уроки</h3>
           <UIButton variant="secondary">
@@ -75,7 +75,7 @@ async function handleModuleSave(payload: { title: string; description: string; o
           <li v-for="lesson in lessons" :key="lesson.id" class="mb-4">
             <NuxtLink
               :to="`/app/teacher/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/edit`"
-              class="underline text-blue-600 hover:text-blue-800"
+              class="text-blue-600 underline hover:text-blue-800"
             >
               {{ lesson.title || 'Без названия' }} (Порядок: {{ lesson.order }})
             </NuxtLink>

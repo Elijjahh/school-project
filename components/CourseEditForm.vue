@@ -135,7 +135,7 @@ async function handleSave() {
               'border-destructive focus-visible:ring-destructive': descriptionError,
             }"
           />
-          <div v-if="descriptionError" class="text-sm font-medium text-destructive">
+          <div v-if="descriptionError" class="text-destructive text-sm font-medium">
             {{ descriptionError }}
           </div>
           <CourseImageUpload :initial-url="imagePreview || image" @change="onImageUrlChange" />
@@ -172,7 +172,7 @@ async function handleSave() {
                   </UISelectGroup>
                 </UISelectContent>
               </UISelect>
-              <div v-if="categoryIdError" class="text-sm font-medium text-destructive mt-1">
+              <div v-if="categoryIdError" class="text-destructive mt-1 text-sm font-medium">
                 {{ categoryIdError }}
               </div>
             </div>
@@ -189,7 +189,7 @@ async function handleSave() {
         /></span>
         <span v-else>Сохранить курс</span>
       </UIButton>
-      <span v-if="saveError" class="text-sm font-medium text-destructive ml-4">{{
+      <span v-if="saveError" class="text-destructive ml-4 text-sm font-medium">{{
         saveError
       }}</span>
     </UICardFooter>

@@ -132,51 +132,51 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <div v-if="loading" class="text-center py-8">Загрузка...</div>
-    <div v-else-if="error" class="text-red-500 text-center py-8">{{ error }}</div>
-    <div v-else-if="course" class="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+  <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div v-if="loading" class="py-8 text-center">Загрузка...</div>
+    <div v-else-if="error" class="py-8 text-center text-red-500">{{ error }}</div>
+    <div v-else-if="course" class="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
       <!-- Main Content -->
       <div class="flex-1 space-y-8">
         <!-- Course Info -->
-        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-4">
+        <div class="flex flex-col gap-4 rounded-lg bg-white p-6 shadow">
           <img
             v-if="course.image"
             :src="course.image"
             :alt="course.title"
-            class="w-full h-64 object-cover rounded mb-2"
+            class="mb-2 h-64 w-full rounded object-cover"
           />
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 class="text-3xl font-bold mb-1">{{ course.title }}</h1>
-              <div class="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <span class="bg-muted px-2 py-0.5 rounded">{{ course.category.name }}</span>
+              <h1 class="mb-1 text-3xl font-bold">{{ course.title }}</h1>
+              <div class="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
+                <span class="bg-muted rounded px-2 py-0.5">{{ course.category.name }}</span>
               </div>
               <p class="text-muted-foreground mb-2">{{ course.description }}</p>
             </div>
             <!-- Teacher section -->
-            <div class="flex items-center gap-3 bg-muted/40 rounded p-2">
+            <div class="bg-muted/40 flex items-center gap-3 rounded p-2">
               <img
                 v-if="course.teacher.image"
                 :src="course.teacher.image"
                 :alt="course.teacher.firstname"
-                class="w-12 h-12 rounded-full object-cover"
+                class="h-12 w-12 rounded-full object-cover"
               />
               <div>
                 <div class="font-semibold">
                   {{ course.teacher.firstname }} {{ course.teacher.lastname }}
                 </div>
-                <div class="text-xs text-muted-foreground">Преподаватель</div>
+                <div class="text-muted-foreground text-xs">Преподаватель</div>
               </div>
             </div>
           </div>
         </div>
         <!-- Course Content (Modules & Lessons) -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h2 class="text-xl font-bold mb-4">Содержание курса</h2>
+        <div class="rounded-lg bg-white p-6 shadow">
+          <h2 class="mb-4 text-xl font-bold">Содержание курса</h2>
           <div v-for="module in course.modules" :key="module.id" class="mb-6">
-            <div class="font-semibold text-lg mb-2">{{ module.title }}</div>
-            <ul class="pl-4 border-l-2 border-muted-foreground/20">
+            <div class="mb-2 text-lg font-semibold">{{ module.title }}</div>
+            <ul class="border-muted-foreground/20 border-l-2 pl-4">
               <li
                 v-for="lesson in module.lessons"
                 :key="lesson.id"
@@ -190,8 +190,8 @@ onMounted(async () => {
         </div>
       </div>
       <!-- Sidebar -->
-      <aside class="w-full lg:w-80 flex-shrink-0 space-y-4">
-        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-4 sticky top-8">
+      <aside class="w-full flex-shrink-0 space-y-4 lg:w-80">
+        <div class="sticky top-8 flex flex-col gap-4 rounded-lg bg-white p-6 shadow">
           <template v-if="isCreator">
             <NuxtLink :to="`/app/teacher/courses/${courseId}/edit`">
               <UIButton variant="default" class="w-full">Редактировать курс</UIButton>
