@@ -1,6 +1,10 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'profile',
+});
+
 const route = useRoute();
-const courseId = Number(route.params.id);
+const courseId = Number(route.params.courseId);
 const moduleId = Number(route.params.moduleId);
 
 const { data: moduleDataRaw, pending: loading, refresh } = useFetch(`/api/modules/${moduleId}`);
@@ -66,7 +70,7 @@ async function handleModuleSave(payload: { title: string; description: string; o
         <div class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">Уроки</h3>
           <UIButton variant="secondary">
-            <NuxtLink :to="`/app/teacher/courses/${courseId}/modules/${moduleId}/lessons/new`">
+            <NuxtLink :to="`/app/courses/${courseId}/modules/${moduleId}/lessons/new`">
               Добавить урок
             </NuxtLink>
           </UIButton>
@@ -74,7 +78,7 @@ async function handleModuleSave(payload: { title: string; description: string; o
         <ul>
           <li v-for="lesson in lessons" :key="lesson.id" class="mb-4">
             <NuxtLink
-              :to="`/app/teacher/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/edit`"
+              :to="`/app/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/edit`"
               class="text-blue-600 underline hover:text-blue-800"
             >
               {{ lesson.title || 'Без названия' }} (Порядок: {{ lesson.order }})

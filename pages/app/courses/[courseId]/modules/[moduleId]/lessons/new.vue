@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'profile',
+});
+
 interface LessonPayload {
   title: string;
   content: string;
@@ -24,9 +28,7 @@ async function handleLessonCreate(payload: LessonPayload) {
       },
     });
     // После создания редиректим на страницу редактирования этого урока
-    router.push(
-      `/app/teacher/courses/${route.params.id}/modules/${moduleId}/lessons/${created.id}/edit`,
-    );
+    router.push(`/app/courses/${route.params.id}/modules/${moduleId}/lessons/${created.id}/edit`);
   } catch {
     error.value = 'Ошибка при создании урока';
   } finally {

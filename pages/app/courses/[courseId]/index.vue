@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { user } = useUserSession();
 const route = useRoute();
-const courseId = computed(() => Number(route.params.id));
+const courseId = computed(() => Number(route.params.courseId));
 const router = useRouter();
 
 // Mock interfaces based on drizzle schema
@@ -117,7 +117,7 @@ async function removeCourse() {
   isRemoving.value = true;
   try {
     await $fetch(`/api/courses/${courseId.value}`, { method: 'DELETE' });
-    router.push('/app/teacher/courses');
+    router.push('/app/my-courses');
   } catch (err) {
     error.value = (err as Error).message || 'Ошибка при удалении курса';
   } finally {
@@ -193,7 +193,7 @@ onMounted(async () => {
       <aside class="w-full flex-shrink-0 space-y-4 lg:w-80">
         <div class="sticky top-8 flex flex-col gap-4 rounded-lg bg-white p-6 shadow">
           <template v-if="isCreator">
-            <NuxtLink :to="`/app/teacher/courses/${courseId}/edit`">
+            <NuxtLink :to="`/app/courses/${courseId}/edit`">
               <UIButton variant="default" class="w-full">Редактировать курс</UIButton>
             </NuxtLink>
             <UIButton

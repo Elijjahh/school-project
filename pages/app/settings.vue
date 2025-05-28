@@ -7,6 +7,14 @@ import { Settings } from 'lucide-vue-next';
 
 const { user } = useUserSession();
 
+definePageMeta({
+  layout: 'profile',
+});
+
+// Определяем роль пользователя
+const isTeacher = computed(() => user.value?.role === 'teacher');
+
+// Создаем единую схему валидации с опциональным полем bio
 const validationSchema = toTypedSchema(
   zod.object({
     lastname: zod
@@ -23,8 +31,18 @@ const validationSchema = toTypedSchema(
       .min(1, { message: 'Это обязательное поле' })
       .email('Введите корректную почту'),
     bio: zod
-      .string({ message: 'Это обязательное поле' })
-      .min(1, { message: 'Это обязательное поле' }),
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          // Для преподавателей bio обязательно
+          if (isTeacher.value && (!val || val.trim().length === 0)) {
+            return false;
+          }
+          return true;
+        },
+        { message: 'Это обязательное поле' },
+      ),
   }),
 );
 
@@ -150,15 +168,19 @@ async function submitForm() {
     firstname: string;
     username: string;
     email: string;
-    bio: string;
+    bio?: string;
     image?: string;
   } = {
     lastname: lastname.value,
     firstname: firstname.value,
     username: username.value,
     email: email.value,
-    bio: bio.value,
   };
+
+  // Добавляем bio только для преподавателей
+  if (isTeacher.value && bio.value) {
+    submitData.bio = bio.value;
+  }
 
   loading.value = true;
   error.value = '';
@@ -306,7 +328,8 @@ async function handleLogout() {
             />
           </div>
 
-          <div class="space-y-2">
+          <!-- Поле "О себе" только для преподавателей -->
+          <div v-if="isTeacher" class="space-y-2">
             <UITextarea
               :id="bioInputId"
               v-model="bio"

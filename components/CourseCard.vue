@@ -55,7 +55,7 @@ const toggleWishlist = async () => {
           <NuxtLink :to="`/app/courses/${course.id}`">
             <UIButton variant="outline" size="sm">Детали</UIButton>
           </NuxtLink>
-          <NuxtLink :to="`/app/teacher/courses/${course.id}/edit`">
+          <NuxtLink :to="`/app/courses/${course.id}/edit`">
             <UIButton variant="secondary" size="sm">Редактировать</UIButton>
           </NuxtLink>
         </div>

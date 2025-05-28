@@ -1,7 +1,11 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'profile',
+});
+
 const route = useRoute();
 const router = useRouter();
-const courseId = Number(route.params.id);
+const courseId = Number(route.params.courseId);
 
 const loading = ref(false);
 const error = ref('');
@@ -19,7 +23,7 @@ async function handleModuleCreate(payload: { title: string; description: string 
       },
     });
     // После создания модуля редиректим на его страницу редактирования
-    router.push(`/app/teacher/courses/${courseId}/modules/${created.id}/edit`);
+    router.push(`/app/courses/${courseId}/modules/${created.id}/edit`);
   } catch {
     error.value = 'Ошибка при создании модуля';
   } finally {

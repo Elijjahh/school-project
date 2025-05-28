@@ -13,7 +13,7 @@ const { loggedIn, user } = useUserSession();
           <img src="/assets/images/logo-img.svg" alt="Логотип" class="w-48" />
         </NuxtLink>
         <nav class="flex items-center space-x-6 text-sm font-medium">
-          <NuxtLink to="/" class="hover:text-foreground/80 text-foreground/60 transition-colors">
+          <NuxtLink to="/app" class="hover:text-foreground/80 text-foreground/60 transition-colors">
             Главная
           </NuxtLink>
           <NuxtLink
@@ -38,12 +38,12 @@ const { loggedIn, user } = useUserSession();
       </div>
       <div class="flex flex-1 items-center justify-end space-x-2">
         <div class="flex items-center space-x-4">
-          <NuxtLink to="/app/profile/wishlist" class="text-muted-foreground hover:text-foreground">
+          <NuxtLink to="/app/wishlist" class="text-muted-foreground hover:text-foreground">
             <Heart class="h-5 w-5" />
           </NuxtLink>
 
           <template v-if="loggedIn">
-            <NuxtLink to="/app/profile">
+            <NuxtLink to="/app">
               <UIAvatar class="h-8 w-8">
                 <UIAvatarImage v-if="user?.image" :src="user.image" />
                 <UIAvatarFallback v-else>

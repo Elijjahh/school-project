@@ -4,6 +4,10 @@ import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
 import type { NuxtError } from '#app';
 
+definePageMeta({
+  layout: 'profile',
+});
+
 // --- Course Info Fields ---
 const {
   value: title,
@@ -129,7 +133,7 @@ async function handleSubmit() {
     success.value = 'Курс успешно создан!';
     // Redirect to edit page for the new course
 
-    router.push('/app/teacher/courses');
+    router.push('/app/my-courses');
   } catch (err) {
     const statusCode = (err as NuxtError).statusCode;
     if (statusCode === 400) error.value = 'Введите корректные данные';

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { User, Mail, MessageSquare } from 'lucide-vue-next';
 
+definePageMeta({
+  layout: 'profile',
+});
+
 // Mock data for instructors - replace with actual API call
 const instructors = ref([
   {

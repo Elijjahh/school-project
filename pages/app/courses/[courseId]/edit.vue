@@ -1,6 +1,10 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'profile',
+});
+
 const route = useRoute();
-const courseId = Number(route.params.id);
+const courseId = Number(route.params.courseId);
 
 const { data: categoriesData, pending: categoriesLoading } = useFetch('/api/categories');
 const { data: courseData, pending: loading } = useFetch(`/api/courses/${courseId}`);
@@ -52,15 +56,13 @@ async function handleCourseSave(payload: {
         <div class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">Модули</h3>
           <UIButton variant="secondary">
-            <NuxtLink :to="`/app/teacher/courses/${courseId}/modules/new`">
-              Добавить модуль
-            </NuxtLink>
+            <NuxtLink :to="`/app/courses/${courseId}/modules/new`"> Добавить модуль </NuxtLink>
           </UIButton>
         </div>
         <ul v-if="courseData?.modules">
           <li v-for="mod in courseData.modules" :key="mod.id" class="mb-4">
             <NuxtLink
-              :to="`/app/teacher/courses/${courseId}/modules/${mod.id}/edit`"
+              :to="`/app/courses/${courseId}/modules/${mod.id}/edit`"
               class="text-blue-600 underline hover:text-blue-800"
             >
               {{ mod.title || 'Без названия' }} (Порядок: {{ mod.order }})

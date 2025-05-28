@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'profile',
+});
+
 const route = useRoute();
 const moduleId = Number(route.params.moduleId);
 const lessonId = Number(route.params.lessonId);

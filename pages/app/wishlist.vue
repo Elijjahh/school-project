@@ -2,6 +2,10 @@
 import { useWishlistStore } from '~/stores/wishlist';
 import { Heart } from 'lucide-vue-next';
 
+definePageMeta({
+  layout: 'profile',
+});
+
 const wishlistStore = useWishlistStore();
 
 // Fetch wishlist on page load
