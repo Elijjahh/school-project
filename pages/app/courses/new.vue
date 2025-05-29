@@ -48,30 +48,23 @@ interface Category {
   id: number;
   name: string;
 }
-const categories = ref<{ id: string; label: string }[]>([]);
-const categoriesLoading = ref(true);
-const categoriesError = ref<unknown>(null);
+
+const {
+  data: categoriesData,
+  pending: categoriesLoading,
+  error: categoriesError,
+} = await useFetch('/api/categories', {
+  server: false,
+  default: () => [],
+});
+
+const categories = computed(() => {
+  const fetched = (categoriesData.value || []) as Category[];
+  return fetched.map((cat) => ({ id: String(cat.id), label: cat.name }));
+});
 
 const { user } = useUserSession();
 const router = useRouter();
-
-async function fetchCategories() {
-  categoriesLoading.value = true;
-  categoriesError.value = null;
-  try {
-    const { data, error: fetchError } = await useFetch('/api/categories');
-    if (fetchError.value) throw fetchError.value;
-    const fetched = (data.value || []) as Category[];
-    categories.value = fetched.map((cat) => ({ id: String(cat.id), label: cat.name }));
-  } catch (err) {
-    categoriesError.value = err;
-    categories.value = [];
-  } finally {
-    categoriesLoading.value = false;
-  }
-}
-
-onMounted(fetchCategories);
 
 // --- Image upload state ---
 const selectedImage = ref<File | null>(null);

@@ -16,24 +16,6 @@ const teacher = computed(() => ({
   bio: user.value?.bio || '',
 }));
 
-// Типы для курсов
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  image?: string | null;
-  completed?: boolean;
-  progress?: number;
-  category?: string;
-  studentsCount?: number;
-  creator?: { id: number };
-}
-
-// Состояние для курсов преподавателя
-const teacherCourses = ref<Course[]>([]);
-const teacherCoursesLoading = ref(true);
-const teacherCoursesError = ref('');
-
 // Данные для студента (статистика и курсы)
 const {
   data: stats,
@@ -63,6 +45,16 @@ const {
   default: () => null,
 });
 
+// Курсы преподавателя
+const {
+  data: teacherCourses,
+  pending: teacherCoursesLoading,
+  error: teacherCoursesError,
+} = await useFetch(`/api/auth/users/${user.value?.id}/teaching-courses`, {
+  server: false,
+  default: () => [],
+});
+
 // Функция для расчета процентов
 function getPercent(finished: number, total: number): string {
   if (!total) return '0%';
@@ -81,32 +73,6 @@ const teacherStatsComputed = computed(() => {
       icon: CheckCircle,
     },
   ];
-});
-
-// Функция загрузки курсов преподавателя
-async function fetchTeacherCourses() {
-  if (!isTeacher.value) return;
-
-  teacherCoursesLoading.value = true;
-  teacherCoursesError.value = '';
-  try {
-    if (!user.value?.id) throw new Error('Пользователь не найден');
-    const { data, error: fetchError } = await useFetch(
-      `/api/auth/users/${user.value.id}/teaching-courses`,
-    );
-    if (fetchError.value) throw fetchError.value;
-    teacherCourses.value = (data.value || []) as Course[];
-  } catch (err: unknown) {
-    teacherCoursesError.value = (err as Error).message || 'Ошибка загрузки курсов';
-  } finally {
-    teacherCoursesLoading.value = false;
-  }
-}
-
-onMounted(() => {
-  if (isTeacher.value) {
-    fetchTeacherCourses();
-  }
 });
 </script>
 
@@ -160,7 +126,7 @@ onMounted(() => {
         </div>
         <div v-if="teacherCoursesLoading" class="py-8 text-center">Загрузка...</div>
         <div v-else-if="teacherCoursesError" class="py-8 text-center text-red-500">
-          {{ teacherCoursesError }}
+          {{ teacherCoursesError.message }}
         </div>
         <div v-else-if="teacherCourses.length" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <CourseCard v-for="course in teacherCourses" :key="course.id" :course="course" />

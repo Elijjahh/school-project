@@ -5,11 +5,11 @@ import * as zod from 'zod';
 import type { NuxtError } from '#app';
 import { Settings } from 'lucide-vue-next';
 
-const { user } = useUserSession();
-
 definePageMeta({
   layout: 'profile',
 });
+
+const { user } = useUserSession();
 
 // Определяем роль пользователя
 const isTeacher = computed(() => user.value?.role === 'teacher');

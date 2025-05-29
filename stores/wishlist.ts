@@ -23,19 +23,18 @@ export const useWishlistStore = defineStore('wishlist', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const { data } = await useFetch('/api/wishlist');
-      courses.value = data.value || [];
+      const data = await $fetch<Course[]>('/api/wishlist');
+      courses.value = data || [];
     } catch (err) {
       error.value = err as Error;
       console.error('Failed to fetch wishlist:', err);
-    } finally {
-      isLoading.value = false;
     }
+    isLoading.value = false;
   }
 
   async function addToWishlist(courseId: number) {
     try {
-      await useFetch('/api/wishlist', {
+      await $fetch('/api/wishlist', {
         method: 'POST',
         body: { courseId },
       });
@@ -48,7 +47,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
   async function removeFromWishlist(courseId: number) {
     try {
-      await useFetch(`/api/wishlist/${courseId}`, {
+      await $fetch(`/api/wishlist/${courseId}`, {
         method: 'DELETE',
       });
       await fetchWishlist(); // Refresh the wishlist
@@ -59,11 +58,8 @@ export const useWishlistStore = defineStore('wishlist', () => {
   }
 
   async function toggleWishlist(courseId: number) {
-    if (isInWishlist(courseId)) {
-      await removeFromWishlist(courseId);
-    } else {
-      await addToWishlist(courseId);
-    }
+    if (isInWishlist(courseId)) await removeFromWishlist(courseId);
+    else await addToWishlist(courseId);
   }
 
   return {

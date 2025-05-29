@@ -34,80 +34,81 @@ interface Course {
   category: Category;
   teacher: Teacher;
   modules: Module[];
+  isParticipating?: boolean;
+  isInWishlist?: boolean;
 }
 
-// Mock data
-const course = ref<(Course & { isParticipating?: boolean; isInWishlist?: boolean }) | null>(null);
-const loading = ref(true);
-const error = ref<string | null>(null);
+// Course data fetching
+const {
+  data: course,
+  pending: loading,
+  error: courseError,
+  refresh: refreshCourse,
+} = await useFetch<Course>(`/api/courses/${courseId.value}`, {
+  server: false,
+  default: () => null,
+});
+
 const isStarting = ref(false);
-const hasStarted = ref(false);
-const isInWishlist = ref(false);
+
+// Computed properties instead of watchers
+const error = computed(() => {
+  return courseError.value?.message || null;
+});
+
+const hasStarted = computed(() => {
+  return !!course.value?.isParticipating;
+});
+
+const isInWishlist = computed(() => {
+  return !!course.value?.isInWishlist;
+});
 
 const isCreator = computed(() => {
   return user.value && course.value && user.value.id === course.value.teacher.id;
 });
 
-async function fetchCourse() {
-  loading.value = true;
-  error.value = null;
-  try {
-    const { data, error: fetchError } = await useFetch(`/api/courses/${courseId.value}`);
-    if (fetchError.value) throw fetchError.value;
-    course.value = data.value as Course & { isParticipating?: boolean; isInWishlist?: boolean };
-    hasStarted.value = !!course.value?.isParticipating;
-    isInWishlist.value = !!course.value?.isInWishlist;
-  } catch (err: unknown) {
-    error.value = (err as Error).message || 'Ошибка загрузки курса';
-  } finally {
-    loading.value = false;
-  }
-}
-
 async function startCourse() {
   isStarting.value = true;
   try {
-    const { data, error: participateError } = await useFetch(
-      `/api/courses/${courseId.value}/participate`,
-      {
-        method: 'POST',
-      },
-    );
-    if (!participateError.value) {
-      hasStarted.value = true;
-      if (data.value && typeof data.value.inWishlist === 'boolean') {
-        isInWishlist.value = data.value.inWishlist;
-      }
-    }
-  } finally {
-    isStarting.value = false;
+    await $fetch(`/api/courses/${courseId.value}/participate`, {
+      method: 'POST',
+    });
+    // Refresh course data to get updated participation status
+    await refreshCourse();
+  } catch (err) {
+    console.error('Error starting course:', err);
   }
+  isStarting.value = false;
 }
 
 async function addToWishlist() {
-  const { data: _data, error } = await useFetch(`/api/courses/${courseId.value}/wishlist`, {
-    method: 'POST',
-  });
-  if (!error.value) {
-    isInWishlist.value = true;
+  try {
+    await $fetch(`/api/courses/${courseId.value}/wishlist`, {
+      method: 'POST',
+    });
+    // Refresh course data to get updated wishlist status
+    await refreshCourse();
+  } catch (err) {
+    console.error('Error adding to wishlist:', err);
   }
 }
 
 async function removeFromWishlist() {
-  const { error } = await useFetch(`/api/courses/${courseId.value}/wishlist`, {
-    method: 'DELETE',
-  });
-  if (!error.value) {
-    isInWishlist.value = false;
+  try {
+    await $fetch(`/api/courses/${courseId.value}/wishlist`, {
+      method: 'DELETE',
+    });
+    // Refresh course data to get updated wishlist status
+    await refreshCourse();
+  } catch (err) {
+    console.error('Error removing from wishlist:', err);
   }
 }
 
 function toggleWishlist() {
-  if (isInWishlist.value) {
-    removeFromWishlist();
-  } else {
-    addToWishlist();
-  }
+  if (isInWishlist.value) removeFromWishlist();
+  else addToWishlist();
 }
 
 const isRemoving = ref(false);
@@ -119,16 +120,11 @@ async function removeCourse() {
     await $fetch(`/api/courses/${courseId.value}`, { method: 'DELETE' });
     router.push('/app/my-courses');
   } catch (err) {
-    error.value = (err as Error).message || 'Ошибка при удалении курса';
+    console.error('Error removing course:', err);
   } finally {
     isRemoving.value = false;
   }
 }
-
-onMounted(async () => {
-  await fetchCourse();
-  // Optionally, fetch participation/wishlist state here if you have endpoints
-});
 </script>
 
 <template>

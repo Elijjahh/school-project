@@ -19,10 +19,6 @@ interface Category {
   image?: string | null;
 }
 
-const categories = ref<{ id: string; label: string }[]>([{ id: 'all', label: 'Все' }]);
-const categoriesLoading = ref(true);
-const categoriesError = ref<unknown>(null);
-
 const sortFields = [
   { id: 'id', label: 'ID' },
   { id: 'title', label: 'Название' },
@@ -37,56 +33,45 @@ const selectedCategory = ref('all');
 const selectedSortField = ref('id');
 const selectedSortOrder = ref('asc');
 
-const courses = ref<Course[]>([]);
-const pending = ref(false);
-const error = ref<unknown>(null);
+// Categories fetching
+const {
+  data: categoriesData,
+  pending: categoriesLoading,
+  error: _categoriesError,
+} = await useFetch<Category[]>('/api/categories', {
+  server: false,
+  default: () => [],
+});
+
+const categories = computed(() => {
+  const fetched = categoriesData.value || [];
+  return [
+    { id: 'all', label: 'Все' },
+    ...fetched.map((cat) => ({ id: String(cat.id), label: cat.name })),
+  ];
+});
+
+// Courses fetching with reactive query
+const coursesQuery = computed(() => ({
+  category: selectedCategory.value !== 'all' ? selectedCategory.value : undefined,
+  sort: selectedSortField.value,
+  order: selectedSortOrder.value,
+}));
+
+const {
+  data: courses,
+  pending,
+  error,
+  refresh: _refreshCourses,
+} = await useFetch<Course[]>('/api/courses', {
+  server: false,
+  default: () => [],
+  query: coursesQuery,
+});
 
 const wishlistStore = useWishlistStore();
 
-async function fetchCategories() {
-  categoriesLoading.value = true;
-  categoriesError.value = null;
-  try {
-    const { data, error: fetchError } = await useFetch<Category[]>('/api/categories');
-    if (fetchError.value) throw fetchError.value;
-    const fetched = data.value || [];
-    categories.value = [
-      { id: 'all', label: 'Все' },
-      ...fetched.map((cat) => ({ id: String(cat.id), label: cat.name })),
-    ];
-  } catch (err) {
-    categoriesError.value = err;
-    categories.value = [{ id: 'all', label: 'Все' }];
-  } finally {
-    categoriesLoading.value = false;
-  }
-}
-
-async function fetchCourses() {
-  pending.value = true;
-  error.value = null;
-  try {
-    const { data, error: fetchError } = await useFetch<Course[]>('/api/courses', {
-      query: {
-        category: selectedCategory.value !== 'all' ? selectedCategory.value : undefined,
-        sort: selectedSortField.value,
-        order: selectedSortOrder.value,
-      },
-    });
-    if (fetchError.value) throw fetchError.value;
-    courses.value = data.value || [];
-  } catch (err) {
-    error.value = err;
-    courses.value = [];
-  } finally {
-    pending.value = false;
-  }
-}
-
-watch([selectedCategory, selectedSortField, selectedSortOrder], fetchCourses, { immediate: true });
-
 onMounted(async () => {
-  await fetchCategories();
   await wishlistStore.fetchWishlist();
 });
 </script>
