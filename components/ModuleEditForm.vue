@@ -2,21 +2,15 @@
 import { useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
-
-interface Module {
-  id: number;
-  title: string;
-  description: string;
-  order: number;
-}
+import type { Module, ModuleUpdatePayload } from '~/drizzle/types';
 
 const props = defineProps<{
-  module: Module;
+  module: Omit<Module, 'courseId'>;
   idx: number;
   loading?: boolean;
 }>();
 const emit = defineEmits<{
-  (e: 'save', payload: { title: string; description: string; order: number }): void;
+  (e: 'save', payload: ModuleUpdatePayload): void;
   (e: 'remove' | 'addLesson'): void;
 }>();
 
@@ -49,16 +43,9 @@ const saveSuccess = ref('');
 const editing = ref(false);
 
 onMounted(() => {
-  console.log(module.value);
-  console.log(module.value.title);
-
-  console.log(title.value);
-
-  setTitle((module.value.title as string) || '');
-  console.log(title.value);
-
-  setDescription((module.value.description as string) || '');
-  setOrder((module.value.order as number) || props.idx + 1);
+  setTitle(module.value.title);
+  setDescription(module.value.description);
+  setOrder(module.value.order);
 });
 
 async function handleSave() {
@@ -103,7 +90,6 @@ function handleAddLesson() {
           <UIButton type="button" @click="editing = true">Редактировать</UIButton>
         </div>
         <div v-else class="space-y-4">
-          {{ title }}
           <FormInput
             :id="`module-title-${idx}`"
             v-model="title"
@@ -111,7 +97,6 @@ function handleAddLesson() {
             placeholder="Введите название"
             :error="titleError"
           />
-          {{ description }}
           <UITextarea
             v-model="description"
             label="Описание модуля"

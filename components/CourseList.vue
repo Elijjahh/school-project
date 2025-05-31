@@ -1,13 +1,11 @@
 <script lang="ts" setup>
+import type { Course } from '~/drizzle/types';
+
 defineProps<{
-  courses?: Array<{
-    id: number;
-    title: string;
-    description: string;
-    image?: string | null;
-    completed?: boolean;
-    progress?: number;
-  }>;
+  courses?: (Course & {
+    completed: boolean;
+    progress: number;
+  })[];
   pending?: boolean;
   error?: Error;
 }>();
@@ -30,6 +28,8 @@ defineProps<{
           title: course.title,
           description: course.description,
           image: course.image,
+          creatorId: course.creatorId,
+          categoryId: course.categoryId,
           completed: course.completed,
           progress: course.progress,
         }"

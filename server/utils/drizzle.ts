@@ -15,5 +15,3 @@ const db = drizzle({
 export function useDrizzle() {
   return db;
 }
-
-export type User = typeof schema.users.$inferSelect;

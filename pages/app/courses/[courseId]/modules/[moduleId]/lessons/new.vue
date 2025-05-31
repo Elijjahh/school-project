@@ -1,12 +1,9 @@
 <script setup lang="ts">
+import type { LessonPayload } from '~/drizzle/types';
+
 definePageMeta({
   layout: 'profile',
 });
-
-interface LessonPayload {
-  title: string;
-  content: string;
-}
 
 const route = useRoute();
 const router = useRouter();
@@ -28,7 +25,9 @@ async function handleLessonCreate(payload: LessonPayload) {
       },
     });
     // После создания редиректим на страницу редактирования этого урока
-    router.push(`/app/courses/${route.params.id}/modules/${moduleId}/lessons/${created.id}/edit`);
+    router.push(
+      `/app/courses/${route.params.courseId}/modules/${moduleId}/lessons/${created.id}/edit`,
+    );
   } catch {
     error.value = 'Ошибка при создании урока';
   } finally {

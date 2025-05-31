@@ -1,17 +1,11 @@
 <script lang="ts" setup>
 import { useWishlistStore } from '~/stores/wishlist';
 import { Heart, Users } from 'lucide-vue-next';
+import type { CourseWithUIFields } from '~/drizzle/types';
 
 const props = defineProps<{
-  course: {
-    id: number;
-    title: string;
-    description: string;
+  course: CourseWithUIFields & {
     image?: string | null;
-    completed?: boolean;
-    progress?: number;
-    category?: string;
-    studentsCount?: number;
   };
   mode?: 'student' | 'teacher';
 }>();

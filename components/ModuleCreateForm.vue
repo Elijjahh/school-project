@@ -2,10 +2,11 @@
 import { useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
+import type { NewModule } from '~/drizzle/types';
 
 const props = defineProps<{ loading?: boolean }>();
 const emit = defineEmits<{
-  (e: 'save', payload: { title: string; description: string }): void;
+  (e: 'save', payload: Pick<NewModule, 'title' | 'description'>): void;
 }>();
 
 // Zod schemas for each field

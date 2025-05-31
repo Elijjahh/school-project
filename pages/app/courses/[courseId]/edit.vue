@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Category } from '~/drizzle/types';
+
 definePageMeta({
   layout: 'profile',
 });
@@ -46,7 +48,7 @@ async function handleCourseSave(payload: {
       <CourseEditForm
         v-if="courseData && categoriesData"
         :course="courseData"
-        :categories="categoriesData"
+        :categories="categoriesData as Category[]"
         :loading="loading"
         :categories-loading="categoriesLoading"
         :categories-error="errorMessage"

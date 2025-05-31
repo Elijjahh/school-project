@@ -1,6 +1,8 @@
+import type { User } from '~/drizzle/types';
+
 declare module 'h3' {
   interface H3EventContext {
-    user: User;
+    user: Omit<User, 'password'>;
   }
 }
 

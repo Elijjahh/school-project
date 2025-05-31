@@ -3,6 +3,7 @@ import { useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
 import type { NuxtError } from '#app';
+import type { Category } from '~/drizzle/types';
 
 definePageMeta({
   layout: 'profile',
@@ -44,19 +45,7 @@ const error = ref('');
 const success = ref('');
 
 // --- Categories (dynamic, fetched from API) ---
-interface Category {
-  id: number;
-  name: string;
-}
-
-const {
-  data: categoriesData,
-  pending: categoriesLoading,
-  error: categoriesError,
-} = await useFetch('/api/categories', {
-  server: false,
-  default: () => [],
-});
+const { data: categoriesData } = await useFetch<Category[]>('/api/categories');
 
 const categories = computed(() => {
   const fetched = (categoriesData.value || []) as Category[];
@@ -218,38 +207,30 @@ async function handleSubmit() {
             </div>
           </div>
           <div>
-            <div v-if="categoriesLoading" class="text-muted-foreground text-sm">
-              Загрузка категорий...
-            </div>
-            <div v-else-if="categoriesError" class="text-destructive text-sm">
-              Ошибка загрузки категорий
-            </div>
-            <div v-else>
-              <UISelect v-model="categoryId">
-                <UISelectTrigger
-                  :class="[
-                    'w-full',
-                    { 'border-destructive focus-visible:ring-destructive': categoryError },
-                  ]"
-                >
-                  <UISelectValue :placeholder="'Выберите категорию'">
-                    {{
-                      categories.find((cat) => cat.id === categoryId)?.label || 'Выберите категорию'
-                    }}
-                  </UISelectValue>
-                </UISelectTrigger>
-                <UISelectContent>
-                  <UISelectGroup>
-                    <UISelectLabel>Категории</UISelectLabel>
-                    <UISelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">
-                      {{ cat.label }}
-                    </UISelectItem>
-                  </UISelectGroup>
-                </UISelectContent>
-              </UISelect>
-              <div v-if="categoryError" class="text-destructive mt-1 text-sm font-medium">
-                {{ categoryError }}
-              </div>
+            <UISelect v-model="categoryId">
+              <UISelectTrigger
+                :class="[
+                  'w-full',
+                  { 'border-destructive focus-visible:ring-destructive': categoryError },
+                ]"
+              >
+                <UISelectValue :placeholder="'Выберите категорию'">
+                  {{
+                    categories.find((cat) => cat.id === categoryId)?.label || 'Выберите категорию'
+                  }}
+                </UISelectValue>
+              </UISelectTrigger>
+              <UISelectContent>
+                <UISelectGroup>
+                  <UISelectLabel>Категории</UISelectLabel>
+                  <UISelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">
+                    {{ cat.label }}
+                  </UISelectItem>
+                </UISelectGroup>
+              </UISelectContent>
+            </UISelect>
+            <div v-if="categoryError" class="text-destructive mt-1 text-sm font-medium">
+              {{ categoryError }}
             </div>
           </div>
         </div>

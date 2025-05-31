@@ -1,17 +1,11 @@
 import { defineStore } from 'pinia';
-
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  image?: string | null;
-}
+import type { Course } from '~/drizzle/types';
 
 export const useWishlistStore = defineStore('wishlist', () => {
   // State
   const courses = ref<Course[]>([]);
-  const isLoading = ref(false);
-  const error = ref<Error | null>(null);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
 
   // Getters
   function isInWishlist(courseId: number) {
@@ -20,16 +14,16 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
   // Actions
   async function fetchWishlist() {
-    isLoading.value = true;
+    loading.value = true;
     error.value = null;
     try {
       const data = await $fetch<Course[]>('/api/wishlist');
       courses.value = data || [];
     } catch (err) {
-      error.value = err as Error;
+      error.value = err as string;
       console.error('Failed to fetch wishlist:', err);
     }
-    isLoading.value = false;
+    loading.value = false;
   }
 
   async function addToWishlist(courseId: number) {
@@ -65,7 +59,8 @@ export const useWishlistStore = defineStore('wishlist', () => {
   return {
     // State
     courses,
-    isLoading,
+    loading,
+    isLoading: loading,
     error,
     // Getters
     isInWishlist,

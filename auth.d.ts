@@ -1,17 +1,9 @@
 // auth.d.ts
+import type { User as DrizzleUser } from '~/drizzle/types';
+
 declare module '#auth-utils' {
-  interface User {
-    image: string | null;
-    firstname: string;
-    lastname: string;
-    username: string;
-    role: 'student' | 'teacher' | 'admin' | null;
-    email: string;
-    createdAt: Date | null;
-    id: number;
-    password?: string;
-    bio?: string;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface User extends Omit<DrizzleUser, 'password'> {}
 }
 
 export {};

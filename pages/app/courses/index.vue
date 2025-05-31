@@ -1,23 +1,7 @@
 <script setup lang="ts">
 import { useWishlistStore } from '~/stores/wishlist';
 import { Compass } from 'lucide-vue-next';
-
-// Expanded type for course
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  image?: string | null;
-  completed?: boolean;
-  progress?: number;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  description?: string;
-  image?: string | null;
-}
+import type { Course, Category } from '~/drizzle/types';
 
 const sortFields = [
   { id: 'id', label: 'ID' },

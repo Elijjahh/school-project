@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Clock, Check } from 'lucide-vue-next';
+import type { CourseWithUIFields } from '~/drizzle/types';
 
 definePageMeta({
   layout: 'profile',
@@ -10,25 +11,12 @@ const { user } = useUserSession();
 // Определяем роль пользователя
 const isTeacher = computed(() => user.value?.role === 'teacher');
 
-// Интерфейс для курсов
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  image?: string | null;
-  category?: string;
-  studentsCount?: number;
-  progress?: number;
-  lastAccessed?: string;
-  completed?: boolean;
-}
-
 // Данные для преподавателей
 const {
   data: teacherCourses,
   pending: teacherPending,
   error: teacherError,
-} = await useFetch<Course[]>(`/api/auth/users/${user.value?.id}/teaching-courses`, {
+} = await useFetch<CourseWithUIFields[]>(`/api/auth/users/${user.value?.id}/teaching-courses`, {
   server: false,
   default: () => [],
 });
@@ -38,7 +26,7 @@ const {
   data: studentCourses,
   pending: studentPending,
   error: studentError,
-} = await useFetch<Course[]>(`/api/auth/users/${user.value?.id}/courses`, {
+} = await useFetch<CourseWithUIFields[]>(`/api/auth/users/${user.value?.id}/courses`, {
   server: false,
   default: () => [],
 });

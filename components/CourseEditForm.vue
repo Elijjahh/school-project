@@ -2,25 +2,18 @@
 import { useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
-
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  image: string | null;
-  category: { id: number; name: string };
-}
+import type { Course, Category, CourseUpdatePayload } from '~/drizzle/types';
 
 const props = defineProps<{
   course: Course;
-  categories: { id: number; name: string }[];
+  categories: Category[];
   loading: boolean;
   categoriesLoading: boolean;
   categoriesError: string;
 }>();
 
 const emit = defineEmits<{
-  save: [value: { title: string; description: string; image: string; categoryId: number }];
+  save: [value: CourseUpdatePayload];
 }>();
 
 const editing = ref(false);
@@ -55,11 +48,11 @@ const {
 const imagePreview = ref<string | null>(null);
 
 onMounted(() => {
-  setTitle((props.course.title as string) || '');
-  setDescription((props.course.description as string) || '');
-  setImage((props.course.image as string) || '');
-  setCategoryId(props.course.category.id || 0);
-  imagePreview.value = (props.course.image as string) || null;
+  setTitle(props.course.title);
+  setDescription(props.course.description || '');
+  setImage(props.course.image || '');
+  setCategoryId(props.course.categoryId);
+  imagePreview.value = props.course.image || null;
 });
 
 const onImageUrlChange = (url: string) => {

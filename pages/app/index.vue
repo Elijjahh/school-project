@@ -217,7 +217,9 @@ const teacherStatsComputed = computed(() => {
                 id: course.id,
                 title: course.title,
                 description: course.description,
-                image: course.image || undefined,
+                image: course.image || null,
+                creatorId: 0,
+                categoryId: 0,
                 completed: course.completed,
                 progress: course.progress || undefined,
               }"

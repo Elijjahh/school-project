@@ -27,12 +27,8 @@ export default defineEventHandler(async (event) => {
 
   // Format the data for the frontend
   return courses.map((c) => ({
-    id: c.id,
-    title: c.title,
-    description: c.description,
-    image: c.image,
+    ...c,
     category: c.category?.name,
-    creator: c.creator,
     studentsCount: studentsCounts[c.id] || 0,
   }));
 });

@@ -58,17 +58,8 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    id: course.id,
-    title: course.title,
-    description: course.description,
-    image: course.image,
-    category: course.category,
-    teacher: {
-      id: course.creator.id,
-      firstname: course.creator.firstname,
-      lastname: course.creator.lastname,
-      image: course.creator.image,
-    },
+    ...course,
+    teacher: { ...course.creator },
     modules: modulesWithLessons,
     isParticipating,
     isInWishlist,

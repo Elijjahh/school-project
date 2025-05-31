@@ -2,15 +2,16 @@
 import { useField } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
+import type { Lesson, LessonUpdatePayload } from '~/drizzle/types';
 
 const props = defineProps<{
-  lesson: Record<string, unknown>;
+  lesson: Omit<Lesson, 'moduleId'>;
   moduleId: number | string;
   idx: number;
   loading?: boolean;
 }>();
 const emit = defineEmits<{
-  (e: 'save', payload: { title: string; content: string; order: number }): void;
+  (e: 'save', payload: LessonUpdatePayload): void;
   (e: 'remove'): void;
 }>();
 
@@ -43,9 +44,9 @@ const saveSuccess = ref('');
 const editing = ref(false);
 
 onMounted(() => {
-  setTitle((lesson.value.title as string) || '');
-  setContent((lesson.value.content as string) || '');
-  setOrder((lesson.value.order as number) || props.idx + 1);
+  setTitle(lesson.value.title);
+  setContent(lesson.value.content);
+  setOrder(lesson.value.order);
 });
 
 async function handleSave() {

@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "type-check": "bunx vue-tsc --build --noEmit",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "format": "prettier --write .",

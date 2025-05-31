@@ -1,71 +1,35 @@
 <script setup lang="ts">
+import { useWishlistStore } from '~/stores/wishlist';
+
 const { user } = useUserSession();
 const route = useRoute();
 const courseId = computed(() => Number(route.params.courseId));
 const router = useRouter();
 
-// Mock interfaces based on drizzle schema
-interface Teacher {
-  id: number;
-  firstname: string;
-  lastname: string;
-  image?: string | null;
-}
-interface Category {
-  id: number;
-  name: string;
-}
-interface Lesson {
-  id: number;
-  title: string;
-  order: number;
-}
-interface Module {
-  id: number;
-  title: string;
-  order: number;
-  lessons: Lesson[];
-}
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  image?: string | null;
-  category: Category;
-  teacher: Teacher;
-  modules: Module[];
-  isParticipating?: boolean;
-  isInWishlist?: boolean;
-}
-
-// Course data fetching
+// Fetch course data
 const {
   data: course,
   pending: loading,
-  error: courseError,
+  error,
   refresh: refreshCourse,
-} = await useFetch<Course>(`/api/courses/${courseId.value}`, {
-  server: false,
+} = await useFetch(`/api/courses/${courseId.value}`, {
   default: () => null,
 });
 
 const isStarting = ref(false);
 
-// Computed properties instead of watchers
-const error = computed(() => {
-  return courseError.value?.message || null;
-});
+const hasError = computed(() => error.value?.message || null);
+const hasStarted = computed(() => !!course.value?.isParticipating);
 
-const hasStarted = computed(() => {
-  return !!course.value?.isParticipating;
-});
+const wishlistStore = useWishlistStore();
+await wishlistStore.fetchWishlist();
 
 const isInWishlist = computed(() => {
   return !!course.value?.isInWishlist;
 });
 
 const isCreator = computed(() => {
-  return user.value && course.value && user.value.id === course.value.teacher.id;
+  return user.value && course.value && user.value.id === course.value.creator.id;
 });
 
 async function startCourse() {
@@ -130,7 +94,7 @@ async function removeCourse() {
 <template>
   <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
     <div v-if="loading" class="py-8 text-center">Загрузка...</div>
-    <div v-else-if="error" class="py-8 text-center text-red-500">{{ error }}</div>
+    <div v-else-if="hasError" class="py-8 text-center text-red-500">{{ hasError }}</div>
     <div v-else-if="course" class="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
       <!-- Main Content -->
       <div class="flex-1 space-y-8">
@@ -153,14 +117,14 @@ async function removeCourse() {
             <!-- Teacher section -->
             <div class="bg-muted/40 flex items-center gap-3 rounded p-2">
               <img
-                v-if="course.teacher.image"
-                :src="course.teacher.image"
-                :alt="course.teacher.firstname"
+                v-if="course.creator.image"
+                :src="course.creator.image"
+                :alt="course.creator.firstname"
                 class="h-12 w-12 rounded-full object-cover"
               />
               <div>
                 <div class="font-semibold">
-                  {{ course.teacher.firstname }} {{ course.teacher.lastname }}
+                  {{ course.creator.firstname }} {{ course.creator.lastname }}
                 </div>
                 <div class="text-muted-foreground text-xs">Преподаватель</div>
               </div>
