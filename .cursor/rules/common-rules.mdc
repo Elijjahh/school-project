@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When executing commands prefer bun and bunx over npm and npx if there is bun.lockdb file in the project, or you see that i use it in terminal.
+
+ALso do not create .md files for overview of what you did if you were not asked to.

@@ -4,10 +4,11 @@ const bodySchema = z.object({
   moduleId: z.number(),
   title: z.string(),
   content: z.string(),
+  videoUrl: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { moduleId, title, content } = await readValidatedBody(event, bodySchema.parse);
+  const { moduleId, title, content, videoUrl } = await readValidatedBody(event, bodySchema.parse);
 
   const [{ value: lessonCount }] = await useDrizzle()
     .select({ value: count() })
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   const [result] = await useDrizzle()
     .insert(lessons)
-    .values({ moduleId, title, content, order: lessonCount + 1 })
+    .values({ moduleId, title, content, videoUrl, order: lessonCount + 1 })
     .returning();
   return result;
 });

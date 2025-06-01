@@ -360,7 +360,16 @@ async function removeCourse() {
                           {{ lessonIndex + 1 }}
                         </div>
                         <div class="min-w-0 flex-1">
-                          <h4 class="truncate font-medium text-gray-900">{{ lesson.title }}</h4>
+                          <NuxtLink
+                            :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}`"
+                            class="block"
+                          >
+                            <h4
+                              class="truncate font-medium text-gray-900 transition-colors hover:text-blue-600"
+                            >
+                              {{ lesson.title }}
+                            </h4>
+                          </NuxtLink>
                           <div class="flex items-center gap-3 text-xs text-gray-500">
                             <span>Урок {{ lesson.order }}</span>
                             <span v-if="lesson.tests?.length"
@@ -371,13 +380,12 @@ async function removeCourse() {
                         </div>
                       </div>
 
-                      <div
-                        v-if="isCreator"
-                        class="flex flex-shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
-                      >
+                      <div class="flex flex-shrink-0 items-center gap-1">
+                        <!-- View Lesson Button for all users -->
                         <UIButton variant="ghost" size="sm">
                           <NuxtLink
-                            :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}/tests/new`"
+                            :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}`"
+                            class="flex items-center gap-1"
                           >
                             <svg
                               class="h-4 w-4"
@@ -389,30 +397,62 @@ async function removeCourse() {
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                               />
-                            </svg>
-                          </NuxtLink>
-                        </UIButton>
-                        <UIButton variant="ghost" size="sm">
-                          <NuxtLink
-                            :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}/edit`"
-                          >
-                            <svg
-                              class="h-4 w-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
                               <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                               />
                             </svg>
                           </NuxtLink>
                         </UIButton>
+
+                        <!-- Creator-only buttons -->
+                        <div
+                          v-if="isCreator"
+                          class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                          <UIButton variant="ghost" size="sm">
+                            <NuxtLink
+                              :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}/tests/new`"
+                            >
+                              <svg
+                                class="h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                            </NuxtLink>
+                          </UIButton>
+                          <UIButton variant="ghost" size="sm">
+                            <NuxtLink
+                              :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}/edit`"
+                            >
+                              <svg
+                                class="h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </NuxtLink>
+                          </UIButton>
+                        </div>
                       </div>
                     </div>
 

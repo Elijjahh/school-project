@@ -26,6 +26,7 @@ async function handleLessonCreate(payload: LessonPayload) {
         moduleId,
         title: payload.title,
         content: payload.content,
+        videoUrl: payload.videoUrl,
       },
     });
     // После создания редиректим на страницу редактирования этого урока

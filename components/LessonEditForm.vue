@@ -34,6 +34,10 @@ const {
   setValue: setContent,
 } = useField('content', contentSchema, { initialValue: '' });
 
+const { value: videoUrl, setValue: setVideoUrl } = useField('videoUrl', undefined, {
+  initialValue: null as string | null,
+});
+
 const { value: order, setValue: setOrder } = useField('order', undefined, {
   initialValue: 0,
 });
@@ -46,6 +50,7 @@ const editing = ref(false);
 onMounted(() => {
   setTitle(lesson.value.title);
   setContent(lesson.value.content);
+  setVideoUrl(lesson.value.videoUrl || null);
   setOrder(lesson.value.order);
 });
 
@@ -57,11 +62,15 @@ async function handleSave() {
     saveError.value = errors[0] as string;
     return;
   }
-  emit('save', {
+
+  const payload = {
     title: title.value,
     content: content.value,
+    videoUrl: videoUrl.value || undefined,
     order: order.value,
-  });
+  };
+
+  emit('save', payload);
   editing.value = false;
 }
 function handleRemove() {
@@ -78,6 +87,17 @@ function handleRemove() {
       <div class="mb-2">
         <div class="font-semibold">Контент</div>
         <div>{{ content }}</div>
+      </div>
+      <div v-if="videoUrl" class="mb-2">
+        <div class="font-semibold">Видео</div>
+        <video
+          :src="videoUrl"
+          controls
+          class="w-full max-w-md rounded-lg border"
+          preload="metadata"
+        >
+          Ваш браузер не поддерживает воспроизведение видео.
+        </video>
       </div>
       <UIButton type="button" @click="editing = true">Редактировать</UIButton>
     </div>
@@ -97,6 +117,9 @@ function handleRemove() {
         :class="{ 'border-destructive focus-visible:ring-destructive': contentError }"
       />
       <div v-if="contentError" class="text-destructive text-sm font-medium">{{ contentError }}</div>
+
+      <UIVideoUpload v-model="videoUrl" label="Видео урока (необязательно)" />
+
       <div class="mt-2 flex gap-2">
         <UIButton type="button" :disabled="saveLoading" @click="handleSave">
           <span v-if="saveLoading" class="flex items-center"

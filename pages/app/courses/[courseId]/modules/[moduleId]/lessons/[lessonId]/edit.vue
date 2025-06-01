@@ -18,6 +18,7 @@ const lesson = computed(() => {
         id: lessonRaw.value.id,
         title: lessonRaw.value.title,
         content: lessonRaw.value.content,
+        videoUrl: lessonRaw.value.videoUrl,
         order: lessonRaw.value.order,
       }
     : null;
@@ -35,22 +36,32 @@ const tests = computed(() => {
 
 const error = ref('');
 
-async function handleLessonSave(payload: { title: string; content: string; order: number }) {
+async function handleLessonSave(payload: {
+  title: string;
+  content: string;
+  videoUrl?: string;
+  order: number;
+}) {
   if (!lesson.value) return;
+
   try {
     if (lessonId) {
+      const apiPayload = {
+        moduleId,
+        title: payload.title,
+        content: payload.content,
+        videoUrl: payload.videoUrl,
+        order: payload.order,
+      };
+
       await $fetch(`/api/lessons/${lessonId}`, {
         method: 'PATCH',
-        body: {
-          moduleId,
-          title: payload.title,
-          content: payload.content,
-          order: payload.order,
-        },
+        body: apiPayload,
       });
     }
     await refresh();
-  } catch {
+  } catch (err) {
+    console.error('Error saving lesson:', err);
     error.value = 'Ошибка при сохранении урока';
   }
 }

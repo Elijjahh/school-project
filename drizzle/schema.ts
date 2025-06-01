@@ -178,6 +178,7 @@ export const lessons = pgTable('lessons', {
     .references(() => modules.id, { onDelete: 'restrict' }),
   title: text('title').notNull(),
   content: text('content').notNull(),
+  videoUrl: text('video_url'),
   order: integer('order').notNull(),
 });
 

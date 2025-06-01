@@ -203,12 +203,18 @@ export default defineEventHandler(async (_event) => {
           // Create lessons
           const lessonCount = faker.number.int({ min: 3, max: 6 });
           for (let j = 0; j < lessonCount; j++) {
+            const hasVideo = faker.datatype.boolean({ probability: 0.3 }); // 30% уроков будут с видео
+            const videoUrl = hasVideo
+              ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+              : null;
+
             const [lesson] = await db
               .insert(tables.lessons)
               .values({
                 moduleId: module.id,
                 title: `Урок ${j + 1}: ${faker.lorem.words(3)}`,
                 content: faker.lorem.paragraphs(3),
+                videoUrl,
                 order: j + 1,
               })
               .returning();

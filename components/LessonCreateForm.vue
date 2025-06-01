@@ -37,6 +37,10 @@ const {
   validateOnValueUpdate: false,
 });
 
+const { value: videoUrl, setValue: setVideoUrl } = useField('videoUrl', undefined, {
+  initialValue: null as string | null,
+});
+
 // Состояние взаимодействия с полями
 const titleTouched = ref(false);
 const contentTouched = ref(false);
@@ -47,6 +51,7 @@ const saveError = ref('');
 onMounted(() => {
   setTitle('');
   setContent('');
+  setVideoUrl(null);
 });
 
 // Computed properties для показа ошибок только после взаимодействия
@@ -83,6 +88,7 @@ async function handleSave() {
   emit('save', {
     title: title.value,
     content: content.value,
+    videoUrl: videoUrl.value || undefined,
   });
 }
 </script>
@@ -109,6 +115,9 @@ async function handleSave() {
       <div v-if="showContentError" class="text-destructive text-sm font-medium">
         {{ contentError }}
       </div>
+
+      <UIVideoUpload v-model="videoUrl" label="Видео урока (необязательно)" />
+
       <div class="mt-2 flex gap-2">
         <UIButton type="button" :disabled="saveLoading || props.loading" @click="handleSave">
           <span v-if="saveLoading || props.loading" class="flex items-center">

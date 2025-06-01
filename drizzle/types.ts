@@ -178,12 +178,14 @@ export type PaginatedResponse<T> = {
 export type LessonPayload = {
   title: string;
   content: string;
+  videoUrl?: string;
 };
 
 // Update payloads for edit forms
 export type LessonUpdatePayload = {
   title: string;
   content: string;
+  videoUrl?: string;
   order: number;
 };
 

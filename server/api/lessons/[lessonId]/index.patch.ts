@@ -4,6 +4,7 @@ const bodySchema = z.object({
   moduleId: z.number(),
   title: z.string(),
   content: z.string(),
+  videoUrl: z.string().optional().nullable(),
   order: z.number(),
 });
 
@@ -15,12 +16,19 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
-  const { moduleId, title, content, order } = await readValidatedBody(event, bodySchema.parse);
+  const { moduleId, title, content, videoUrl, order } = await readValidatedBody(
+    event,
+    bodySchema.parse,
+  );
+
+  // Handle videoUrl explicitly - if undefined or null, set to null
+  const processedVideoUrl = videoUrl === undefined ? null : videoUrl;
 
   const result = await useDrizzle()
     .update(lessons)
-    .set({ moduleId, title, content, order })
+    .set({ moduleId, title, content, videoUrl: processedVideoUrl, order })
     .where(eq(lessons.id, lessonId))
     .returning();
+
   return result[0];
 });

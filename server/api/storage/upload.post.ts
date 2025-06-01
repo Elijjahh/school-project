@@ -34,20 +34,26 @@ export default defineEventHandler(async (event) => {
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    const allowedTypes = [...allowedImageTypes, ...allowedVideoTypes];
+
     if (!allowedTypes.includes(file.type || '')) {
       throw createError({
         statusCode: 400,
-        message: 'Invalid file type. Only JPG, PNG and GIF are allowed',
+        message:
+          'Invalid file type. Only JPG, PNG, GIF images and MP4, WebM, OGG videos are allowed',
       });
     }
 
-    // Validate file size (2MB max)
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    // Validate file size based on type
+    const isVideo = allowedVideoTypes.includes(file.type || '');
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 2 * 1024 * 1024; // 100MB for videos, 2MB for images
+
     if (file.data.length > maxSize) {
       throw createError({
         statusCode: 400,
-        message: 'File size exceeds 2MB limit',
+        message: `File size exceeds ${isVideo ? '100MB' : '2MB'} limit`,
       });
     }
 
