@@ -22,7 +22,6 @@ const emit = defineEmits<Emits>();
 const uploading = ref(false);
 const uploadError = ref('');
 const fileInputRef = ref<HTMLInputElement>();
-const replacingVideo = ref(false);
 
 const videoUrl = computed({
   get: () => props.modelValue ?? null,
@@ -53,11 +52,6 @@ async function handleFileSelect(event: Event) {
   uploadError.value = '';
   uploading.value = true;
 
-  // If replacing existing video, show replacement indicator
-  if (videoUrl.value) {
-    replacingVideo.value = true;
-  }
-
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -72,7 +66,6 @@ async function handleFileSelect(event: Event) {
     uploadError.value = (error as Error)?.message || 'Ошибка при загрузке видео';
   } finally {
     uploading.value = false;
-    replacingVideo.value = false;
   }
 }
 
@@ -103,33 +96,44 @@ function triggerFileSelect() {
         @change="handleFileSelect"
       />
 
-      <UIButton type="button" variant="outline" :disabled="uploading" @click="triggerFileSelect">
-        <span v-if="uploading" class="flex items-center">
-          <span class="mr-2">Загружаем видео...</span>
-          <span
-            class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-          />
-        </span>
-        <span v-else>{{ label }}</span>
-      </UIButton>
+      <!-- Placeholder for first upload with same style as video -->
+      <div v-if="!uploading" class="relative">
+        <div class="flex h-64 w-full items-center justify-center rounded-lg border bg-gray-100">
+          <UIButton type="button" variant="outline" size="lg" @click="triggerFileSelect">
+            {{ label }}
+          </UIButton>
+        </div>
+      </div>
+
+      <!-- Loading state for first upload -->
+      <div v-else class="relative">
+        <div class="flex h-64 w-full items-center justify-center rounded-lg bg-gray-900">
+          <div class="text-center text-white">
+            <div
+              class="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></div>
+            <div class="text-sm">Загружаем видео...</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-else class="space-y-2">
-      <!-- Video preview with loading overlay -->
+      <!-- Video preview with loading overlay - full width -->
       <div class="relative">
         <video
           :src="videoUrl"
           controls
-          class="w-full max-w-md rounded-lg border"
+          class="w-full rounded-lg border"
           preload="metadata"
-          :class="{ 'opacity-50': replacingVideo }"
+          :class="{ 'opacity-50': uploading }"
         >
           Ваш браузер не поддерживает воспроизведение видео.
         </video>
 
         <!-- Loading overlay when replacing video -->
         <div
-          v-if="replacingVideo"
+          v-if="uploading"
           class="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-lg bg-black"
         >
           <div class="text-center text-white">

@@ -90,12 +90,7 @@ function handleRemove() {
       </div>
       <div v-if="videoUrl" class="mb-2">
         <div class="font-semibold">Видео</div>
-        <video
-          :src="videoUrl"
-          controls
-          class="w-full max-w-md rounded-lg border"
-          preload="metadata"
-        >
+        <video :src="videoUrl" controls class="w-full rounded-lg border" preload="metadata">
           Ваш браузер не поддерживает воспроизведение видео.
         </video>
       </div>
