@@ -8,6 +8,14 @@ export default defineEventHandler(async (event) => {
 
   const test = await useDrizzle().query.tests.findFirst({
     where: (tests, { eq }) => eq(tests.id, testId),
+    with: {
+      questions: {
+        with: {
+          answers: true,
+        },
+        orderBy: (questions, { asc }) => [asc(questions.id)],
+      },
+    },
   });
 
   if (!test)
