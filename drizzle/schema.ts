@@ -28,6 +28,7 @@ export const users = pgTable('users', {
 export const usersRelations = relations(users, ({ many }) => ({
   courses: many(courses),
   coursesParticipations: many(coursesParticipations),
+  testAttempts: many(testAttempts, { relationName: 'testAttemptsOnUsers' }),
 }));
 
 export const categories = pgTable('categories', {
@@ -242,15 +243,27 @@ export const testAttempts = pgTable('testAttempts', {
   testId: integer('testId')
     .notNull()
     .references(() => tests.id, { onDelete: 'restrict' }),
+  userId: integer('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'restrict' }),
+  score: integer('score').notNull().default(0),
+  totalQuestions: integer('totalQuestions').notNull(),
+  completed: boolean('completed').notNull().default(false),
   datetime: timestamp().defaultNow(),
 });
 
-export const testAttemptsRelations = relations(testAttempts, ({ one }) => ({
+export const testAttemptsRelations = relations(testAttempts, ({ one, many }) => ({
   test: one(tests, {
     fields: [testAttempts.testId],
     references: [tests.id],
     relationName: 'testAttemptsOnTests',
   }),
+  user: one(users, {
+    fields: [testAttempts.userId],
+    references: [users.id],
+    relationName: 'testAttemptsOnUsers',
+  }),
+  userAnswers: many(userAnswers, { relationName: 'userAnswersOnTestAttempts' }),
 }));
 
 export const questions = pgTable('questions', {
@@ -283,6 +296,36 @@ export const answersRelations = relations(answers, ({ one }) => ({
   question: one(questions, {
     fields: [answers.questionId],
     references: [questions.id],
+  }),
+}));
+
+export const userAnswers = pgTable('userAnswers', {
+  id: serial('id').primaryKey(),
+  attemptId: integer('attemptId')
+    .notNull()
+    .references(() => testAttempts.id, { onDelete: 'restrict' }),
+  questionId: integer('questionId')
+    .notNull()
+    .references(() => questions.id, { onDelete: 'restrict' }),
+  selectedAnswerId: integer('selectedAnswerId').references(() => answers.id, {
+    onDelete: 'restrict',
+  }),
+  correct: boolean('correct').notNull(),
+});
+
+export const userAnswersRelations = relations(userAnswers, ({ one }) => ({
+  attempt: one(testAttempts, {
+    fields: [userAnswers.attemptId],
+    references: [testAttempts.id],
+    relationName: 'userAnswersOnTestAttempts',
+  }),
+  question: one(questions, {
+    fields: [userAnswers.questionId],
+    references: [questions.id],
+  }),
+  selectedAnswer: one(answers, {
+    fields: [userAnswers.selectedAnswerId],
+    references: [answers.id],
   }),
 }));
 
