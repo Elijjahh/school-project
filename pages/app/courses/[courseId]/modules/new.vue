@@ -46,15 +46,9 @@ async function handleModuleCreate(payload: { title: string; description: string 
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}`">{{
+              <UIBreadcrumbLink :href="`/app/courses/${courseId}/edit`">{{
                 courseData?.title || 'Курс'
               }}</UIBreadcrumbLink>
-            </UIBreadcrumbItem>
-            <UIBreadcrumbSeparator />
-            <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}/edit`"
-                >Редактирование</UIBreadcrumbLink
-              >
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>

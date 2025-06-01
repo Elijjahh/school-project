@@ -81,14 +81,7 @@ async function handleLessonSave(payload: { title: string; content: string; order
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink
-                :href="`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/edit`"
-                >{{ lesson?.title || 'Урок' }}</UIBreadcrumbLink
-              >
-            </UIBreadcrumbItem>
-            <UIBreadcrumbSeparator />
-            <UIBreadcrumbItem>
-              <UIBreadcrumbPage>Редактирование</UIBreadcrumbPage>
+              <UIBreadcrumbPage>{{ lesson?.title || 'Урок' }}</UIBreadcrumbPage>
             </UIBreadcrumbItem>
           </UIBreadcrumbList>
         </UIBreadcrumb>

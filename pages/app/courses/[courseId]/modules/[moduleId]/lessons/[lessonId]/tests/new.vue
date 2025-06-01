@@ -86,7 +86,7 @@ async function handleTestCreate(payload: {
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}`">{{
+              <UIBreadcrumbLink :href="`/app/courses/${courseId}/edit`">{{
                 courseData?.title || 'Курс'
               }}</UIBreadcrumbLink>
             </UIBreadcrumbItem>

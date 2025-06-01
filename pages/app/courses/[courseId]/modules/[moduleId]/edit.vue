@@ -71,13 +71,7 @@ async function handleModuleSave(payload: { title: string; description: string; o
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}/edit`">{{
-                moduleData?.title || 'Модуль'
-              }}</UIBreadcrumbLink>
-            </UIBreadcrumbItem>
-            <UIBreadcrumbSeparator />
-            <UIBreadcrumbItem>
-              <UIBreadcrumbPage>Редактирование</UIBreadcrumbPage>
+              <UIBreadcrumbPage>{{ moduleData?.title || 'Модуль' }}</UIBreadcrumbPage>
             </UIBreadcrumbItem>
           </UIBreadcrumbList>
         </UIBreadcrumb>

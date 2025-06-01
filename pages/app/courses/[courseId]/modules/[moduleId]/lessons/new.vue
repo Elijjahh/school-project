@@ -50,7 +50,7 @@ async function handleLessonCreate(payload: LessonPayload) {
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}`">{{
+              <UIBreadcrumbLink :href="`/app/courses/${courseId}/edit`">{{
                 courseData?.title || 'Курс'
               }}</UIBreadcrumbLink>
             </UIBreadcrumbItem>

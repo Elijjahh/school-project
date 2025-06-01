@@ -50,13 +50,7 @@ async function handleCourseSave(payload: {
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}`">{{
-                courseData?.title || 'Курс'
-              }}</UIBreadcrumbLink>
-            </UIBreadcrumbItem>
-            <UIBreadcrumbSeparator />
-            <UIBreadcrumbItem>
-              <UIBreadcrumbPage>Редактирование</UIBreadcrumbPage>
+              <UIBreadcrumbPage>{{ courseData?.title || 'Курс' }}</UIBreadcrumbPage>
             </UIBreadcrumbItem>
           </UIBreadcrumbList>
         </UIBreadcrumb>
