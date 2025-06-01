@@ -86,13 +86,25 @@ export type CourseInsert = InferInsertModel<typeof courses>;
 export type CourseWithDetails = Course & {
   creator: User;
   category: Category;
-  modules?: ModuleWithLessons[];
+  modules?: ModuleWithLessonsAndTests[];
   isParticipating?: boolean;
   isInWishlist?: boolean;
 };
 
 export type ModuleWithLessons = Module & {
   lessons: Lesson[];
+};
+
+export type ModuleWithLessonsAndTests = Module & {
+  lessons: LessonWithTests[];
+};
+
+export type LessonWithTests = Lesson & {
+  tests: TestWithStats[];
+};
+
+export type TestWithStats = Test & {
+  questionsCount: number;
 };
 
 export type UserWithCourses = User & {

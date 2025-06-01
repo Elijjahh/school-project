@@ -21,11 +21,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Курс с таким id не найден' });
   }
 
-  // Get modules and lessons
+  // Get modules and lessons with tests
   const dbModules = await db.query.modules.findMany({
     where: (m, { eq }) => eq(m.courseId, courseId),
     orderBy: (m, { asc }) => asc(m.order),
   });
+
   const moduleIds = dbModules.map((m) => m.id);
   const dbLessons = moduleIds.length
     ? await db.query.lessons.findMany({
@@ -34,13 +35,36 @@ export default defineEventHandler(async (event) => {
       })
     : [];
 
+  // Get tests for all lessons
+  const lessonIds = dbLessons.map((l) => l.id);
+  const dbTests = lessonIds.length
+    ? await db.query.tests.findMany({
+        where: (t, { inArray }) => inArray(t.lessonId, lessonIds),
+        with: {
+          questions: true,
+        },
+      })
+    : [];
+
   const modulesWithLessons = dbModules.map((mod) => ({
     id: mod.id,
     title: mod.title,
+    description: mod.description,
     order: mod.order,
     lessons: dbLessons
       .filter((l) => l.moduleId === mod.id)
-      .map((l) => ({ id: l.id, title: l.title, order: l.order })),
+      .map((l) => ({
+        id: l.id,
+        title: l.title,
+        order: l.order,
+        tests: dbTests
+          .filter((t) => t.lessonId === l.id)
+          .map((t) => ({
+            id: t.id,
+            maxAttempts: t.maxAttempts,
+            questionsCount: t.questions?.length || 0,
+          })),
+      })),
   }));
 
   // Participation and wishlist state for current user
