@@ -1,39 +1,40 @@
 <script setup lang="ts">
-import type { LessonPayload } from '~/drizzle/types';
-
 definePageMeta({
   layout: 'profile',
 });
 
 const route = useRoute();
-const router = useRouter();
 const courseId = Number(route.params.courseId);
 const moduleId = Number(route.params.moduleId);
+const lessonId = Number(route.params.lessonId);
+const testId = Number(route.params.testId);
 
+const { data: testData, pending: loading, refresh } = useFetch(`/api/tests/${testId}`);
 const { data: courseData } = useFetch(`/api/courses/${courseId}`);
 const { data: moduleData } = useFetch(`/api/modules/${moduleId}`);
+const { data: lessonData } = useFetch(`/api/lessons/${lessonId}`);
 
-const loading = ref(false);
 const error = ref('');
 
-async function handleLessonCreate(payload: LessonPayload) {
-  loading.value = true;
-  error.value = '';
+async function handleTestSave(payload: {
+  maxAttempts: number;
+  testQuestions: Array<{ text: string; answers: Array<{ text: string; correct: boolean }> }>;
+}) {
+  if (!testData.value) return;
   try {
-    const created = await $fetch('/api/lessons', {
-      method: 'POST',
-      body: {
-        moduleId,
-        title: payload.title,
-        content: payload.content,
+    await fetch(`/api/tests/${testId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        maxAttempts: payload.maxAttempts,
+        testQuestions: payload.testQuestions,
+      }),
     });
-    // После создания редиректим на страницу редактирования этого урока
-    router.push(`/app/courses/${courseId}/modules/${moduleId}/lessons/${created.id}/edit`);
+    await refresh();
   } catch {
-    error.value = 'Ошибка при создании урока';
-  } finally {
-    loading.value = false;
+    error.value = 'Ошибка при сохранении теста';
   }
 }
 </script>
@@ -41,7 +42,8 @@ async function handleLessonCreate(payload: LessonPayload) {
 <template>
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
-      <div class="space-y-8">
+      <div v-if="loading" class="py-8 text-center">Загрузка...</div>
+      <div v-else class="space-y-8">
         <!-- Breadcrumbs -->
         <UIBreadcrumb>
           <UIBreadcrumbList>
@@ -50,7 +52,7 @@ async function handleLessonCreate(payload: LessonPayload) {
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbLink :href="`/app/courses/${courseId}/edit`">{{
+              <UIBreadcrumbLink :href="`/app/courses/${courseId}`">{{
                 courseData?.title || 'Курс'
               }}</UIBreadcrumbLink>
             </UIBreadcrumbItem>
@@ -62,19 +64,26 @@ async function handleLessonCreate(payload: LessonPayload) {
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbPage>Создать урок</UIBreadcrumbPage>
+              <UIBreadcrumbLink
+                :href="`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/edit`"
+                >{{ lessonData?.title || 'Урок' }}</UIBreadcrumbLink
+              >
+            </UIBreadcrumbItem>
+            <UIBreadcrumbSeparator />
+            <UIBreadcrumbItem>
+              <UIBreadcrumbPage>Тест</UIBreadcrumbPage>
             </UIBreadcrumbItem>
           </UIBreadcrumbList>
         </UIBreadcrumb>
 
         <!-- Header -->
         <div class="space-y-2">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">Создать урок</h1>
-          <p class="text-gray-600">Заполните информацию о новом уроке</p>
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">Редактировать тест</h1>
+          <p class="text-gray-600">Измените настройки теста и его вопросы</p>
         </div>
 
-        <!-- Lesson Creation Form -->
-        <LessonCreateForm :module-id="moduleId" :loading="loading" @save="handleLessonCreate" />
+        <!-- Test Edit Form -->
+        <TestEditForm v-if="testData" :test="testData" :loading="loading" @save="handleTestSave" />
 
         <!-- Error Message -->
         <div v-if="error" class="rounded-md bg-red-50 p-4">

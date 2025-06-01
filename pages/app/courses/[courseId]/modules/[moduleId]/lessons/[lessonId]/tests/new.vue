@@ -1,37 +1,73 @@
 <script setup lang="ts">
-import type { LessonPayload } from '~/drizzle/types';
-
 definePageMeta({
   layout: 'profile',
 });
+
+interface CreatedQuestion {
+  id: number;
+}
+
+interface CreatedTest {
+  id: number;
+}
 
 const route = useRoute();
 const router = useRouter();
 const courseId = Number(route.params.courseId);
 const moduleId = Number(route.params.moduleId);
+const lessonId = Number(route.params.lessonId);
 
 const { data: courseData } = useFetch(`/api/courses/${courseId}`);
 const { data: moduleData } = useFetch(`/api/modules/${moduleId}`);
+const { data: lessonData } = useFetch(`/api/lessons/${lessonId}`);
 
 const loading = ref(false);
 const error = ref('');
 
-async function handleLessonCreate(payload: LessonPayload) {
+async function handleTestCreate(payload: {
+  maxAttempts: number;
+  questions: Array<{ text: string; answers: Array<{ text: string; correct: boolean }> }>;
+}) {
   loading.value = true;
   error.value = '';
   try {
-    const created = await $fetch('/api/lessons', {
+    // Создаем тест
+    const createdTest = await $fetch<CreatedTest>('/api/tests', {
       method: 'POST',
       body: {
-        moduleId,
-        title: payload.title,
-        content: payload.content,
+        lessonId,
+        maxAttempts: payload.maxAttempts,
       },
     });
-    // После создания редиректим на страницу редактирования этого урока
-    router.push(`/app/courses/${courseId}/modules/${moduleId}/lessons/${created.id}/edit`);
+
+    // Создаем вопросы и ответы
+    for (const questionData of payload.questions) {
+      const createdQuestion = await $fetch<CreatedQuestion>('/api/questions', {
+        method: 'POST',
+        body: {
+          testId: createdTest.id,
+          text: questionData.text,
+        },
+      });
+
+      for (const answerData of questionData.answers) {
+        await $fetch('/api/answers', {
+          method: 'POST',
+          body: {
+            questionId: createdQuestion.id,
+            text: answerData.text,
+            correct: answerData.correct,
+          },
+        });
+      }
+    }
+
+    // После создания редиректим на страницу редактирования теста
+    router.push(
+      `/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tests/${createdTest.id}/edit`,
+    );
   } catch {
-    error.value = 'Ошибка при создании урока';
+    error.value = 'Ошибка при создании теста';
   } finally {
     loading.value = false;
   }
@@ -62,19 +98,26 @@ async function handleLessonCreate(payload: LessonPayload) {
             </UIBreadcrumbItem>
             <UIBreadcrumbSeparator />
             <UIBreadcrumbItem>
-              <UIBreadcrumbPage>Создать урок</UIBreadcrumbPage>
+              <UIBreadcrumbLink
+                :href="`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/edit`"
+                >{{ lessonData?.title || 'Урок' }}</UIBreadcrumbLink
+              >
+            </UIBreadcrumbItem>
+            <UIBreadcrumbSeparator />
+            <UIBreadcrumbItem>
+              <UIBreadcrumbPage>Создать тест</UIBreadcrumbPage>
             </UIBreadcrumbItem>
           </UIBreadcrumbList>
         </UIBreadcrumb>
 
         <!-- Header -->
         <div class="space-y-2">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">Создать урок</h1>
-          <p class="text-gray-600">Заполните информацию о новом уроке</p>
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">Создать тест</h1>
+          <p class="text-gray-600">Создайте тест с вопросами для урока</p>
         </div>
 
-        <!-- Lesson Creation Form -->
-        <LessonCreateForm :module-id="moduleId" :loading="loading" @save="handleLessonCreate" />
+        <!-- Test Creation Form -->
+        <TestCreateForm :lesson-id="lessonId" :loading="loading" @save="handleTestCreate" />
 
         <!-- Error Message -->
         <div v-if="error" class="rounded-md bg-red-50 p-4">

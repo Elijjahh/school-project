@@ -2,7 +2,7 @@ import { tests } from '~/drizzle/schema';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { lessonId } = body;
+  const { lessonId, maxAttempts = 3 } = body;
 
   if (!lessonId) {
     throw createError({
@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
     .insert(tests)
     .values({
       lessonId: Number(lessonId),
+      maxAttempts: Number(maxAttempts),
     })
     .returning();
   return test;
