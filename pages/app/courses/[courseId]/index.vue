@@ -1,6 +1,45 @@
 <script setup lang="ts">
 import { useWishlistStore } from '~/stores/wishlist';
 
+interface LessonProgress {
+  lessonId: number;
+  title: string;
+  order: number;
+  completed: boolean;
+  tests: Array<{
+    testId: number;
+    maxAttempts: number;
+    attemptsCount: number;
+    completedAttempts: number;
+    bestScore: number;
+    bestPercentage: number;
+    passed: boolean;
+    lastAttemptAt: string | null;
+  }>;
+}
+
+interface ModuleProgress {
+  moduleId: number;
+  title: string;
+  order: number;
+  completed: boolean;
+  totalLessons: number;
+  completedLessons: number;
+  progress: number;
+  lessons: LessonProgress[];
+}
+
+interface CourseProgressData {
+  courseId: number;
+  courseCompleted: boolean;
+  overallProgress: number;
+  totalModules: number;
+  completedModules: number;
+  totalLessons: number;
+  completedLessons: number;
+  modules: ModuleProgress[];
+}
+
 const { user } = useUserSession();
 const route = useRoute();
 const courseId = computed(() => Number(route.params.courseId));
@@ -21,6 +60,16 @@ const isStarting = ref(false);
 const hasError = computed(() => error.value?.message || null);
 const hasStarted = computed(() => !!course.value?.isParticipating);
 
+// Fetch course progress if user is enrolled
+const { data: courseProgress } = await useFetch<CourseProgressData>(
+  `/api/courses/${courseId.value}/progress`,
+  {
+    query: computed(() => (hasStarted.value && user.value?.id ? { userId: user.value.id } : {})),
+    default: () => null,
+    server: false,
+  },
+);
+
 const wishlistStore = useWishlistStore();
 await wishlistStore.fetchWishlist();
 
@@ -31,6 +80,24 @@ const isInWishlist = computed(() => {
 const isCreator = computed(() => {
   return user.value && course.value && user.value.id === course.value.creator.id;
 });
+
+// Progress checking functions
+const isModuleCompleted = (moduleId: number) => {
+  if (!courseProgress.value?.modules) return false;
+  const moduleProgress = courseProgress.value.modules.find(
+    (m: ModuleProgress) => m.moduleId === moduleId,
+  );
+  return moduleProgress?.completed || false;
+};
+
+const isLessonCompleted = (lessonId: number) => {
+  if (!courseProgress.value?.modules) return false;
+  for (const module of courseProgress.value.modules) {
+    const lesson = module.lessons?.find((l: LessonProgress) => l.lessonId === lessonId);
+    if (lesson) return lesson.completed;
+  }
+  return false;
+};
 
 async function startCourse() {
   isStarting.value = true;
@@ -305,14 +372,30 @@ async function removeCourse() {
                   class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4"
                 >
                   <div class="flex min-w-0 flex-1 items-center gap-4">
-                    <div
-                      class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-900 font-medium text-white"
-                    >
-                      {{ moduleIndex + 1 }}
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-900 font-medium text-white"
+                      >
+                        {{ moduleIndex + 1 }}
+                      </div>
+                      <!-- Module completion indicator -->
+                      <div
+                        v-if="hasStarted"
+                        :class="isModuleCompleted(module.id) ? 'bg-green-500' : 'bg-gray-300'"
+                        class="h-3 w-3 rounded-full"
+                        :title="
+                          isModuleCompleted(module.id) ? 'Модуль завершен' : 'Модуль не завершен'
+                        "
+                      ></div>
                     </div>
                     <div class="min-w-0 flex-1">
                       <h3 class="truncate text-lg font-semibold text-gray-900">
                         {{ module.title }}
+                        <span
+                          v-if="hasStarted && isModuleCompleted(module.id)"
+                          class="ml-2 text-green-600"
+                          >✓</span
+                        >
                       </h3>
                       <p v-if="module.description" class="line-clamp-2 text-sm text-gray-600">
                         {{ module.description }}
@@ -390,6 +473,15 @@ async function removeCourse() {
                         >
                           {{ lessonIndex + 1 }}
                         </div>
+                        <!-- Lesson completion indicator -->
+                        <div
+                          v-if="hasStarted"
+                          :class="isLessonCompleted(lesson.id) ? 'bg-green-500' : 'bg-gray-300'"
+                          class="h-2 w-2 rounded-full"
+                          :title="
+                            isLessonCompleted(lesson.id) ? 'Урок завершен' : 'Урок не завершен'
+                          "
+                        ></div>
                         <div class="min-w-0 flex-1">
                           <NuxtLink
                             v-if="hasStarted || isCreator"
@@ -400,6 +492,11 @@ async function removeCourse() {
                               class="truncate font-medium text-gray-900 transition-colors hover:text-blue-600"
                             >
                               {{ lesson.title }}
+                              <span
+                                v-if="hasStarted && isLessonCompleted(lesson.id)"
+                                class="ml-2 text-green-600"
+                                >✓</span
+                              >
                             </h4>
                           </NuxtLink>
                           <h4 v-else class="cursor-not-allowed truncate font-medium text-gray-500">
@@ -690,6 +787,36 @@ async function removeCourse() {
                   </UIButton>
                 </template>
               </div>
+            </UICard>
+
+            <!-- Progress Card -->
+            <UICard v-if="hasStarted && user?.id" class="p-6">
+              <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-semibold text-gray-900">Прогресс</h3>
+                <UIButton variant="outline" size="sm">
+                  <NuxtLink
+                    :to="`/app/courses/${courseId}/progress`"
+                    class="flex items-center gap-1"
+                  >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                    Детали
+                  </NuxtLink>
+                </UIButton>
+              </div>
+              <CourseProgress :courseId="courseId" :userId="user.id" :showDetails="false" />
             </UICard>
 
             <!-- Statistics Card -->

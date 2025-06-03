@@ -1,4 +1,6 @@
 import { testAttempts } from '~/drizzle/schema';
+import { useDrizzle, eq } from '~/server/utils/drizzle';
+import { updateLessonProgress } from '~/server/utils/updateLessonProgress';
 
 export default defineEventHandler(async (event) => {
   const { attemptId } = await getValidatedRouterParams(
@@ -17,12 +19,17 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Получаем попытку с ответами
+  // Получаем попытку с ответами и информацией о тесте
   const attempt = await useDrizzle().query.testAttempts.findFirst({
     where: (testAttempts, { and, eq }) =>
       and(eq(testAttempts.id, attemptId), eq(testAttempts.userId, session.user.id)),
     with: {
       userAnswers: true,
+      test: {
+        with: {
+          lesson: true,
+        },
+      },
     },
   });
 
@@ -43,6 +50,8 @@ export default defineEventHandler(async (event) => {
   // Подсчитываем правильные ответы
   const correctAnswers = attempt.userAnswers.filter((answer) => answer.correct);
   const score = correctAnswers.length;
+  const percentage = Math.round((score / attempt.totalQuestions) * 100);
+  const passed = score >= Math.ceil(attempt.totalQuestions * 0.6); // 60% для прохождения
 
   // Обновляем попытку
   await useDrizzle()
@@ -53,10 +62,20 @@ export default defineEventHandler(async (event) => {
     })
     .where(eq(testAttempts.id, attemptId));
 
+  // Если тест пройден успешно, обновляем прогресс урока
+  if (passed && attempt.test?.lesson) {
+    try {
+      await updateLessonProgress(attempt.test.lesson.id, session.user.id);
+    } catch (error) {
+      console.error('Failed to update lesson progress:', error);
+      // Не прерываем выполнение, если обновление прогресса не удалось
+    }
+  }
+
   return {
     score,
     totalQuestions: attempt.totalQuestions,
-    percentage: Math.round((score / attempt.totalQuestions) * 100),
-    passed: score >= Math.ceil(attempt.totalQuestions * 0.6), // 60% для прохождения
+    percentage,
+    passed,
   };
 });
