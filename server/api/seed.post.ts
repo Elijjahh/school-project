@@ -10,7 +10,7 @@ export default defineEventHandler(async (_event) => {
 
     // Create admin user
     const [_admin] = await db
-      .insert(tables.users)
+      .insert(schema.users)
       .values({
         username: 'admin',
         email: 'admin@example.com',
@@ -26,7 +26,7 @@ export default defineEventHandler(async (_event) => {
     const teachers = await Promise.all(
       Array.from({ length: 5 }, async (_, index) => {
         const [teacher] = await db
-          .insert(tables.users)
+          .insert(schema.users)
           .values({
             username: `teacher${index + 1}`,
             email: `teacher${index + 1}@example.com`,
@@ -45,7 +45,7 @@ export default defineEventHandler(async (_event) => {
     const students = await Promise.all(
       Array.from({ length: 20 }, async (_, index) => {
         const [student] = await db
-          .insert(tables.users)
+          .insert(schema.users)
           .values({
             username: `student${index + 1}`,
             email: `student${index + 1}@example.com`,
@@ -95,7 +95,7 @@ export default defineEventHandler(async (_event) => {
 
     const categories = await Promise.all(
       categoryData.map(async (category) => {
-        const [createdCategory] = await db.insert(tables.categories).values(category).returning();
+        const [createdCategory] = await db.insert(schema.categories).values(category).returning();
         return createdCategory;
       }),
     );
@@ -148,7 +148,7 @@ export default defineEventHandler(async (_event) => {
       coursesData.map(async ({ title, categoryName }) => {
         const category = categories.find((c) => c.name === categoryName)!;
         const [course] = await db
-          .insert(tables.courses)
+          .insert(schema.courses)
           .values({
             title,
             description: faker.lorem.paragraphs(2),
@@ -166,7 +166,7 @@ export default defineEventHandler(async (_event) => {
 
       for (const student of courseStudents) {
         const [participation] = await db
-          .insert(tables.coursesParticipations)
+          .insert(schema.coursesParticipations)
           .values({
             userId: student.id,
             courseId: course.id,
@@ -174,7 +174,7 @@ export default defineEventHandler(async (_event) => {
           .returning();
 
         // Create course progress
-        await db.insert(tables.coursesProgress).values({
+        await db.insert(schema.coursesProgress).values({
           courseId: course.id,
           participationId: participation.id,
           finished: faker.datatype.boolean(),
@@ -184,7 +184,7 @@ export default defineEventHandler(async (_event) => {
         const moduleCount = faker.number.int({ min: 3, max: 8 });
         for (let i = 0; i < moduleCount; i++) {
           const [module] = await db
-            .insert(tables.modules)
+            .insert(schema.modules)
             .values({
               courseId: course.id,
               title: `Модуль ${i + 1}: ${faker.lorem.words(3)}`,
@@ -194,7 +194,7 @@ export default defineEventHandler(async (_event) => {
             .returning();
 
           // Create module progress
-          await db.insert(tables.modulesProgress).values({
+          await db.insert(schema.modulesProgress).values({
             moduleId: module.id,
             participationId: participation.id,
             finished: faker.datatype.boolean(),
@@ -209,7 +209,7 @@ export default defineEventHandler(async (_event) => {
               : null;
 
             const [lesson] = await db
-              .insert(tables.lessons)
+              .insert(schema.lessons)
               .values({
                 moduleId: module.id,
                 title: `Урок ${j + 1}: ${faker.lorem.words(3)}`,
@@ -220,7 +220,7 @@ export default defineEventHandler(async (_event) => {
               .returning();
 
             // Create lesson progress
-            await db.insert(tables.lessonsProgress).values({
+            await db.insert(schema.lessonsProgress).values({
               lessonId: lesson.id,
               participationId: participation.id,
               finished: faker.datatype.boolean(),
@@ -228,46 +228,54 @@ export default defineEventHandler(async (_event) => {
 
             // Create test
             const [test] = await db
-              .insert(tables.tests)
+              .insert(schema.tests)
               .values({
                 lessonId: lesson.id,
                 maxAttempts: faker.number.int({ min: 1, max: 3 }),
               })
               .returning();
 
-            // Create test attempt
-            if (faker.datatype.boolean()) {
-              const [_attempt] = await db
-                .insert(tables.testAttempts)
+            // Create questions first
+            const questionCount = faker.number.int({ min: 2, max: 3 });
+            const createdQuestions = [];
+
+            for (let k = 0; k < questionCount; k++) {
+              const [question] = await db
+                .insert(schema.questions)
                 .values({
                   testId: test.id,
-                  datetime: new Date(),
+                  text: faker.lorem.sentence() + '?',
                 })
                 .returning();
 
-              // Create questions
-              const questionCount = faker.number.int({ min: 5, max: 10 });
-              for (let k = 0; k < questionCount; k++) {
-                const [question] = await db
-                  .insert(tables.questions)
-                  .values({
-                    testId: test.id,
-                    text: faker.lorem.sentence() + '?',
-                  })
-                  .returning();
+              // Create answers
+              const answerCount = faker.number.int({ min: 2, max: 4 });
+              const correctAnswerIndex = faker.number.int({ min: 0, max: answerCount - 1 });
 
-                // Create answers
-                const answerCount = faker.number.int({ min: 2, max: 4 });
-                const correctAnswerIndex = faker.number.int({ min: 0, max: answerCount - 1 });
-
-                for (let l = 0; l < answerCount; l++) {
-                  await db.insert(tables.answers).values({
-                    questionId: question.id,
-                    text: faker.lorem.sentence(),
-                    correct: l === correctAnswerIndex,
-                  });
-                }
+              for (let l = 0; l < answerCount; l++) {
+                await db.insert(schema.answers).values({
+                  questionId: question.id,
+                  text: faker.lorem.sentence(),
+                  correct: l === correctAnswerIndex,
+                });
               }
+
+              createdQuestions.push(question);
+            }
+
+            // Create test attempt with proper userId and totalQuestions
+            if (faker.datatype.boolean()) {
+              const [_attempt] = await db
+                .insert(schema.testAttempts)
+                .values({
+                  testId: test.id,
+                  userId: student.id, // Fix: Add missing userId
+                  totalQuestions: createdQuestions.length, // Fix: Add missing totalQuestions
+                  score: faker.number.int({ min: 0, max: createdQuestions.length }),
+                  completed: faker.datatype.boolean(),
+                  datetime: new Date(),
+                })
+                .returning();
             }
           }
         }

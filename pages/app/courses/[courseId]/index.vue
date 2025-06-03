@@ -200,25 +200,27 @@ async function removeCourse() {
                       ? 'урок'
                       : 'уроков'
                   }}
-                  •
-                  {{
-                    course.modules?.reduce(
-                      (acc, m) =>
-                        acc +
-                        (m.lessons?.reduce((acc2, l) => acc2 + (l.tests?.length || 0), 0) || 0),
-                      0,
-                    ) || 0
-                  }}
-                  {{
-                    (course.modules?.reduce(
-                      (acc, m) =>
-                        acc +
-                        (m.lessons?.reduce((acc2, l) => acc2 + (l.tests?.length || 0), 0) || 0),
-                      0,
-                    ) || 0) === 1
-                      ? 'тест'
-                      : 'тестов'
-                  }}
+                  <span v-if="hasStarted || isCreator">
+                    •
+                    {{
+                      course.modules?.reduce(
+                        (acc, m) =>
+                          acc +
+                          (m.lessons?.reduce((acc2, l) => acc2 + (l.tests?.length || 0), 0) || 0),
+                        0,
+                      ) || 0
+                    }}
+                    {{
+                      (course.modules?.reduce(
+                        (acc, m) =>
+                          acc +
+                          (m.lessons?.reduce((acc2, l) => acc2 + (l.tests?.length || 0), 0) || 0),
+                        0,
+                      ) || 0) === 1
+                        ? 'тест'
+                        : 'тестов'
+                    }}
+                  </span>
                 </p>
               </div>
               <UIButton v-if="isCreator" variant="outline" size="sm">
@@ -237,6 +239,35 @@ async function removeCourse() {
                   Добавить модуль
                 </NuxtLink>
               </UIButton>
+            </div>
+
+            <!-- Information message for non-participants -->
+            <div
+              v-if="!hasStarted && !isCreator"
+              class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4"
+            >
+              <div class="flex items-start gap-3">
+                <svg
+                  class="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <h3 class="font-medium text-blue-900">Начните курс для доступа к материалам</h3>
+                  <p class="mt-1 text-sm text-blue-700">
+                    Чтобы получить доступ к урокам и тестам, необходимо начать прохождение курса.
+                    Нажмите кнопку "Начать курс" в правой панели.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div class="max-h-[600px] space-y-4 overflow-y-auto">
@@ -291,7 +322,7 @@ async function removeCourse() {
                           >{{ module.lessons?.length || 0 }}
                           {{ (module.lessons?.length || 0) === 1 ? 'урок' : 'уроков' }}</span
                         >
-                        <span
+                        <span v-if="hasStarted || isCreator"
                           >{{
                             module.lessons?.reduce((acc, l) => acc + (l.tests?.length || 0), 0) || 0
                           }}
@@ -361,6 +392,7 @@ async function removeCourse() {
                         </div>
                         <div class="min-w-0 flex-1">
                           <NuxtLink
+                            v-if="hasStarted || isCreator"
                             :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}`"
                             class="block"
                           >
@@ -370,9 +402,12 @@ async function removeCourse() {
                               {{ lesson.title }}
                             </h4>
                           </NuxtLink>
+                          <h4 v-else class="cursor-not-allowed truncate font-medium text-gray-500">
+                            {{ lesson.title }}
+                          </h4>
                           <div class="flex items-center gap-3 text-xs text-gray-500">
                             <span>Урок {{ lesson.order }}</span>
-                            <span v-if="lesson.tests?.length"
+                            <span v-if="lesson.tests?.length && (hasStarted || isCreator)"
                               >{{ lesson.tests.length }}
                               {{ lesson.tests.length === 1 ? 'тест' : 'тестов' }}</span
                             >
@@ -381,8 +416,8 @@ async function removeCourse() {
                       </div>
 
                       <div class="flex flex-shrink-0 items-center gap-1">
-                        <!-- View Lesson Button for all users -->
-                        <UIButton variant="ghost" size="sm">
+                        <!-- View Lesson Button for participants and creator -->
+                        <UIButton v-if="hasStarted || isCreator" variant="ghost" size="sm">
                           <NuxtLink
                             :to="`/app/courses/${courseId}/modules/${module.id}/lessons/${lesson.id}`"
                             class="flex items-center gap-1"
@@ -407,6 +442,22 @@ async function removeCourse() {
                               />
                             </svg>
                           </NuxtLink>
+                        </UIButton>
+                        <!-- Locked lesson indicator for non-participants -->
+                        <UIButton v-else variant="ghost" size="sm" disabled class="opacity-50">
+                          <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                            />
+                          </svg>
                         </UIButton>
 
                         <!-- Creator-only buttons -->
@@ -457,7 +508,7 @@ async function removeCourse() {
                     </div>
 
                     <!-- Tests List -->
-                    <div v-if="lesson.tests?.length" class="mt-2 ml-11 space-y-1">
+                    <div v-if="lesson.tests?.length && hasStarted" class="mt-2 ml-11 space-y-1">
                       <div
                         v-for="(test, testIndex) in lesson.tests"
                         :key="test.id"
@@ -655,7 +706,7 @@ async function removeCourse() {
                     course.modules?.reduce((acc, m) => acc + (m.lessons?.length || 0), 0) || 0
                   }}</span>
                 </div>
-                <div class="flex justify-between">
+                <div v-if="hasStarted || isCreator" class="flex justify-between">
                   <span class="text-sm text-gray-600">Тесты</span>
                   <span class="font-medium">{{
                     course.modules?.reduce(
