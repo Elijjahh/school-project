@@ -1,3 +1,6 @@
+import { useDrizzle, inArray } from '~/server/utils/drizzle';
+import { coursesProgress, lessonsProgress, modules, lessons } from '~/drizzle/schema';
+
 export default defineEventHandler(async (event) => {
   const userId = Number(getRouterParam(event, 'userId'));
   const db = useDrizzle();
@@ -6,25 +9,76 @@ export default defineEventHandler(async (event) => {
   const participations = await db.query.coursesParticipations.findMany({
     where: (cp, { eq }) => eq(cp.userId, userId),
     with: {
-      course: true,
+      course: {
+        with: {
+          category: true,
+          creator: true,
+        },
+      },
     },
   });
 
-  // Get progress for each participation
-  const progresses = await db.query.coursesProgress.findMany({
-    where: (cp, { eq }) => eq(cp.participationId, userId),
-  });
+  if (!participations.length) {
+    return [];
+  }
 
-  // Map participation to course info and progress
-  const result = participations.map((p) => {
-    const progress = progresses.find((pr) => pr.courseId === p.course.id);
+  const participationIds = participations.map((p) => p.id);
+  const courseIds = participations.map((p) => p.course.id);
+
+  // Get progress for each course
+  const coursesProgressData = await db
+    .select()
+    .from(coursesProgress)
+    .where(inArray(coursesProgress.participationId, participationIds));
+
+  // Get all modules for these courses
+  const allModules = await db.select().from(modules).where(inArray(modules.courseId, courseIds));
+
+  // Get all lessons for these modules
+  const moduleIds = allModules.map((m) => m.id);
+  const allLessons = moduleIds.length
+    ? await db.select().from(lessons).where(inArray(lessons.moduleId, moduleIds))
+    : [];
+
+  // Get lessons progress
+  const lessonsProgressData = participationIds.length
+    ? await db
+        .select()
+        .from(lessonsProgress)
+        .where(inArray(lessonsProgress.participationId, participationIds))
+    : [];
+
+  // Calculate progress for each course
+  const result = participations.map((participation) => {
+    const courseProgress = coursesProgressData.find(
+      (cp) => cp.participationId === participation.id,
+    );
+
+    // Get modules for this course
+    const courseModules = allModules.filter((m) => m.courseId === participation.course.id);
+    const courseLessons = allLessons.filter((l) => courseModules.some((m) => m.id === l.moduleId));
+
+    // Calculate progress percentage
+    let progressPercentage = 0;
+    if (courseLessons.length > 0) {
+      const completedLessons = lessonsProgressData.filter(
+        (lp) =>
+          lp.participationId === participation.id &&
+          lp.finished &&
+          courseLessons.some((cl) => cl.id === lp.lessonId),
+      );
+      progressPercentage = Math.round((completedLessons.length / courseLessons.length) * 100);
+    }
+
     return {
-      id: p.course.id,
-      image: p.course.image,
-      title: p.course.title,
-      description: p.course.description,
-      completed: progress ? progress.finished : false,
-      progress: null, // You can calculate percent if you have more info
+      id: participation.course.id,
+      image: participation.course.image,
+      title: participation.course.title,
+      description: participation.course.description,
+      completed: courseProgress?.finished || false,
+      progress: progressPercentage,
+      category: participation.course.category,
+      creator: participation.course.creator,
     };
   });
 

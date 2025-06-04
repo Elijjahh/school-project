@@ -9,7 +9,7 @@ const moduleId = Number(route.params.moduleId);
 const lessonId = Number(route.params.lessonId);
 const testId = Number(route.params.testId);
 
-const { data: testData, pending: loading, refresh } = useFetch(`/api/tests/${testId}`);
+const { data: testData, pending: loading } = useFetch(`/api/tests/${testId}`);
 const { data: courseData } = useFetch(`/api/courses/${courseId}`);
 const { data: moduleData } = useFetch(`/api/modules/${moduleId}`);
 const { data: lessonData } = useFetch(`/api/lessons/${lessonId}`);
@@ -21,20 +21,39 @@ async function handleTestSave(payload: {
   testQuestions: Array<{ text: string; answers: Array<{ text: string; correct: boolean }> }>;
 }) {
   if (!testData.value) return;
+
   try {
-    await fetch(`/api/tests/${testId}`, {
+    await $fetch(`/api/tests/${testId}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        maxAttempts: payload.maxAttempts,
-        testQuestions: payload.testQuestions,
-      }),
+      body: payload,
     });
-    await refresh();
-  } catch {
+    await navigateTo(`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/edit`);
+  } catch (err) {
+    console.error('Error saving test:', err);
     error.value = 'Ошибка при сохранении теста';
+  }
+}
+
+const deleting = ref(false);
+
+async function handleDeleteTest() {
+  if (!confirm('Вы уверены, что хотите удалить этот тест? Это действие нельзя отменить.')) {
+    return;
+  }
+
+  deleting.value = true;
+  error.value = '';
+
+  try {
+    await $fetch(`/api/tests/${testId}`, {
+      method: 'DELETE',
+    });
+    await navigateTo(`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/edit`);
+  } catch (err) {
+    console.error('Error deleting test:', err);
+    error.value = 'Ошибка при удалении теста';
+  } finally {
+    deleting.value = false;
   }
 }
 </script>
@@ -83,7 +102,14 @@ async function handleTestSave(payload: {
         </div>
 
         <!-- Test Edit Form -->
-        <TestEditForm v-if="testData" :test="testData" :loading="loading" @save="handleTestSave" />
+        <TestEditForm
+          v-if="testData"
+          :test="testData"
+          :loading="loading"
+          :deleting="deleting"
+          @save="handleTestSave"
+          @delete="handleDeleteTest"
+        />
 
         <!-- Error Message -->
         <div v-if="error" class="rounded-md bg-red-50 p-4">

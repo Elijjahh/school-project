@@ -126,14 +126,14 @@ const error = computed(() => {
             </div>
 
             <!-- Прогресс для студентов -->
-            <div v-if="course.progress !== undefined" class="space-y-2">
+            <div v-if="course.progress !== undefined && course.progress !== null" class="space-y-2">
               <div class="flex items-center justify-between text-sm">
                 <span>Прогресс</span>
                 <span>{{ course.progress }}%</span>
               </div>
               <div class="bg-muted h-2 rounded-full">
                 <div
-                  class="bg-primary h-full rounded-full"
+                  class="bg-primary h-full rounded-full transition-all duration-300"
                   :style="{ width: `${course.progress}%` }"
                 ></div>
               </div>

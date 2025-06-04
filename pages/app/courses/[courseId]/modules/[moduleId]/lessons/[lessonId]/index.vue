@@ -13,16 +13,66 @@ const { data: lessonData, pending: loading } = useFetch(`/api/lessons/${lessonId
 const { data: courseData } = useFetch(`/api/courses/${courseId}`);
 const { data: moduleData } = useFetch(`/api/modules/${moduleId}`);
 
+// Получаем прогресс урока
+const { data: lessonProgress, refresh: refreshLessonProgress } = await useFetch(
+  `/api/courses/${courseId}/progress`,
+  {
+    query: computed(() => (user.value?.id ? { userId: user.value.id } : {})),
+    default: () => null,
+    server: false,
+  },
+);
+
 const lesson = computed(() => lessonData.value);
 const tests = computed(() => lesson.value?.tests || []);
+
+// Проверяем, завершен ли текущий урок
+const isLessonCompleted = computed(() => {
+  if (!lessonProgress.value?.modules) return false;
+
+  for (const module of lessonProgress.value.modules) {
+    const lessonData = module.lessons?.find((l) => l.lessonId === lessonId);
+    if (lessonData) return lessonData.completed;
+  }
+  return false;
+});
 
 // Ссылки на компоненты прогресса
 const lessonProgressRef = ref();
 
 // Обработчик обновления прогресса урока
 const handleProgressUpdated = () => {
-  // Логика для обновления прогресса (если нужно)
+  // Обновляем данные о прогрессе
+  refreshLessonProgress();
 };
+
+// Обновляем прогресс при монтировании и при фокусе на страницу
+onMounted(() => {
+  // Обновляем прогресс при возврате на страницу
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      refreshLessonProgress();
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+  // Очищаем слушатель при размонтировании
+  onUnmounted(() => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  });
+});
+
+// Также обновляем прогресс при навигации
+watch(
+  () => route.fullPath,
+  () => {
+    // Небольшая задержка для завершения навигации
+    setTimeout(() => {
+      refreshLessonProgress();
+    }, 100);
+  },
+);
 </script>
 
 <template>
@@ -57,29 +107,52 @@ const handleProgressUpdated = () => {
           </div>
 
           <!-- Lesson Progress and Course Progress Link -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-start">
+            <!-- Таймер для уроков без тестов (только если урок не завершен) -->
             <LessonProgress
-              v-if="user?.id"
+              v-if="user?.id && !tests.length && !isLessonCompleted"
               ref="lessonProgressRef"
-              :lessonId="lessonId"
-              :userId="user.id"
-              :autoMarkCompleted="!tests.length"
-              @progressUpdated="handleProgressUpdated"
+              :lesson-id="lessonId"
+              :user-id="user.id"
+              :auto-mark-completed="!tests.length"
+              @progress-updated="handleProgressUpdated"
             />
 
-            <UIButton v-if="user?.id" variant="outline" size="sm">
-              <NuxtLink :to="`/app/courses/${courseId}/progress`" class="flex items-center gap-2">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Информация для уроков с тестами (если урок не завершен) -->
+            <div
+              v-else-if="user?.id && tests.length && !isLessonCompleted"
+              class="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3"
+            >
+              <div class="flex items-center gap-2">
+                <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                <span class="text-sm font-medium text-blue-800">
+                  Для завершения урока пройдите тест ниже
+                </span>
+              </div>
+            </div>
+
+            <!-- Сообщение о завершении урока -->
+            <div
+              v-else-if="user?.id && isLessonCompleted"
+              class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3"
+            >
+              <div class="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                <svg
+                  class="h-3 w-3 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
-                Прогресс курса
-              </NuxtLink>
-            </UIButton>
+              </div>
+              <span class="text-sm font-medium text-green-800">Урок завершен</span>
+            </div>
           </div>
         </div>
 

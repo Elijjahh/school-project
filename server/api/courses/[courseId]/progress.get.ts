@@ -2,6 +2,7 @@ import { useDrizzle, eq, and } from '~/server/utils/drizzle';
 import {
   modules,
   lessons,
+  courses,
   coursesParticipations,
   coursesProgress,
   modulesProgress,
@@ -9,6 +10,21 @@ import {
   tests,
   testAttempts,
 } from '~/drizzle/schema';
+
+// Типы для данных
+type TestData = {
+  id: number;
+  lessonId: number;
+  maxAttempts: number;
+};
+
+type AttemptData = {
+  testId: number;
+  score: number | null;
+  totalQuestions: number;
+  completed: boolean;
+  datetime: Date | null;
+};
 
 export default defineEventHandler(async (event) => {
   const courseId = parseInt(getRouterParam(event, 'courseId') as string);
@@ -25,7 +41,113 @@ export default defineEventHandler(async (event) => {
   try {
     const db = useDrizzle();
 
-    // Проверяем участие пользователя в курсе
+    // Сначала проверяем, является ли пользователь автором курса
+    const courseData = await db
+      .select({ creatorId: courses.creatorId })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1);
+
+    if (!courseData.length) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Course not found',
+      });
+    }
+
+    // Если пользователь - автор курса, возвращаем пустой прогресс
+    if (courseData[0].creatorId === userId) {
+      // Получаем структуру курса для автора
+      const allModules = await db
+        .select({
+          id: modules.id,
+          title: modules.title,
+          order: modules.order,
+        })
+        .from(modules)
+        .where(eq(modules.courseId, courseId))
+        .orderBy(modules.order);
+
+      const allLessons = await db
+        .select({
+          id: lessons.id,
+          moduleId: lessons.moduleId,
+          title: lessons.title,
+          order: lessons.order,
+        })
+        .from(lessons)
+        .innerJoin(modules, eq(lessons.moduleId, modules.id))
+        .where(eq(modules.courseId, courseId))
+        .orderBy(modules.order, lessons.order);
+
+      const allTests = await db
+        .select({
+          id: tests.id,
+          lessonId: tests.lessonId,
+          maxAttempts: tests.maxAttempts,
+        })
+        .from(tests)
+        .innerJoin(lessons, eq(tests.lessonId, lessons.id))
+        .innerJoin(modules, eq(lessons.moduleId, modules.id))
+        .where(eq(modules.courseId, courseId));
+
+      // Группируем тесты по урокам
+      const testsByLesson = new Map<number, TestData[]>();
+      allTests.forEach((test) => {
+        if (!testsByLesson.has(test.lessonId)) {
+          testsByLesson.set(test.lessonId, []);
+        }
+        testsByLesson.get(test.lessonId)?.push(test);
+      });
+
+      // Формируем ответ для автора (все незавершено)
+      const moduleProgresses = allModules.map((module) => {
+        const moduleLessons = allLessons.filter((lesson) => lesson.moduleId === module.id);
+
+        return {
+          moduleId: module.id,
+          title: module.title,
+          order: module.order,
+          completed: false,
+          totalLessons: moduleLessons.length,
+          completedLessons: 0,
+          progress: 0,
+          lessons: moduleLessons.map((lesson) => {
+            const lessonTests = testsByLesson.get(lesson.id) || [];
+            return {
+              lessonId: lesson.id,
+              title: lesson.title,
+              order: lesson.order,
+              completed: false,
+              tests: lessonTests.map((test) => ({
+                testId: test.id,
+                maxAttempts: test.maxAttempts,
+                attemptsCount: 0,
+                completedAttempts: 0,
+                bestScore: 0,
+                bestPercentage: 0,
+                passed: false,
+                lastAttemptAt: null,
+              })),
+            };
+          }),
+        };
+      });
+
+      return {
+        courseId,
+        courseCompleted: false,
+        overallProgress: 0,
+        totalModules: allModules.length,
+        completedModules: 0,
+        totalLessons: allLessons.length,
+        completedLessons: 0,
+        modules: moduleProgresses,
+        isAuthor: true, // Флаг для фронтенда
+      };
+    }
+
+    // Проверяем участие пользователя в курсе (для студентов)
     const participation = await db
       .select({ id: coursesParticipations.id })
       .from(coursesParticipations)
@@ -131,21 +253,21 @@ export default defineEventHandler(async (event) => {
     const completedLessonIds = new Set(completedLessons.map((l) => l.lessonId));
 
     // Группируем тесты по урокам
-    const testsByLesson = new Map();
+    const testsByLesson = new Map<number, TestData[]>();
     allTests.forEach((test) => {
       if (!testsByLesson.has(test.lessonId)) {
         testsByLesson.set(test.lessonId, []);
       }
-      testsByLesson.get(test.lessonId).push(test);
+      testsByLesson.get(test.lessonId)?.push(test);
     });
 
     // Группируем попытки по тестам
-    const attemptsByTest = new Map();
+    const attemptsByTest = new Map<number, AttemptData[]>();
     userAttempts.forEach((attempt) => {
       if (!attemptsByTest.has(attempt.testId)) {
         attemptsByTest.set(attempt.testId, []);
       }
-      attemptsByTest.get(attempt.testId).push(attempt);
+      attemptsByTest.get(attempt.testId)?.push(attempt);
     });
 
     // Формируем ответ
@@ -173,16 +295,19 @@ export default defineEventHandler(async (event) => {
             title: lesson.title,
             order: lesson.order,
             completed: completedLessonIds.has(lesson.id),
-            tests: lessonTests.map((test: any) => {
+            tests: lessonTests.map((test: TestData) => {
               const testAttemptsList = attemptsByTest.get(test.id) || [];
               const completedAttempts = testAttemptsList.filter(
-                (attempt: any) => attempt.completed,
+                (attempt: AttemptData) => attempt.completed,
               );
-              const bestAttempt = completedAttempts.reduce((best: any, current: any) => {
-                const currentScore = current.score || 0;
-                const bestScore = best?.score || 0;
-                return currentScore > bestScore ? current : best;
-              }, null);
+              const bestAttempt = completedAttempts.reduce(
+                (best: AttemptData | null, current: AttemptData) => {
+                  const currentScore = current.score || 0;
+                  const bestScore = best?.score || 0;
+                  return currentScore > bestScore ? current : best;
+                },
+                null,
+              );
               const passed = bestAttempt
                 ? (bestAttempt.score || 0) >= Math.ceil((bestAttempt.totalQuestions || 0) * 0.6)
                 : false;

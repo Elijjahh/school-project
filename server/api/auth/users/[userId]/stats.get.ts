@@ -1,34 +1,58 @@
+import { useDrizzle, eq, and, inArray, count } from '~/server/utils/drizzle';
+import * as tables from '~/drizzle/schema';
+
 export default defineEventHandler(async (event) => {
   const userId = Number(getRouterParam(event, 'userId'));
   const db = useDrizzle();
 
-  // Enrolled courses
-  const [enrolledCourses] = await db
-    .select({ count: count() })
+  // Enrolled courses - получаем все участия пользователя
+  const userParticipations = await db
+    .select({
+      participationId: tables.coursesParticipations.id,
+      courseId: tables.coursesParticipations.courseId,
+    })
     .from(tables.coursesParticipations)
     .where(eq(tables.coursesParticipations.userId, userId));
 
-  // Completed courses
+  const enrolledCoursesCount = userParticipations.length;
+
+  if (enrolledCoursesCount === 0) {
+    return {
+      enrolledCourses: 0,
+      activeCourses: 0,
+      completedCourses: 0,
+      instructors: 0,
+    };
+  }
+
+  const participationIds = userParticipations.map((p) => p.participationId);
+
+  // Completed courses - курсы где есть запись о завершении
   const [completedCourses] = await db
     .select({ count: count() })
     .from(tables.coursesProgress)
     .where(
       and(
         eq(tables.coursesProgress.finished, true),
-        eq(tables.coursesProgress.participationId, userId),
+        inArray(tables.coursesProgress.participationId, participationIds),
       ),
     );
 
-  // Active courses (enrolled but not finished)
-  const [activeCourses] = await db
-    .select({ count: count() })
+  // Active courses - курсы где нет записи о завершении или завершение = false
+  const completedParticipationIds = await db
+    .select({ participationId: tables.coursesProgress.participationId })
     .from(tables.coursesProgress)
     .where(
       and(
-        eq(tables.coursesProgress.finished, false),
-        eq(tables.coursesProgress.participationId, userId),
+        eq(tables.coursesProgress.finished, true),
+        inArray(tables.coursesProgress.participationId, participationIds),
       ),
     );
+
+  const completedParticipationIdsSet = new Set(
+    completedParticipationIds.map((cp) => cp.participationId),
+  );
+  const activeCourses = enrolledCoursesCount - completedParticipationIdsSet.size;
 
   // Instructors (unique creators of user's courses)
   const instructorRows = await db.query.coursesParticipations.findMany({
@@ -43,8 +67,8 @@ export default defineEventHandler(async (event) => {
   const instructors = instructorIds.length;
 
   return {
-    enrolledCourses: enrolledCourses.count,
-    activeCourses: activeCourses.count,
+    enrolledCourses: enrolledCoursesCount,
+    activeCourses: activeCourses,
     completedCourses: completedCourses.count,
     instructors,
   };

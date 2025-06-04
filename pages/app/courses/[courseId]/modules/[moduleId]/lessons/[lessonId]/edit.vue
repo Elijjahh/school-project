@@ -35,6 +35,7 @@ const tests = computed(() => {
 });
 
 const error = ref('');
+const deletingTestId = ref<number | null>(null);
 
 async function handleLessonSave(payload: {
   title: string;
@@ -63,6 +64,25 @@ async function handleLessonSave(payload: {
   } catch (err) {
     console.error('Error saving lesson:', err);
     error.value = 'Ошибка при сохранении урока';
+  }
+}
+
+async function handleDeleteTest(testId: number) {
+  if (!confirm('Вы уверены, что хотите удалить этот тест? Это действие нельзя отменить.')) {
+    return;
+  }
+
+  deletingTestId.value = testId;
+  try {
+    await $fetch(`/api/tests/${testId}`, {
+      method: 'DELETE',
+    });
+    await refresh(); // Обновляем данные урока
+  } catch (err) {
+    console.error('Error deleting test:', err);
+    error.value = 'Ошибка при удалении теста';
+  } finally {
+    deletingTestId.value = null;
   }
 }
 </script>
@@ -182,24 +202,62 @@ async function handleLessonSave(payload: {
                 >
                   T{{ index + 1 }}
                 </div>
-                <UIButton
-                  variant="ghost"
-                  size="sm"
-                  class="opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <NuxtLink
-                    :to="`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tests/${test.id}/edit`"
+                <div class="flex gap-1">
+                  <UIButton
+                    variant="ghost"
+                    size="sm"
+                    class="opacity-0 transition-opacity group-hover:opacity-100"
                   >
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <NuxtLink
+                      :to="`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/tests/${test.id}/edit`"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </NuxtLink>
+                  </UIButton>
+                  <UIButton
+                    variant="ghost"
+                    size="sm"
+                    class="text-red-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50"
+                    :disabled="deletingTestId === test.id"
+                    @click="handleDeleteTest(test.id)"
+                  >
+                    <svg
+                      v-if="deletingTestId === test.id"
+                      class="h-4 w-4 animate-spin"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                       />
                     </svg>
-                  </NuxtLink>
-                </UIButton>
+                    <svg
+                      v-else
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </UIButton>
+                </div>
               </div>
 
               <div class="mt-4">
@@ -261,10 +319,64 @@ async function handleLessonSave(payload: {
                     Редактировать
                   </NuxtLink>
                 </UIButton>
+                <UIButton
+                  variant="destructive"
+                  size="sm"
+                  class="mt-2 w-full"
+                  :disabled="deletingTestId === test.id"
+                  @click="handleDeleteTest(test.id)"
+                >
+                  <svg
+                    v-if="deletingTestId === test.id"
+                    class="mr-2 h-4 w-4 animate-spin"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  <svg
+                    v-else
+                    class="mr-2 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                  {{ deletingTestId === test.id ? 'Удаление...' : 'Удалить тест' }}
+                </UIButton>
               </div>
             </div>
           </div>
         </UICard>
+
+        <!-- Error Message -->
+        <div v-if="error" class="rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-red-800">{{ error }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
