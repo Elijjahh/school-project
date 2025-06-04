@@ -337,7 +337,7 @@ async function removeCourse() {
               </div>
             </div>
 
-            <div class="max-h-[600px] space-y-4 overflow-y-auto">
+            <div class="space-y-4">
               <div v-if="!course.modules?.length" class="py-12 text-center">
                 <svg
                   class="mx-auto h-16 w-16 text-gray-300"
@@ -700,7 +700,7 @@ async function removeCourse() {
 
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-          <div class="sticky top-8 space-y-4">
+          <div class="sticky top-16 space-y-4">
             <!-- Actions Card -->
             <UICard class="p-6">
               <h3 class="mb-4 font-semibold text-gray-900">Управление курсом</h3>
@@ -735,7 +735,7 @@ async function removeCourse() {
                           d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                         />
                       </svg>
-                      Аналитика студентов
+                      Аналитика курса
                     </NuxtLink>
                   </UIButton>
                   <UIButton

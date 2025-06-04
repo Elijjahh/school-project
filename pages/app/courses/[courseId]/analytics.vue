@@ -1,46 +1,76 @@
 <script setup lang="ts">
-import { CheckCircle, Users, BookOpen, BarChart3, Clock } from 'lucide-vue-next';
+import { BarChart3 } from 'lucide-vue-next';
 
 definePageMeta({
   layout: 'profile',
 });
 
-interface StudentProgress {
-  participationId: number;
-  userId: number;
-  username: string;
-  firstName: string | null;
-  lastName: string | null;
-  image: string | null;
-  fullName: string;
-  progress: {
-    courseCompleted: boolean;
-    completedLessons: number;
-    totalLessons: number;
-    completedModules: number;
-    totalModules: number;
-    overallProgress: number;
-    testsStats: {
-      totalTests: number;
-      passedTests: number;
-      totalAttempts: number;
-      avgScore: number;
-      passRate: number;
-    };
-  };
+interface TestAnalytics {
+  testId: number;
+  title: string;
+  order: number;
+  maxAttempts: number;
+  totalStudents: number;
+  studentsAttempted: number;
+  studentsCompleted: number;
+  studentsPassedRate: number;
+  avgScore: number;
+  avgAttempts: number;
+  completionRate: number;
+  passRate: number;
+  difficultyLevel: 'easy' | 'medium' | 'hard';
 }
 
-interface AnalyticsData {
+interface LessonAnalytics {
+  lessonId: number;
+  title: string;
+  order: number;
+  totalStudents: number;
+  studentsCompleted: number;
+  completionRate: number;
+  tests: TestAnalytics[];
+  avgTestScore: number;
+  hasTests: boolean;
+}
+
+interface ModuleAnalytics {
+  moduleId: number;
+  title: string;
+  order: number;
+  totalStudents: number;
+  studentsCompleted: number;
+  completionRate: number;
+  lessons: LessonAnalytics[];
+  avgLessonCompletion: number;
+  avgTestScore: number;
+  totalTests: number;
+}
+
+interface ContentAnalyticsData {
   courseId: number;
   courseTitle: string;
-  students: StudentProgress[];
   totalStudents: number;
+  modules: ModuleAnalytics[];
   summary: {
     totalModules: number;
     totalLessons: number;
     totalTests: number;
-    avgProgress: number;
-    completedStudents: number;
+    avgModuleCompletion: number;
+    avgLessonCompletion: number;
+    avgTestCompletion: number;
+    avgTestScore: number;
+    mostDifficultContent: {
+      type: 'module' | 'lesson' | 'test';
+      id: number;
+      title: string;
+      completionRate: number;
+    };
+    easiestContent: {
+      type: 'module' | 'lesson' | 'test';
+      id: number;
+      title: string;
+      completionRate: number;
+    };
   };
 }
 
@@ -66,67 +96,29 @@ if (!courseData.value || courseData.value.creator.id !== user.value.id) {
   });
 }
 
-// Получаем аналитику по студентам
+// Получаем аналитику по содержанию курса
 const {
   data: analytics,
   pending,
   error,
   refresh,
-} = await useFetch<AnalyticsData>(`/api/courses/${courseId}/students-progress`);
+} = await useFetch<ContentAnalyticsData>(`/api/courses/${courseId}/content-analytics`);
 
-// Вычисляемые свойства для отображения статистики
-const summaryStats = computed(() => {
-  if (!analytics.value) return [];
+// Состояние фильтров и сортировки
+const sortBy = ref<'order' | 'completion' | 'difficulty'>('order');
+const sortOrder = ref<'asc' | 'desc'>('asc');
+const showOnlyProblematic = ref(false);
 
-  const { summary, totalStudents } = analytics.value;
+// Фильтрованные и отсортированные модули
+const filteredModules = computed(() => {
+  if (!analytics.value?.modules) return [];
 
-  return [
-    {
-      label: 'Всего студентов',
-      value: totalStudents,
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      label: 'Завершили курс',
-      value: `${summary.completedStudents}/${totalStudents}`,
-      percentage:
-        totalStudents > 0 ? Math.round((summary.completedStudents / totalStudents) * 100) : 0,
-      icon: CheckCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    {
-      label: 'Средний прогресс',
-      value: `${summary.avgProgress}%`,
-      icon: BarChart3,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      label: 'Всего уроков',
-      value: summary.totalLessons,
-      icon: BookOpen,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-    },
-  ];
-});
+  let filtered = [...analytics.value.modules];
 
-// Фильтрация и сортировка
-const searchQuery = ref('');
-const sortBy = ref<'progress' | 'name' | 'tests'>('progress');
-const sortOrder = ref<'asc' | 'desc'>('desc');
-
-const filteredStudents = computed(() => {
-  if (!analytics.value?.students) return [];
-
-  const filtered = analytics.value.students.filter(
-    (student) =>
-      student.fullName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      student.username.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  );
+  // Фильтрация проблематичного контента
+  if (showOnlyProblematic.value) {
+    filtered = filtered.filter((module) => module.completionRate < 70);
+  }
 
   // Сортировка
   filtered.sort((a, b) => {
@@ -134,20 +126,20 @@ const filteredStudents = computed(() => {
     let bValue: number;
 
     switch (sortBy.value) {
-      case 'progress':
-        aValue = a.progress.overallProgress;
-        bValue = b.progress.overallProgress;
+      case 'completion':
+        aValue = a.completionRate;
+        bValue = b.completionRate;
         break;
-      case 'name':
-        return sortOrder.value === 'asc'
-          ? a.fullName.localeCompare(b.fullName)
-          : b.fullName.localeCompare(a.fullName);
-      case 'tests':
-        aValue = a.progress.testsStats.avgScore;
-        bValue = b.progress.testsStats.avgScore;
+      case 'difficulty':
+        // Сложность определяется обратно пропорционально проценту прохождения
+        aValue = 100 - a.completionRate;
+        bValue = 100 - b.completionRate;
         break;
+      case 'order':
       default:
-        return 0;
+        aValue = a.order;
+        bValue = b.order;
+        break;
     }
 
     return sortOrder.value === 'asc' ? aValue - bValue : bValue - aValue;
@@ -155,21 +147,6 @@ const filteredStudents = computed(() => {
 
   return filtered;
 });
-
-const getProgressColor = (progress: number) => {
-  if (progress >= 90) return 'bg-green-500';
-  if (progress >= 70) return 'bg-blue-500';
-  if (progress >= 50) return 'bg-yellow-500';
-  if (progress >= 30) return 'bg-orange-500';
-  return 'bg-red-500';
-};
-
-const getTestScoreColor = (score: number) => {
-  if (score >= 90) return 'text-green-600';
-  if (score >= 70) return 'text-blue-600';
-  if (score >= 60) return 'text-yellow-600';
-  return 'text-red-600';
-};
 </script>
 
 <template>
@@ -197,8 +174,14 @@ const getTestScoreColor = (score: number) => {
 
         <!-- Header -->
         <div class="space-y-2">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">Аналитика курса</h1>
+          <div class="flex items-center gap-3">
+            <BarChart3 class="h-8 w-8 text-blue-600" />
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">Аналитика курса</h1>
+          </div>
           <p class="text-gray-600">{{ courseData?.title || 'Курс' }}</p>
+          <p class="text-sm text-gray-500">
+            Анализ эффективности материалов курса и их прохождения
+          </p>
         </div>
 
         <!-- Loading State -->
@@ -214,56 +197,35 @@ const getTestScoreColor = (score: number) => {
 
         <!-- Analytics Content -->
         <div v-else-if="analytics" class="space-y-8">
-          <!-- Summary Stats -->
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div
-              v-for="stat in summaryStats"
-              :key="stat.label"
-              class="rounded-lg border bg-white p-6 shadow-sm"
-            >
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-sm font-medium text-gray-600">{{ stat.label }}</p>
-                  <p class="text-2xl font-semibold text-gray-900">{{ stat.value }}</p>
-                  <p v-if="stat.percentage !== undefined" class="text-sm text-gray-500">
-                    {{ stat.percentage }}%
-                  </p>
-                </div>
-                <div :class="[stat.bgColor, stat.color]" class="rounded-lg p-3">
-                  <component :is="stat.icon" class="h-6 w-6" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Summary -->
+          <AnalyticsContentSummary
+            :summary="analytics.summary"
+            :total-students="analytics.totalStudents"
+          />
 
           <!-- Controls -->
           <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <!-- Search -->
-            <div class="relative max-w-md">
-              <UIInput v-model="searchQuery" placeholder="Поиск студентов..." class="pl-10" />
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg
-                  class="h-4 w-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
+            <!-- Filters -->
+            <div class="flex items-center gap-4">
+              <div class="flex items-center space-x-2">
+                <input
+                  id="problematic"
+                  v-model="showOnlyProblematic"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label for="problematic" class="text-sm text-gray-700">
+                  Только проблематичный контент (&lt;70%)
+                </label>
               </div>
             </div>
 
             <!-- Sort Controls -->
             <div class="flex items-center gap-4">
               <UISelect v-model="sortBy">
-                <option value="progress">По прогрессу</option>
-                <option value="name">По имени</option>
-                <option value="tests">По тестам</option>
+                <option value="order">По порядку</option>
+                <option value="completion">По проценту прохождения</option>
+                <option value="difficulty">По сложности</option>
               </UISelect>
 
               <UIButton
@@ -276,192 +238,45 @@ const getTestScoreColor = (score: number) => {
             </div>
           </div>
 
-          <!-- Students Table -->
-          <div class="overflow-hidden rounded-lg border bg-white shadow">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                    >
-                      Студент
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                    >
-                      Общий прогресс
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                    >
-                      Модули
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                    >
-                      Уроки
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                    >
-                      Тесты
-                    </th>
-                    <th
-                      class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                    >
-                      Статус
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                  <tr
-                    v-for="student in filteredStudents"
-                    :key="student.userId"
-                    class="hover:bg-gray-50"
-                  >
-                    <!-- Student Info -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="h-10 w-10 flex-shrink-0">
-                          <img
-                            v-if="student.image"
-                            :src="student.image"
-                            :alt="student.fullName"
-                            class="h-10 w-10 rounded-full object-cover"
-                          />
-                          <div
-                            v-else
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-300"
-                          >
-                            <span class="text-sm font-medium text-gray-700">
-                              {{ student.fullName.charAt(0).toUpperCase() }}
-                            </span>
-                          </div>
-                        </div>
-                        <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">
-                            {{ student.fullName }}
-                          </div>
-                          <div class="text-sm text-gray-500">@{{ student.username }}</div>
-                        </div>
-                      </div>
-                    </td>
+          <!-- Modules Grid -->
+          <div class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-900">
+              Модули курса
+              <span v-if="showOnlyProblematic" class="text-lg font-normal text-gray-600">
+                (проблематичные)
+              </span>
+            </h2>
 
-                    <!-- Overall Progress -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="mr-3 h-2 w-16 rounded-full bg-gray-200">
-                          <div
-                            :class="getProgressColor(student.progress.overallProgress)"
-                            class="h-2 rounded-full transition-all duration-300"
-                            :style="{ width: `${student.progress.overallProgress}%` }"
-                          ></div>
-                        </div>
-                        <span class="text-sm font-medium text-gray-900">
-                          {{ student.progress.overallProgress }}%
-                        </span>
-                      </div>
-                    </td>
-
-                    <!-- Modules -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">
-                        {{ student.progress.completedModules }}/{{ student.progress.totalModules }}
-                      </div>
-                      <div v-if="student.progress.totalModules > 0" class="text-xs text-gray-500">
-                        {{
-                          Math.round(
-                            (student.progress.completedModules / student.progress.totalModules) *
-                              100,
-                          )
-                        }}%
-                      </div>
-                    </td>
-
-                    <!-- Lessons -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">
-                        {{ student.progress.completedLessons }}/{{ student.progress.totalLessons }}
-                      </div>
-                      <div v-if="student.progress.totalLessons > 0" class="text-xs text-gray-500">
-                        {{
-                          Math.round(
-                            (student.progress.completedLessons / student.progress.totalLessons) *
-                              100,
-                          )
-                        }}%
-                      </div>
-                    </td>
-
-                    <!-- Tests -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">
-                        {{ student.progress.testsStats.passedTests }}/{{
-                          student.progress.testsStats.totalTests
-                        }}
-                      </div>
-                      <div
-                        v-if="student.progress.testsStats.avgScore > 0"
-                        class="text-xs"
-                        :class="getTestScoreColor(student.progress.testsStats.avgScore)"
-                      >
-                        Средний балл: {{ student.progress.testsStats.avgScore }}%
-                      </div>
-                      <div v-else class="text-xs text-gray-500">Тестов не проходил</div>
-                    </td>
-
-                    <!-- Status -->
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span
-                        v-if="student.progress.courseCompleted"
-                        class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"
-                      >
-                        <CheckCircle class="mr-1 h-3 w-3" />
-                        Завершен
-                      </span>
-                      <span
-                        v-else-if="student.progress.overallProgress > 0"
-                        class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800"
-                      >
-                        <Clock class="mr-1 h-3 w-3" />
-                        В процессе
-                      </span>
-                      <span
-                        v-else
-                        class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800"
-                      >
-                        Не начат
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Empty State -->
-            <div v-if="filteredStudents.length === 0" class="py-12 text-center">
-              <Users class="mx-auto h-12 w-12 text-gray-400" />
+            <div v-if="filteredModules.length === 0" class="py-12 text-center">
+              <BarChart3 class="mx-auto h-12 w-12 text-gray-400" />
               <h3 class="mt-2 text-sm font-medium text-gray-900">
-                {{ searchQuery ? 'Студенты не найдены' : 'Пока нет студентов' }}
+                {{ showOnlyProblematic ? 'Проблематичный контент не найден' : 'Модули не найдены' }}
               </h3>
               <p class="mt-1 text-sm text-gray-500">
                 {{
-                  searchQuery
-                    ? 'Попробуйте изменить поисковый запрос'
-                    : 'Студенты появятся после записи на курс'
+                  showOnlyProblematic
+                    ? 'Все модули имеют хорошие показатели прохождения'
+                    : 'В курсе пока нет модулей'
                 }}
               </p>
+            </div>
+
+            <div v-else class="space-y-6">
+              <AnalyticsModuleCard
+                v-for="module in filteredModules"
+                :key="module.moduleId"
+                :module="module"
+              />
             </div>
           </div>
 
           <!-- Quick Actions -->
-          <div class="flex flex-wrap gap-4">
+          <div class="flex flex-wrap gap-4 border-t pt-6">
             <UIButton variant="outline" @click="refresh"> Обновить данные </UIButton>
 
-            <UIButton variant="outline" tag="a" :href="`/app/courses/${courseId}`">
-              Вернуться к курсу
-            </UIButton>
+            <NuxtLink :to="`/app/courses/${courseId}`">
+              <UIButton variant="outline"> Вернуться к курсу </UIButton>
+            </NuxtLink>
           </div>
         </div>
       </div>
