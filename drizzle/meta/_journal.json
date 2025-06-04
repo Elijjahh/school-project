@@ -78,6 +78,13 @@
       "when": 1748819771563,
       "tag": "0010_cuddly_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1749034389245,
+      "tag": "0011_perpetual_secret_warriors",
+      "breakpoints": true
     }
   ]
 }

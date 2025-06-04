@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Home, Book, Users, Heart, Settings } from 'lucide-vue-next';
+import { Home, Book, Users, Heart, Settings, Shield } from 'lucide-vue-next';
 
 const { user } = useUserSession();
 
 // Определяем роль пользователя
 const isTeacher = computed(() => user.value?.role === 'teacher');
+const isAdmin = computed(() => user.value?.role === 'admin');
 
 const studentTabs = [
   { label: 'Панель', icon: Home, path: '/app' },
@@ -20,7 +21,17 @@ const teacherTabs = [
   { label: 'Настройки', icon: Settings, path: '/app/settings' },
 ];
 
-const tabs = computed(() => (isTeacher.value ? teacherTabs : studentTabs));
+const adminTabs = [
+  { label: 'Обзор', icon: Home, path: '/app' },
+  { label: 'Админ панель', icon: Shield, path: '/admin' },
+  { label: 'Настройки', icon: Settings, path: '/app/settings' },
+];
+
+const tabs = computed(() => {
+  if (isAdmin.value) return adminTabs;
+  if (isTeacher.value) return teacherTabs;
+  return studentTabs;
+});
 
 const route = useRoute();
 const activeTab = computed(() => {

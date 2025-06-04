@@ -29,10 +29,18 @@ const { loggedIn, user } = useUserSession();
             О нас
           </NuxtLink>
           <NuxtLink
-            to="/become-instructor"
+            v-if="user?.role === 'student'"
+            to="/app/apply-teacher"
             class="hover:text-foreground/80 text-foreground/60 transition-colors"
           >
             Стать преподавателем
+          </NuxtLink>
+          <NuxtLink
+            v-if="user?.role === 'admin'"
+            to="/admin"
+            class="hover:text-foreground/80 text-foreground/60 transition-colors"
+          >
+            Админ панель
           </NuxtLink>
         </nav>
       </div>

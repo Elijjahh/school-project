@@ -14,6 +14,7 @@ import type {
   questions,
   answers,
   wishlist,
+  teacherApplications,
 } from './schema';
 
 // User types
@@ -71,6 +72,11 @@ export type NewAnswer = typeof answers.$inferInsert;
 // Wishlist types
 export type WishlistItem = typeof wishlist.$inferSelect;
 export type NewWishlistItem = typeof wishlist.$inferInsert;
+
+// Teacher Applications types
+export type TeacherApplication = InferSelectModel<typeof teacherApplications>;
+export type NewTeacherApplication = InferInsertModel<typeof teacherApplications>;
+export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
 
 // Alternative syntax using InferSelectModel/InferInsertModel (deprecated but still available)
 export type UserSelect = InferSelectModel<typeof users>;

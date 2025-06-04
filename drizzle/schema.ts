@@ -12,6 +12,12 @@ import { relations } from 'drizzle-orm';
 
 export const roleEnum = pgEnum('role', ['student', 'teacher', 'admin']);
 
+export const applicationStatusEnum = pgEnum('application_status', [
+  'pending',
+  'approved',
+  'rejected',
+]);
+
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   username: text('username').notNull().unique(),
@@ -333,10 +339,10 @@ export const wishlist = pgTable('wishlist', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'restrict' }),
+    .references(() => users.id, { onDelete: 'cascade' }),
   courseId: integer('course_id')
     .notNull()
-    .references(() => courses.id, { onDelete: 'restrict' }),
+    .references(() => courses.id, { onDelete: 'cascade' }),
   createdAt: timestamp().defaultNow(),
 });
 
@@ -348,5 +354,26 @@ export const wishlistRelations = relations(wishlist, ({ one }) => ({
   course: one(courses, {
     fields: [wishlist.courseId],
     references: [courses.id],
+  }),
+}));
+
+export const teacherApplications = pgTable('teacher_applications', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  motivation: text('motivation').notNull(),
+  experience: text('experience'),
+  education: text('education'),
+  status: applicationStatusEnum().default('pending'),
+  adminComment: text('admin_comment'),
+  createdAt: timestamp().defaultNow(),
+  updatedAt: timestamp().defaultNow(),
+});
+
+export const teacherApplicationsRelations = relations(teacherApplications, ({ one }) => ({
+  user: one(users, {
+    fields: [teacherApplications.userId],
+    references: [users.id],
   }),
 }));

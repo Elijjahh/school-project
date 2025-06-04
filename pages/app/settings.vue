@@ -4,12 +4,48 @@ import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
 import type { NuxtError } from '#app';
 import { Settings } from 'lucide-vue-next';
+import type { TeacherApplication } from '~/drizzle/types';
 
 definePageMeta({
   layout: 'profile',
 });
 
 const { user } = useUserSession();
+
+// Получаем информацию о заявке пользователя
+const { data: applicationData } = await useFetch('/api/teacher-applications/my', {
+  server: false,
+});
+
+const application = computed(() => applicationData.value as TeacherApplication | null);
+
+// Функция для получения текста статуса
+const getStatusText = (status: string | null) => {
+  switch (status) {
+    case 'pending':
+      return 'На рассмотрении';
+    case 'approved':
+      return 'Одобрено';
+    case 'rejected':
+      return 'Отклонено';
+    default:
+      return 'Неизвестно';
+  }
+};
+
+// Функция для получения цвета статуса
+const getStatusColor = (status: string | null) => {
+  switch (status) {
+    case 'pending':
+      return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+    case 'approved':
+      return 'bg-green-50 border-green-200 text-green-800';
+    case 'rejected':
+      return 'bg-red-50 border-red-200 text-red-800';
+    default:
+      return 'bg-gray-50 border-gray-200 text-gray-800';
+  }
+};
 
 // Определяем роль пользователя
 const isTeacher = computed(() => user.value?.role === 'teacher');
@@ -363,6 +399,93 @@ async function handleLogout() {
             </UIButton>
           </div>
         </form>
+      </UICardContent>
+    </UICard>
+
+    <!-- Карточка для подачи заявки на роль преподавателя (только для студентов) -->
+    <UICard v-if="user?.role === 'student'" class="mb-8">
+      <UICardHeader>
+        <UICardTitle>Стать преподавателем</UICardTitle>
+        <UICardDescription>
+          <span v-if="!application">
+            Подайте заявку на получение роли преподавателя на нашей платформе
+          </span>
+          <span v-else> Информация о вашей заявке на роль преподавателя </span>
+        </UICardDescription>
+      </UICardHeader>
+      <UICardContent>
+        <!-- Если заявка не подана -->
+        <div v-if="!application" class="flex items-center justify-between">
+          <div class="space-y-1">
+            <p class="text-muted-foreground text-sm">
+              Если у вас есть опыт и знания, которыми вы хотите поделиться, станьте преподавателем и
+              создавайте собственные курсы
+            </p>
+          </div>
+          <UIButton @click="navigateTo('/app/apply-teacher')"> Подать заявку </UIButton>
+        </div>
+
+        <!-- Если заявка подана -->
+        <div v-else class="space-y-4">
+          <div class="rounded-lg border p-4" :class="getStatusColor(application.status)">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-semibold">
+                  Статус заявки: {{ getStatusText(application.status) }}
+                </h3>
+                <p class="mt-1 text-sm">
+                  Подана:
+                  {{
+                    application.createdAt
+                      ? new Date(application.createdAt).toLocaleDateString('ru-RU')
+                      : ''
+                  }}
+                </p>
+              </div>
+              <div class="text-right">
+                <Icon
+                  :name="
+                    application.status === 'approved'
+                      ? 'lucide:check-circle'
+                      : application.status === 'rejected'
+                        ? 'lucide:x-circle'
+                        : 'lucide:clock'
+                  "
+                  class="h-6 w-6"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Комментарий администратора если есть -->
+          <div v-if="application.adminComment" class="rounded-lg bg-gray-50 p-4">
+            <h4 class="mb-2 font-medium text-gray-900">Комментарий администратора:</h4>
+            <p class="text-sm text-gray-700">{{ application.adminComment }}</p>
+          </div>
+
+          <!-- Информация о заявке -->
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <h4 class="mb-1 font-medium text-gray-900">Мотивация:</h4>
+              <p class="text-sm text-gray-600">{{ application.motivation }}</p>
+            </div>
+            <div v-if="application.experience">
+              <h4 class="mb-1 font-medium text-gray-900">Опыт:</h4>
+              <p class="text-sm text-gray-600">{{ application.experience }}</p>
+            </div>
+            <div v-if="application.education" class="md:col-span-2">
+              <h4 class="mb-1 font-medium text-gray-900">Образование:</h4>
+              <p class="text-sm text-gray-600">{{ application.education }}</p>
+            </div>
+          </div>
+
+          <!-- Кнопка для повторной подачи заявки если отклонена -->
+          <div v-if="application.status === 'rejected'" class="border-t pt-4">
+            <UIButton @click="navigateTo('/app/apply-teacher')" variant="outline">
+              Подать новую заявку
+            </UIButton>
+          </div>
+        </div>
       </UICardContent>
     </UICard>
 
