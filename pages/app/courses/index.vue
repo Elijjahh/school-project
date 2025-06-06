@@ -22,13 +22,13 @@ const {
   data: categoriesData,
   pending: categoriesLoading,
   error: _categoriesError,
-} = await useFetch<Category[]>('/api/categories', {
+} = await useFetch<{ categories: Category[]; total: number }>('/api/categories', {
   server: false,
-  default: () => [],
+  default: () => ({ categories: [], total: 0 }),
 });
 
 const categories = computed(() => {
-  const fetched = categoriesData.value || [];
+  const fetched = categoriesData.value?.categories || [];
   return [
     { id: 'all', label: 'Все' },
     ...fetched.map((cat) => ({ id: String(cat.id), label: cat.name })),

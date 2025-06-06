@@ -34,7 +34,9 @@ const toggleWishlist = async () => {
     </div>
     <div class="space-y-3 p-4">
       <h3 class="leading-none font-semibold tracking-tight">{{ course.title }}</h3>
-      <p class="text-muted-foreground line-clamp-2 text-sm">{{ course.description }}</p>
+      <p class="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
+        {{ course.description }}
+      </p>
       <div v-if="mode === 'teacher'" class="flex flex-col gap-2 pt-2">
         <div class="text-muted-foreground flex items-center gap-2 text-xs">
           <UIBadge v-if="course.category" variant="secondary" class="text-xs">
