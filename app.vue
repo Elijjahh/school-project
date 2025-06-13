@@ -7,6 +7,7 @@ definePageMeta({
 <template>
   <NuxtLayout>
     <NuxtPage />
+    <UIModalProvider />
   </NuxtLayout>
 </template>
 

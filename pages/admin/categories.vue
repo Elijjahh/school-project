@@ -80,8 +80,17 @@ const saveCategory = async () => {
   }
 };
 
+const { confirm, alert } = useModal();
+
 const deleteCategory = async (category: Category) => {
-  if (!confirm(`Вы уверены, что хотите удалить категорию "${category.name}"?`)) {
+  const confirmed = await confirm({
+    title: 'Удаление категории',
+    message: `Вы уверены, что хотите удалить категорию "${category.name}"?`,
+    confirmText: 'Удалить',
+    cancelText: 'Отмена',
+  });
+
+  if (!confirmed) {
     return;
   }
 
@@ -98,7 +107,11 @@ const deleteCategory = async (category: Category) => {
       'statusCode' in error &&
       (error as { statusCode: number }).statusCode === 409
     ) {
-      alert('Нельзя удалить категорию, которая используется в курсах');
+      await alert({
+        title: 'Ошибка удаления',
+        message: 'Нельзя удалить категорию, которая используется в курсах',
+        type: 'error',
+      });
     } else {
       console.error('Error deleting category:', error);
     }

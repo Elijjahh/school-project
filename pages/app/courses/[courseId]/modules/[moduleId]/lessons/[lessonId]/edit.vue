@@ -67,8 +67,17 @@ async function handleLessonSave(payload: {
   }
 }
 
+const { confirm } = useModal();
+
 async function handleDeleteTest(testId: number) {
-  if (!confirm('Вы уверены, что хотите удалить этот тест? Это действие нельзя отменить.')) {
+  const confirmed = await confirm({
+    title: 'Удаление теста',
+    message: 'Вы уверены, что хотите удалить этот тест? Это действие нельзя отменить.',
+    confirmText: 'Удалить',
+    cancelText: 'Отмена',
+  });
+
+  if (!confirmed) {
     return;
   }
 

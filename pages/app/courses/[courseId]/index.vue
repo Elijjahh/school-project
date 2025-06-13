@@ -144,8 +144,18 @@ function toggleWishlist() {
 
 const isRemoving = ref(false);
 
+const { confirm } = useModal();
+
 async function removeCourse() {
-  if (!confirm('Вы уверены, что хотите удалить этот курс?')) return;
+  const confirmed = await confirm({
+    title: 'Удаление курса',
+    message: 'Вы уверены, что хотите удалить этот курс?',
+    confirmText: 'Удалить',
+    cancelText: 'Отмена',
+  });
+
+  if (!confirmed) return;
+
   isRemoving.value = true;
   try {
     await $fetch(`/api/courses/${courseId.value}`, { method: 'DELETE' });
