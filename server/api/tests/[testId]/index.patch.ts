@@ -14,6 +14,44 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle();
 
+  // Проверяем, что пользователь может редактировать этот тест
+  const user = getCurrentUser(event);
+
+  // Админ может редактировать любой тест
+  if (user.role !== 'admin') {
+    // Получаем тест с информацией об уроке, модуле и курсе
+    const test = await db.query.tests.findFirst({
+      where: (tests, { eq }) => eq(tests.id, testId),
+      with: {
+        lesson: {
+          with: {
+            module: {
+              with: {
+                course: {
+                  columns: { creatorId: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!test) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Test not found',
+      });
+    }
+
+    if (test.lesson.module.course.creatorId !== user.id) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Access denied. You can only edit tests in your own courses.',
+      });
+    }
+  }
+
   // Обновляем тест
   await db
     .update(tests)

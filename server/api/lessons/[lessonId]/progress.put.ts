@@ -2,12 +2,15 @@ import { updateLessonProgress } from '~/server/utils/updateLessonProgress';
 
 export default defineEventHandler(async (event) => {
   const lessonId = parseInt(getRouterParam(event, 'lessonId') as string);
-  const { userId } = await readBody(event);
 
-  if (!userId || !lessonId) {
+  // Используем текущего пользователя вместо принятия userId из тела запроса
+  const user = getCurrentUser(event);
+  const userId = user.id;
+
+  if (!lessonId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'User ID and Lesson ID are required',
+      statusMessage: 'Lesson ID is required',
     });
   }
 

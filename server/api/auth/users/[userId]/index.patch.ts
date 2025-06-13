@@ -16,6 +16,17 @@ export default defineEventHandler(async (event) => {
     bodySchema.parse,
   );
 
+  // Проверяем, что пользователь может редактировать эти данные
+  const currentUser = getCurrentUser(event);
+
+  // Админ может редактировать любые данные, пользователь только свои
+  if (currentUser.role !== 'admin' && currentUser.id !== Number(id)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Access denied. You can only edit your own profile.',
+    });
+  }
+
   // Check if user exists
   const [existingUser] = await useDrizzle()
     .select()

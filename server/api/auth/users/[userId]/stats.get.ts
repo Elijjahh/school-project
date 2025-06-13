@@ -3,6 +3,18 @@ import * as tables from '~/drizzle/schema';
 
 export default defineEventHandler(async (event) => {
   const userId = Number(getRouterParam(event, 'userId'));
+
+  // Проверяем, что пользователь может просматривать эту статистику
+  const currentUser = getCurrentUser(event);
+
+  // Админ может просматривать статистику любого пользователя, обычный пользователь только свою
+  if (currentUser.role !== 'admin' && currentUser.id !== userId) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Access denied. You can only view your own statistics.',
+    });
+  }
+
   const db = useDrizzle();
 
   // Enrolled courses - получаем все участия пользователя

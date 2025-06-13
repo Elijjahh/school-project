@@ -16,6 +16,9 @@ const storage = createStorage({
 });
 
 export default defineEventHandler(async (event) => {
+  // Только авторизованные пользователи могут загружать файлы
+  getCurrentUser(event); // Проверяем авторизацию
+
   try {
     const form = await readMultipartFormData(event);
     if (!form) {

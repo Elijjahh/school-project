@@ -66,7 +66,7 @@ async function handleCourseSave(payload: {
           <CourseEditForm
             v-if="courseData && categoriesData"
             :course="courseData"
-            :categories="categoriesData as Category[]"
+            :categories="categoriesData.categories"
             :loading="loading"
             :categories-loading="categoriesLoading"
             :categories-error="errorMessage"

@@ -24,6 +24,32 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle();
 
+  // Проверяем, что пользователь может удалить этот курс
+  const user = getCurrentUser(event);
+
+  // Админ может удалить любой курс
+  if (user.role !== 'admin') {
+    // Проверяем, является ли пользователь создателем курса
+    const course = await db.query.courses.findFirst({
+      where: (courses, { eq }) => eq(courses.id, courseId),
+      columns: { creatorId: true },
+    });
+
+    if (!course) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Course not found',
+      });
+    }
+
+    if (course.creatorId !== user.id) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Access denied. You can only delete your own courses.',
+      });
+    }
+  }
+
   // Проверяем, есть ли участники
   const participations = await db
     .select()

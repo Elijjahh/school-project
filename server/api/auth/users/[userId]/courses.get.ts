@@ -3,6 +3,18 @@ import { coursesProgress, lessonsProgress, modules, lessons } from '~/drizzle/sc
 
 export default defineEventHandler(async (event) => {
   const userId = Number(getRouterParam(event, 'userId'));
+
+  // Проверяем, что пользователь может просматривать курсы этого пользователя
+  const currentUser = getCurrentUser(event);
+
+  // Админ может просматривать курсы любого пользователя, обычный пользователь только свои
+  if (currentUser.role !== 'admin' && currentUser.id !== userId) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Access denied. You can only view your own courses.',
+    });
+  }
+
   const db = useDrizzle();
 
   // Get all participations for the user

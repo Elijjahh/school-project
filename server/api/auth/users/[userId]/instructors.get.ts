@@ -8,6 +8,17 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Проверяем, что пользователь может просматривать преподавателей этого пользователя
+  const currentUser = getCurrentUser(event);
+
+  // Админ может просматривать преподавателей любого пользователя, обычный пользователь только своих
+  if (currentUser.role !== 'admin' && currentUser.id !== parseInt(userId)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Access denied. You can only view your own instructors.',
+    });
+  }
+
   const db = useDrizzle();
 
   // Получаем участие пользователя в курсах с информацией о создателях курсов

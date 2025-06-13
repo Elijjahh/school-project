@@ -10,8 +10,47 @@ export default defineEventHandler(async (event) => {
     }).parse,
   );
 
+  // Проверяем, что пользователь может удалить этот тест
+  const user = getCurrentUser(event);
+  const db = useDrizzle();
+
+  // Админ может удалить любой тест
+  if (user.role !== 'admin') {
+    // Получаем тест с информацией об уроке, модуле и курсе
+    const test = await db.query.tests.findFirst({
+      where: (tests, { eq }) => eq(tests.id, testId),
+      with: {
+        lesson: {
+          with: {
+            module: {
+              with: {
+                course: {
+                  columns: { creatorId: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!test) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Test not found',
+      });
+    }
+
+    if (test.lesson.module.course.creatorId !== user.id) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Access denied. You can only delete tests in your own courses.',
+      });
+    }
+  }
+
   // Используем транзакцию для каскадного удаления
-  const result = await useDrizzle().transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     // 1. Получаем все вопросы теста
     const testQuestions = await tx
       .select({ id: questions.id })

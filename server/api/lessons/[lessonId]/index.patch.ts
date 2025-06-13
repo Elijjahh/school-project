@@ -21,6 +21,40 @@ export default defineEventHandler(async (event) => {
     bodySchema.parse,
   );
 
+  // Проверяем, что пользователь может редактировать этот урок
+  const user = getCurrentUser(event);
+
+  // Админ может редактировать любой урок
+  if (user.role !== 'admin') {
+    // Получаем урок с информацией о модуле и курсе
+    const lesson = await useDrizzle().query.lessons.findFirst({
+      where: (lessons, { eq }) => eq(lessons.id, lessonId),
+      with: {
+        module: {
+          with: {
+            course: {
+              columns: { creatorId: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!lesson) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Lesson not found',
+      });
+    }
+
+    if (lesson.module.course.creatorId !== user.id) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Access denied. You can only edit lessons in your own courses.',
+      });
+    }
+  }
+
   // Handle videoUrl explicitly - if undefined or null, set to null
   const processedVideoUrl = videoUrl === undefined ? null : videoUrl;
 
