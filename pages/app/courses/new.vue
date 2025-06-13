@@ -187,14 +187,7 @@ async function handleSubmit() {
                       alt="Course image"
                       class="h-full w-full rounded object-cover"
                     />
-                    <div
-                      v-else
-                      class="bg-muted flex h-full w-full items-center justify-center rounded"
-                    >
-                      <span class="text-muted-foreground text-2xl font-medium">
-                        <span>📷</span>
-                      </span>
-                    </div>
+                    <ImagePlaceholder v-else class="h-full w-full rounded" />
                   </div>
                   <div class="space-y-2">
                     <UIButton

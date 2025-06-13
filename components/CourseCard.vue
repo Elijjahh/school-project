@@ -23,13 +23,15 @@ const toggleWishlist = async () => {
 </script>
 
 <template>
-  <UICard class="group relative overflow-hidden rounded-lg border">
+  <UICard class="group relative overflow-hidden rounded-lg border" no-padding>
     <div class="relative flex aspect-video flex-col">
       <img
-        :src="course.image || ''"
+        v-if="course.image"
+        :src="course.image"
         class="h-full w-full object-cover transition-all group-hover:scale-105"
         :alt="course.title"
       />
+      <ImagePlaceholder v-else class="h-full w-full" />
       <div class="from-background/80 flex-1 bg-gradient-to-t to-transparent" />
     </div>
     <div class="space-y-3 p-4">

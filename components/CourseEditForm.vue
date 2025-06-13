@@ -108,6 +108,7 @@ async function handleSave() {
               alt="Course image"
               class="h-24 w-24 rounded object-cover"
             />
+            <ImagePlaceholder v-else class="h-24 w-24 rounded" />
           </div>
           <UIButton type="button" @click="editing = true">Редактировать</UIButton>
         </div>

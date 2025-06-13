@@ -55,9 +55,14 @@ const formatDate = (dateString: string) => {
           <!-- Аватар -->
           <div class="flex-shrink-0">
             <img
+              v-if="instructor.image"
               :src="instructor.image"
               :alt="instructor.name"
               class="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg"
+            />
+            <ImagePlaceholder
+              v-else
+              class="h-32 w-32 rounded-full border-4 border-white shadow-lg"
             />
           </div>
 
@@ -98,13 +103,16 @@ const formatDate = (dateString: string) => {
             v-for="course in instructor.courses"
             :key="course.id"
             class="overflow-hidden transition-shadow hover:shadow-lg"
+            no-padding
           >
             <div class="relative">
               <img
-                :src="course.image || '/default-course-image.jpg'"
+                v-if="course.image"
+                :src="course.image"
                 :alt="course.title"
                 class="h-48 w-full object-cover"
               />
+              <ImagePlaceholder v-else class="h-48 w-full" />
               <div v-if="course.category" class="absolute top-3 left-3">
                 <UIBadge variant="secondary" class="bg-white/90 text-gray-900">
                   {{ course.category }}

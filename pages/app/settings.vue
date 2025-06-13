@@ -285,14 +285,7 @@ async function handleLogout() {
                 alt="Profile"
                 class="h-full w-full rounded-full object-cover"
               />
-              <div
-                v-else
-                class="bg-muted flex h-full w-full items-center justify-center rounded-full"
-              >
-                <span class="text-muted-foreground text-2xl font-medium">
-                  {{ user?.firstname?.[0] }}{{ user?.lastname?.[0] }}
-                </span>
-              </div>
+              <ImagePlaceholder v-else class="h-full w-full rounded-full" />
             </div>
             <div class="space-y-2">
               <UIButton

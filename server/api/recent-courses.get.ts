@@ -25,7 +25,7 @@ export default defineEventHandler(async (_event) => {
     id: course.id,
     title: course.title,
     description: course.description,
-    image: course.image || '/placeholder-course.jpg',
+    image: course.image,
     creatorId: course.creatorId,
     categoryName: course.category?.name || 'Без категории',
     creatorName: course.creator

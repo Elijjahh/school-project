@@ -64,32 +64,32 @@ export default defineEventHandler(async (_event) => {
       {
         name: 'Программирование',
         description: 'Курсы по различным языкам программирования и технологиям разработки',
-        image: 'https://example.com/images/programming.jpg',
+        image: null,
       },
       {
         name: 'Веб-разработка',
         description: 'Создание современных веб-приложений и сайтов',
-        image: 'https://example.com/images/web-dev.jpg',
+        image: null,
       },
       {
         name: 'Мобильная разработка',
         description: 'Разработка приложений для iOS и Android',
-        image: 'https://example.com/images/mobile-dev.jpg',
+        image: null,
       },
       {
         name: 'Базы данных',
         description: 'Работа с различными базами данных и системами хранения',
-        image: 'https://example.com/images/databases.jpg',
+        image: null,
       },
       {
         name: 'Искусственный интеллект',
         description: 'Машинное обучение, нейронные сети и анализ данных',
-        image: 'https://example.com/images/ai.jpg',
+        image: null,
       },
       {
         name: 'DevOps',
         description: 'Развертывание, автоматизация и управление инфраструктурой',
-        image: 'https://example.com/images/devops.jpg',
+        image: null,
       },
     ];
 

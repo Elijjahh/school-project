@@ -127,8 +127,19 @@ const topInstructors = computed(() => topInstructorsData.value?.instructors || [
           </UIButton>
         </div>
         <div class="grid gap-6 md:grid-cols-3">
-          <UICard v-for="course in popularCourses" :key="course.id" class="overflow-hidden">
-            <img :src="course.image" :alt="course.title" class="h-48 w-full object-cover" />
+          <UICard
+            v-for="course in popularCourses"
+            :key="course.id"
+            class="overflow-hidden"
+            no-padding
+          >
+            <img
+              v-if="course.image"
+              :src="course.image"
+              :alt="course.title"
+              class="h-48 w-full object-cover"
+            />
+            <ImagePlaceholder v-else class="h-48 w-full" />
             <div class="p-6">
               <h3 class="mb-2 text-xl font-semibold">{{ course.title }}</h3>
               <p class="text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
@@ -159,8 +170,19 @@ const topInstructors = computed(() => topInstructorsData.value?.instructors || [
           </UIButton>
         </div>
         <div class="grid gap-6 md:grid-cols-3">
-          <UICard v-for="course in recentCourses" :key="course.id" class="overflow-hidden">
-            <img :src="course.image" :alt="course.title" class="h-48 w-full object-cover" />
+          <UICard
+            v-for="course in recentCourses"
+            :key="course.id"
+            class="overflow-hidden"
+            no-padding
+          >
+            <img
+              v-if="course.image"
+              :src="course.image"
+              :alt="course.title"
+              class="h-48 w-full object-cover"
+            />
+            <ImagePlaceholder v-else class="h-48 w-full" />
             <div class="p-6">
               <h3 class="mb-2 text-xl font-semibold">{{ course.title }}</h3>
               <p class="text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
@@ -235,10 +257,12 @@ const topInstructors = computed(() => topInstructorsData.value?.instructors || [
           <UICard v-for="instructor in topInstructors" :key="instructor.id" class="p-6">
             <div class="space-y-4 text-center">
               <img
-                :src="instructor.image || '/default-avatar.png'"
+                v-if="instructor.image"
+                :src="instructor.image"
                 :alt="instructor.name"
                 class="mx-auto h-24 w-24 rounded-full object-cover"
               />
+              <ImagePlaceholder v-else class="mx-auto h-24 w-24 rounded-full" />
               <h3 class="text-xl font-semibold">{{ instructor.name }}</h3>
               <p class="text-muted-foreground">{{ instructor.expertise }}</p>
               <div class="flex items-center justify-center space-x-2">
