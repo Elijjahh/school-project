@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Category } from '~/drizzle/types';
-
 definePageMeta({
   layout: 'profile',
 });
@@ -8,7 +6,16 @@ definePageMeta({
 const route = useRoute();
 const courseId = Number(route.params.courseId);
 
-const { data: categoriesData, pending: categoriesLoading } = useFetch('/api/categories');
+const { data: categoriesData, pending: categoriesLoading } = useFetch<{
+  categories: {
+    id: number;
+    name: string;
+    description: string | null;
+    image: string | null;
+    createdAt: string | null;
+  }[];
+  total: number;
+}>('/api/categories');
 const { data: courseData, pending: loading } = useFetch(`/api/courses/${courseId}`);
 
 const errorMessage = ref('');
@@ -66,7 +73,7 @@ async function handleCourseSave(payload: {
           <CourseEditForm
             v-if="courseData && categoriesData"
             :course="courseData"
-            :categories="categoriesData.categories"
+            :categories="categoriesData?.categories || []"
             :loading="loading"
             :categories-loading="categoriesLoading"
             :categories-error="errorMessage"

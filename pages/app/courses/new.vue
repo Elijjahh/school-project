@@ -45,10 +45,12 @@ const error = ref('');
 const success = ref('');
 
 // --- Categories (dynamic, fetched from API) ---
-const { data: categoriesData } = await useFetch<Category[]>('/api/categories');
+const { data: categoriesData } = await useFetch<{ categories: Category[]; total: number }>(
+  '/api/categories',
+);
 
 const categories = computed(() => {
-  const fetched = (categoriesData.value || []) as Category[];
+  const fetched = categoriesData.value?.categories || [];
   return fetched.map((cat) => ({ id: String(cat.id), label: cat.name }));
 });
 

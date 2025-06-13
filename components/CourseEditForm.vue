@@ -4,9 +4,12 @@ import { toTypedSchema } from '@vee-validate/zod';
 import * as zod from 'zod';
 import type { Course, Category, CourseUpdatePayload } from '~/drizzle/types';
 
+// Тип для сериализованной категории (Date -> string)
+type SerializedCategory = Omit<Category, 'createdAt'> & { createdAt: string | null };
+
 const props = defineProps<{
   course: Course;
-  categories: Category[];
+  categories: SerializedCategory[];
   loading: boolean;
   categoriesLoading: boolean;
   categoriesError: string;
