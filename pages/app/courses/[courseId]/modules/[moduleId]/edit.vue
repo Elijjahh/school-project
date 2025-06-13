@@ -50,6 +50,47 @@ async function handleModuleSave(payload: { title: string; description: string; o
     error.value = 'Ошибка при сохранении модуля';
   }
 }
+
+const { confirm, alert } = useModal();
+
+async function handleModuleDelete() {
+  const confirmed = await confirm({
+    title: 'Удаление модуля',
+    message: 'Вы уверены, что хотите удалить этот модуль?',
+    confirmText: 'Удалить',
+    cancelText: 'Отмена',
+  });
+
+  if (!confirmed) return;
+
+  try {
+    await $fetch(`/api/modules/${moduleId}`, {
+      method: 'DELETE',
+    });
+    await navigateTo(`/app/courses/${courseId}/edit`);
+  } catch (deleteError) {
+    console.error('Error deleting module:', deleteError);
+
+    if (
+      deleteError &&
+      typeof deleteError === 'object' &&
+      'statusCode' in deleteError &&
+      (deleteError as { statusCode: number }).statusCode === 409
+    ) {
+      await alert({
+        title: 'Невозможно удалить модуль',
+        message: 'У модуля есть связанные данные, которые необходимо удалить сначала',
+        type: 'error',
+      });
+    } else {
+      await alert({
+        title: 'Ошибка удаления',
+        message: 'Не удалось удалить модуль. Попробуйте позже.',
+        type: 'error',
+      });
+    }
+  }
+}
 </script>
 
 <template>
@@ -90,6 +131,7 @@ async function handleModuleSave(payload: { title: string; description: string; o
             :idx="0"
             :loading="loading"
             @save="handleModuleSave"
+            @remove="handleModuleDelete"
           />
         </UICard>
 

@@ -1,4 +1,5 @@
-import { lessons } from '~/drizzle/schema';
+import { lessons, tests, lessonsProgress } from '~/drizzle/schema';
+import { eq, count } from 'drizzle-orm';
 
 export default defineEventHandler(async (event) => {
   const { lessonId } = await getValidatedRouterParams(
@@ -42,6 +43,37 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const result = await useDrizzle().delete(lessons).where(eq(lessons.id, lessonId)).returning();
-  return result[0];
+  // Проверяем связанные записи
+  const [testsCount, progressCount] = await Promise.all([
+    useDrizzle().select({ count: count() }).from(tests).where(eq(tests.lessonId, lessonId)),
+    useDrizzle()
+      .select({ count: count() })
+      .from(lessonsProgress)
+      .where(eq(lessonsProgress.lessonId, lessonId)),
+  ]);
+
+  const totalTests = testsCount[0].count;
+  const totalProgress = progressCount[0].count;
+
+  if (totalTests > 0 || totalProgress > 0) {
+    const reasons = [];
+    if (totalTests > 0) reasons.push(`содержит ${totalTests} тест(ов)`);
+    if (totalProgress > 0) reasons.push(`имеет прогресс у ${totalProgress} студент(ов)`);
+
+    throw createError({
+      statusCode: 409,
+      statusMessage: `Невозможно удалить урок: ${reasons.join(', ')}`,
+    });
+  }
+
+  try {
+    const result = await useDrizzle().delete(lessons).where(eq(lessons.id, lessonId)).returning();
+    return result[0];
+  } catch {
+    // Если происходит ошибка foreign key constraint
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'Невозможно удалить урок: есть связанные данные',
+    });
+  }
 });

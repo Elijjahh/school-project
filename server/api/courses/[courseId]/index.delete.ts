@@ -1,4 +1,4 @@
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, count } from 'drizzle-orm';
 import {
   courses,
   modules,
@@ -50,13 +50,39 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Проверяем, есть ли участники
-  const participations = await db
-    .select()
-    .from(coursesParticipations)
-    .where(eq(coursesParticipations.courseId, courseId));
-  if (participations.length > 0) {
-    throw createError({ statusCode: 400, message: 'Нельзя удалить курс с участниками' });
+  // Проверяем связанные записи
+  const [participationsCount, modulesCount, progressCount] = await Promise.all([
+    db
+      .select({ count: count() })
+      .from(coursesParticipations)
+      .where(eq(coursesParticipations.courseId, courseId)),
+    db.select({ count: count() }).from(modules).where(eq(modules.courseId, courseId)),
+    db
+      .select({ count: count() })
+      .from(coursesProgress)
+      .where(eq(coursesProgress.courseId, courseId)),
+  ]);
+
+  const totalParticipations = participationsCount[0].count;
+  const totalModules = modulesCount[0].count;
+  const totalProgress = progressCount[0].count;
+
+  if (totalParticipations > 0 || totalModules > 0 || totalProgress > 0) {
+    const reasons = [];
+    if (totalParticipations > 0) {
+      reasons.push('имеет ' + totalParticipations + ' участник(ов)');
+    }
+    if (totalModules > 0) {
+      reasons.push('содержит ' + totalModules + ' модул(ей)');
+    }
+    if (totalProgress > 0) {
+      reasons.push('имеет прогресс у ' + totalProgress + ' студент(ов)');
+    }
+
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'Невозможно удалить курс: ' + reasons.join(', '),
+    });
   }
 
   // Каскадное удаление в транзакции

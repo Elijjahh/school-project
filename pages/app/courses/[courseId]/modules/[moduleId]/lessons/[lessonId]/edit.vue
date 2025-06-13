@@ -67,7 +67,7 @@ async function handleLessonSave(payload: {
   }
 }
 
-const { confirm } = useModal();
+const { confirm, alert } = useModal();
 
 async function handleDeleteTest(testId: number) {
   const confirmed = await confirm({
@@ -87,11 +87,61 @@ async function handleDeleteTest(testId: number) {
       method: 'DELETE',
     });
     await refresh(); // Обновляем данные урока
-  } catch (err) {
-    console.error('Error deleting test:', err);
-    error.value = 'Ошибка при удалении теста';
+  } catch (testError) {
+    console.error('Error deleting test:', testError);
+
+    if (
+      testError &&
+      typeof testError === 'object' &&
+      'statusCode' in testError &&
+      (testError as { statusCode: number }).statusCode === 409
+    ) {
+      const errorMessage =
+        'statusMessage' in testError
+          ? (testError as { statusMessage: string }).statusMessage
+          : null;
+      await alert({
+        title: 'Невозможно удалить тест',
+        message:
+          errorMessage || 'У теста есть связанные данные, которые необходимо удалить сначала',
+        type: 'error',
+      });
+    } else {
+      await alert({
+        title: 'Ошибка удаления',
+        message: 'Не удалось удалить тест. Попробуйте позже.',
+        type: 'error',
+      });
+    }
   } finally {
     deletingTestId.value = null;
+  }
+}
+
+async function handleLessonDelete() {
+  const confirmed = await confirm({
+    title: 'Удаление урока',
+    message: 'Вы уверены, что хотите удалить этот урок?',
+    confirmText: 'Удалить',
+    cancelText: 'Отмена',
+  });
+
+  if (!confirmed) return;
+
+  try {
+    await $fetch(`/api/lessons/${lessonId}`, {
+      method: 'DELETE',
+    });
+    await navigateTo(`/app/courses/${courseId}/modules/${moduleId}/edit`);
+  } catch (deleteError) {
+    console.error('Error deleting lesson:', deleteError);
+
+    // Простой тест модального окна
+    await alert({
+      title: 'Тестовое сообщение',
+      message: 'Урок нельзя удалить, так как у него есть тесты или прогресс студентов.',
+      type: 'error',
+    });
   }
 }
 </script>
@@ -141,6 +191,7 @@ async function handleDeleteTest(testId: number) {
             :idx="0"
             :loading="loading"
             @save="handleLessonSave"
+            @remove="handleLessonDelete"
           />
         </UICard>
 

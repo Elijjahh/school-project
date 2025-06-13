@@ -29,6 +29,10 @@ import {
   Play,
   FileText,
   GraduationCap,
+  XCircle,
+  CheckCircle,
+  AlertTriangle,
+  Info,
 } from 'lucide-vue-next';
 
 interface Props {
@@ -75,6 +79,10 @@ const iconComponents = {
   'lucide:play': Play,
   'lucide:file-text': FileText,
   'lucide:graduation-cap': GraduationCap,
+  'lucide:x-circle': XCircle,
+  'lucide:check-circle': CheckCircle,
+  'lucide:alert-triangle': AlertTriangle,
+  'lucide:info': Info,
 };
 
 const IconComponent = computed(() => {

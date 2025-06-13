@@ -144,7 +144,7 @@ function toggleWishlist() {
 
 const isRemoving = ref(false);
 
-const { confirm } = useModal();
+const { confirm, alert } = useModal();
 
 async function removeCourse() {
   const confirmed = await confirm({
@@ -160,8 +160,27 @@ async function removeCourse() {
   try {
     await $fetch(`/api/courses/${courseId.value}`, { method: 'DELETE' });
     router.push('/app/my-courses');
-  } catch (err) {
-    console.error('Error removing course:', err);
+  } catch (error) {
+    console.error('Error removing course:', error);
+
+    if (
+      error &&
+      typeof error === 'object' &&
+      'statusCode' in error &&
+      (error as { statusCode: number }).statusCode === 409
+    ) {
+      await alert({
+        title: 'Невозможно удалить курс',
+        message: 'У курса есть связанные данные, которые необходимо удалить сначала',
+        type: 'error',
+      });
+    } else {
+      await alert({
+        title: 'Ошибка удаления',
+        message: 'Не удалось удалить курс. Попробуйте позже.',
+        type: 'error',
+      });
+    }
   } finally {
     isRemoving.value = false;
   }

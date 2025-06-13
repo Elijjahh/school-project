@@ -36,7 +36,7 @@ async function handleTestSave(payload: {
 
 const deleting = ref(false);
 
-const { confirm } = useModal();
+const { confirm, alert } = useModal();
 
 async function handleDeleteTest() {
   const confirmed = await confirm({
@@ -58,9 +58,30 @@ async function handleDeleteTest() {
       method: 'DELETE',
     });
     await navigateTo(`/app/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}/edit`);
-  } catch (err) {
-    console.error('Error deleting test:', err);
-    error.value = 'Ошибка при удалении теста';
+  } catch (deleteError) {
+    console.error('Error deleting test:', deleteError);
+
+    if (
+      deleteError &&
+      typeof deleteError === 'object' &&
+      'statusCode' in deleteError &&
+      (deleteError as { statusCode: number }).statusCode === 409
+    ) {
+      const errorMessage =
+        'statusMessage' in deleteError ? (deleteError as any).statusMessage : null;
+      await alert({
+        title: 'Невозможно удалить тест',
+        message:
+          errorMessage || 'У теста есть связанные данные, которые необходимо удалить сначала',
+        type: 'error',
+      });
+    } else {
+      await alert({
+        title: 'Ошибка удаления',
+        message: 'Не удалось удалить тест. Попробуйте позже.',
+        type: 'error',
+      });
+    }
   } finally {
     deleting.value = false;
   }
