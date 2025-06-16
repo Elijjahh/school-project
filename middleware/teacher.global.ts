@@ -13,7 +13,7 @@ export default defineNuxtRouteMiddleware((to) => {
 
   // Проверяем страницы, которые требуют роль преподавателя или админа
   const teacherRoutes = ['/app/apply-teacher'];
-  const teacherOnlyRoutes = ['/app/my-courses', '/app/settings'];
+  const teacherOnlyRoutes = ['/app/settings'];
 
   if (teacherRoutes.includes(to.path)) {
     if (!user.value) {
@@ -26,16 +26,6 @@ export default defineNuxtRouteMiddleware((to) => {
   if (teacherOnlyRoutes.includes(to.path)) {
     if (!user.value) {
       return navigateTo('/login');
-    }
-
-    // Для личных курсов - проверяем только у преподавателей и админов
-    if (to.path === '/app/my-courses') {
-      if (user.value.role !== 'teacher' && user.value.role !== 'admin') {
-        throw createError({
-          statusCode: 403,
-          statusMessage: 'Access denied. Teacher or admin role required.',
-        });
-      }
     }
   }
 });
